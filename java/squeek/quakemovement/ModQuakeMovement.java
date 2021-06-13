@@ -24,13 +24,13 @@ public class ModQuakeMovement implements ModInitializer {
 		//Cause this class to be loaded so the config loads on startup
 	}
 
-	public static void drawSpeedometer(MatrixStack matrixStack)
+	public static void drawSpeedometer(MatrixStack matrices)
 	{
 		MinecraftClient mc = MinecraftClient.getInstance();
 		PlayerEntity player = mc.player;
 		double deltaX = player.getX() - player.prevX;
 		double deltaZ = player.getZ() - player.prevZ;
-		double speed = MathHelper.sqrt(deltaX * deltaX + deltaZ * deltaZ);
+		double speed = MathHelper.sqrt((float) (deltaX * deltaX + deltaZ * deltaZ));
 		String speedString = String.format("%.02f", speed);
 		int x;
 		int y;
@@ -44,8 +44,8 @@ public class ModQuakeMovement implements ModInitializer {
 		} else {
 			y = mc.getWindow().getScaledHeight() - mc.textRenderer.fontHeight - 10;
 		}
-		GlStateManager.pushMatrix();
-		mc.textRenderer.drawWithShadow(matrixStack, speedString, x, y, 0xFFDDDDDD);
-		GlStateManager.popMatrix();
+		matrices.push();
+		mc.textRenderer.drawWithShadow(matrices, speedString, x, y, 0xFFDDDDDD);
+		matrices.pop();
 	}
 }
