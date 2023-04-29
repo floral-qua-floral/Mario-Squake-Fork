@@ -257,15 +257,16 @@ public class QuakeClientPlayer
 
 	private static void minecraft_ApplyGravity(PlayerEntity player)
 	{
-		BlockPos pos = new BlockPos((int) player.getX(), (int) player.getY(), (int) player.getZ());
 		double velocityY = player.getVelocity().y;
-		if (player.hasStatusEffect(StatusEffects.LEVITATION)) {
-			velocityY += (0.05D * (double)(player.getStatusEffect(StatusEffects.LEVITATION).getAmplifier() + 1) - /*vec3d6.y*/ velocityY) * 0.2D;
+
+		// TODO: SLOW_FALLING
+
+		if (player.hasStatusEffect(StatusEffects.LEVITATION))
+		{
+			velocityY += (0.05D * (double) (player.getStatusEffect(StatusEffects.LEVITATION).getAmplifier() + 1) - velocityY) * 0.2D;
 			player.fallDistance = 0.0F;
-		} else if (player.hasStatusEffect(StatusEffects.SLOW_FALLING) && velocityY < 0) {
-			velocityY = -0.01D;
-            player.fallDistance = 0.0F;
-		} else if (player.world.isClient && !player.world.isChunkLoaded(pos))
+		}
+		else if (player.world.isClient && !player.world.isChunkLoaded(player.getBlockPos()))
 		{
 			if (player.getY() > 0.0D)
 			{
@@ -276,7 +277,7 @@ public class QuakeClientPlayer
 				velocityY = 0.0D;
 			}
 		}
-		else
+		else if (!player.hasNoGravity())
 		{
 			// gravity
 			velocityY -= 0.08D;
@@ -294,35 +295,13 @@ public class QuakeClientPlayer
 
 	private static void minecraft_SwingLimbsBasedOnMovement(PlayerEntity player)
 	{
-		player.lastLimbDistance = player.limbDistance;
-		double d0 = player.getX() - player.prevX;
-		double d1 = player.getZ() - player.prevZ;
-		float f6 = MathHelper.sqrt((float) (d0 * d0 + d1 * d1)) * 4.0F;
-
-		if (f6 > 1.0F)
-		{
-			f6 = 1.0F;
-		}
-
-		player.limbDistance += (f6 - player.limbDistance) * 0.4F;
-		player.limbAngle += player.limbDistance;
+		// this got extracted out in the Minecraft code, so just use that
+		player.updateLimbs(false);
 	}
 
 	private static void minecraft_WaterMove(PlayerEntity player, Vec3d movementInput)
 	{
-		double d0 = player.getY();
-		player.updateVelocity(0.04F, movementInput);
-		player.move(MovementType.SELF, player.getVelocity());
-		Vec3d velocity = player.getVelocity().multiply(0.800000011920929D);
-		if (!player.isSwimming()) {
-			velocity = velocity.add(0, -0.01, 0);
-		}
-		player.setVelocity(velocity);
 
-		if (player.horizontalCollision && player.doesNotCollide(velocity.x, velocity.y + 0.6000000238418579D - player.getY() + d0, velocity.z))
-		{
-			player.setVelocity(velocity.x, 0.30000001192092896D, velocity.z);
-		}
 	}
 
 	/* =================================================
@@ -494,7 +473,7 @@ public class QuakeClientPlayer
 		// get all relevant movement values
 		float wishspeed = (sidemove != 0.0F || forwardmove != 0.0F) ? quake_getMaxMoveSpeed(player) : 0.0F;
 		double[] wishdir = getMovementDirection(player, sidemove, forwardmove);
-		boolean isOffsetInLiquid = player.world.getBlockState(new BlockPos(player.getX(), player.getY() + 1.0D, player.getZ())).getFluidState().isEmpty();
+		boolean isOffsetInLiquid = player.world.getBlockState(player.getBlockPos()).getFluidState().isEmpty();
 		boolean isSharking = isJumping(player) && isOffsetInLiquid;
 		double curspeed = getSpeed(player);
 

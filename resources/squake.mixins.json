@@ -6,8 +6,7 @@
     "PlayerEntityMixin"
   ],
   "client": [
-    "KeyPressMixin",
-    "TestSpeedometerMixin"
+    "KeyPressMixin"
   ],
   "injectors": {
     "defaultRequire": 1
