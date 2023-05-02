@@ -261,8 +261,6 @@ public class QuakeClientPlayer
 	{
 		double velocityY = player.getVelocity().y;
 
-		// TODO: SLOW_FALLING
-
 		if (player.hasStatusEffect(StatusEffects.LEVITATION))
 		{
 			velocityY += (0.05D * (double) (player.getStatusEffect(StatusEffects.LEVITATION).getAmplifier() + 1) - velocityY) * 0.2D;
@@ -279,10 +277,12 @@ public class QuakeClientPlayer
 				velocityY = 0.0D;
 			}
 		}
-		else if (!player.hasNoGravity())
-		{
-			// gravity
-			velocityY -= 0.08D;
+		else if (!player.hasNoGravity()) {
+			if (player.hasStatusEffect(StatusEffects.SLOW_FALLING)) {
+				velocityY -= 0.01D;
+			} else {
+				velocityY -= 0.08D;
+			}
 		}
 
 		// air resistance
