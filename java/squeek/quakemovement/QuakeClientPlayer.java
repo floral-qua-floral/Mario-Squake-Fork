@@ -3,6 +3,7 @@ package squeek.quakemovement;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockRenderType;
 import net.minecraft.block.BlockState;
+import net.minecraft.enchantment.EnchantmentHelper;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.MovementType;
 import net.minecraft.entity.effect.StatusEffects;
@@ -22,6 +23,7 @@ import java.util.List;
 import java.util.Random;
 
 import org.apache.commons.lang3.mutable.MutableBoolean;
+import squeek.quakemovement.mixin.ILivingEntityMixin;
 
 public class QuakeClientPlayer
 {
@@ -301,7 +303,46 @@ public class QuakeClientPlayer
 
 	private static void minecraft_WaterMove(PlayerEntity player, Vec3d movementInput)
 	{
+		double d = 0.08;
+		boolean bl = player.getVelocity().y <= 0.0;
+		if (bl && player.hasStatusEffect(StatusEffects.SLOW_FALLING)) {
+			d = 0.01;
+			player.onLanding();
+		}
+		double e = player.getY();
+		double f = player.isSprinting() ? 0.9F : ((ILivingEntityMixin) player).invokeGetBaseMovementSpeedMultiplier();
+		float g = 0.02F;
+		float h = (float) EnchantmentHelper.getDepthStrider(player);
+		if (h > 3.0F) {
+			h = 3.0F;
+		}
 
+		if (!player.isOnGround()) {
+			h *= 0.5F;
+		}
+
+		if (h > 0.0F) {
+			f += (0.54600006F - f) * h / 3.0F;
+			g += (player.getMovementSpeed() - g) * h / 3.0F;
+		}
+
+		if (player.hasStatusEffect(StatusEffects.DOLPHINS_GRACE)) {
+			f = 0.96F;
+		}
+
+		player.updateVelocity(g, movementInput);
+		player.move(MovementType.SELF, player.getVelocity());
+		Vec3d vec3d = player.getVelocity();
+		if (player.horizontalCollision && player.isClimbing()) {
+			vec3d = new Vec3d(vec3d.x, 0.2, vec3d.z);
+		}
+
+		player.setVelocity(vec3d.multiply((double)f, 0.800000011920929, (double)f));
+		Vec3d vec3d2 = player.applyFluidMovingSpeed(d, bl, player.getVelocity());
+		player.setVelocity(vec3d2);
+		if (player.horizontalCollision && player.doesNotCollide(vec3d2.x, vec3d2.y + 0.6000000238418579 - player.getY() + e, vec3d2.z)) {
+			player.setVelocity(vec3d2.x, 0.30000001192092896, vec3d2.z);
+		}
 	}
 
 	/* =================================================
