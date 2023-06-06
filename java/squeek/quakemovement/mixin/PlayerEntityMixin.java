@@ -46,7 +46,7 @@ public abstract class PlayerEntityMixin extends LivingEntity implements IsJumpin
 
 	@Override
 	public void updateVelocity(float speed, Vec3d movementInput) {
-		if (!ModQuakeMovement.CONFIG.isEnabled() || !world.isClient) {
+		if (!ModQuakeMovement.CONFIG.isEnabled() || !this.getWorld().isClient) {
 			super.updateVelocity(speed, movementInput);
 			return;
 		}
@@ -73,6 +73,6 @@ public abstract class PlayerEntityMixin extends LivingEntity implements IsJumpin
 	
 	@Inject(at = @At("RETURN"), method = "handleFallDamage")
 	private void postHandleFallDamage(float fallDistance, float damageMultiplier, DamageSource damageSource, CallbackInfoReturnable<Boolean> cir) {
-		if (!world.isClient) velocityModified = velocityHack;
+		if (!this.getWorld().isClient) velocityModified = velocityHack;
 	}
 }
