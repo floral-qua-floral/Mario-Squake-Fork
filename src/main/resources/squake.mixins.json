@@ -3,13 +3,12 @@
   "package": "squeek.quakemovement.mixin",
   "compatibilityLevel": "JAVA_8",
   "mixins": [
-    "ILivingEntityMixin",
     "PlayerEntityMixin"
-  ],
-  "client": [
-    "KeyPressMixin"
   ],
   "injectors": {
     "defaultRequire": 1
-  }
+  },
+  "client": [
+    "InGameHudMixin"
+  ]
 }
