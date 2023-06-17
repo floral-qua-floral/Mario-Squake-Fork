@@ -298,7 +298,6 @@ public class QuakeClientPlayer {
             return false;
         } else if (player.isTouchingWater() && !player.getAbilities().flying) {
             if (ModQuakeMovement.CONFIG.isSharkingEnabled()) {
-                System.out.println("Starting water move");
                 return quake_WaterMove(player, (float) movementInput.x, (float) movementInput.y, (float) movementInput.z);
             } else {
                 return false;
@@ -420,10 +419,8 @@ public class QuakeClientPlayer {
             }
 
             if (curspeed > 0.098) {
-                System.out.println("Applying air acceleration");
                 quake_AirAccelerate(player, wishspeed, wishdir[0], wishdir[1], ModQuakeMovement.CONFIG.getGroundAccelerate());
             } else {
-                System.out.println("Applying normal acceleration");
                 quake_Accelerate(player, .0980F, wishdir[0], wishdir[1], ModQuakeMovement.CONFIG.getGroundAccelerate());
             }
             player.move(MovementType.SELF, player.getVelocity());
