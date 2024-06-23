@@ -42,9 +42,6 @@ public class QuakeClientPlayer {
         if ((player.getAbilities().flying || player.isFallFlying()) && !player.hasVehicle()) return false;
         else didQuakeMovement = quake_travel(player, movementInput);
 
-        if (didQuakeMovement)
-            player.increaseTravelMotionStats(player.getX() - d0, player.getY() - d1, player.getZ() - d2);
-
         return didQuakeMovement;
     }
 
@@ -179,7 +176,7 @@ public class QuakeClientPlayer {
     private static void spawnBunnyhopParticles(PlayerEntity player, int numParticles) {
         // taken from sprint
         int j = MathHelper.floor(player.getX());
-        int i = MathHelper.floor(player.getY() - 0.20000000298023224D - player.getHeightOffset());
+        int i = MathHelper.floor(player.getY() - 0.20000000298023224D - (-0.35)); //player.getHeightOffset());
         int k = MathHelper.floor(player.getZ());
         BlockState blockState = player.getWorld().getBlockState(new BlockPos(j, i, k));
 
