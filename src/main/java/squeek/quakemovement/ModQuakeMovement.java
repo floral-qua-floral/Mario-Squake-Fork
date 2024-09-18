@@ -15,9 +15,12 @@ import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
 import net.minecraft.util.math.Vec3d;
 import org.lwjgl.glfw.GLFW;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class ModQuakeMovement implements ClientModInitializer {
     public static final String MODID = "squake";
+    public static final Logger LOGGER = LoggerFactory.getLogger(MODID);
     public static final ModConfig CONFIG;
     public static final String CATEGORY = "fabric.mods." + MODID;
     private static final KeyBinding toggleEnabled = new KeyBinding(CATEGORY + "." + "enable", InputUtil.Type.KEYSYM, GLFW.GLFW_KEY_UNKNOWN, CATEGORY);
