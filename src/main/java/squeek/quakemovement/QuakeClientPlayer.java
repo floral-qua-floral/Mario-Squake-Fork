@@ -3,6 +3,7 @@ package squeek.quakemovement;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockRenderType;
 import net.minecraft.block.BlockState;
+import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.MovementType;
 import net.minecraft.entity.effect.StatusEffects;
@@ -47,23 +48,11 @@ public class QuakeClientPlayer {
 		if (player.isClimbing()) return false;
 
 //        return quake_travel(player, movementInput);
-		return MarioClientTravel.mario_travel(player, movementInput);
-
-//		// Calculate forward and sideways vector components
-//		double yawRad = Math.toRadians(player.getYaw());
-//		double forwardX = -Math.sin(yawRad);
-//		double forwardZ = Math.cos(yawRad);
-//		double rightwardX = forwardZ;
-//		double rightwardZ = -forwardX;
-//
-//		// Calculate current forwards and sideways velocity
-//		Vec3d currentVel = player.getVelocity();
-//		double forwardVel = currentVel.x * forwardX + currentVel.z * forwardZ;
-//		double rightwardVel = currentVel.x * rightwardX + currentVel.z * rightwardZ;
-//
-//		player.sendMessage(Text.of(String.format("forwardVel: %f, rightwardVel: %f", forwardVel, rightwardVel)));
-//
-//		return(false);
+		if (player instanceof ClientPlayerEntity clientPlayer) {
+			return MarioClientTravel.mario_travel(clientPlayer, movementInput);
+		}
+		return false;
+//		return false;
 	}
 
 	public static void beforeOnLivingUpdate(PlayerEntity player) {
