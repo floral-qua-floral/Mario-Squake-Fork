@@ -28,7 +28,7 @@ public abstract class PlayerEntityMixin extends LivingEntity implements IsJumpin
 		if (!ModQuakeMovement.CONFIG.isEnabled())
 			return;
 
-		if (QuakeClientPlayer.travel((PlayerEntity) (Object) this, movementInput))
+		if (MarioClient.attempt_travel((PlayerEntity) (Object) this, movementInput))
 			info.cancel();
 	}
 

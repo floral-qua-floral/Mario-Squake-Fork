@@ -2,6 +2,7 @@ package squeek.quakemovement;
 
 import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.entity.MovementType;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.util.math.Vec3d;
 import org.slf4j.Logger;
 import squeek.quakemovement.mariostates.MarioGrounded;
@@ -9,12 +10,6 @@ import squeek.quakemovement.mariostates.MarioState;
 
 public class MarioClient {
 	private static final Logger LOGGER = ModQuakeMovement.LOGGER;
-
-	public static class InvalidMarioStateException extends Exception {
-		public InvalidMarioStateException(String errorMessage) {
-			super(errorMessage);
-		}
-	}
 
 	public static ClientPlayerEntity player;
 	public static double forwardVel;
@@ -30,7 +25,31 @@ public class MarioClient {
 		marioState = newState;
 	}
 
-	public static boolean mario_travel(ClientPlayerEntity player, Vec3d movementInput) {
+	public static boolean attempt_travel(PlayerEntity player, Vec3d movementInput) {
+		// don't do special movement if this is running server-side
+		if (!player.getWorld().isClient) return false;
+
+		// don't do special movement if special movement is disabled
+		if (!ModQuakeMovement.CONFIG.isEnabled()) return false;
+
+		// don't do special movement if the player is flying, or gliding with an Elytra
+		if (player.getAbilities().flying || player.isFallFlying()) return false;
+
+		// don't do special movement if the player is in a vehicle
+		if (player.hasVehicle()) return false;
+
+		// don't do special movement if the player is climbing
+		if (player.isClimbing()) return false;
+
+//        return quake_travel(player, movementInput);
+		if (player instanceof ClientPlayerEntity clientPlayer) {
+			return mario_travel(clientPlayer, movementInput);
+		}
+		return false;
+//		return false;
+	}
+
+	private static boolean mario_travel(ClientPlayerEntity player, Vec3d movementInput) {
 		MarioClient.player = player;
 
 		// Calculate forward and sideways vector components
@@ -47,6 +66,8 @@ public class MarioClient {
 		Vec3d currentVel = player.getVelocity();
 		forwardVel = currentVel.x * forwardX + currentVel.z * forwardZ;
 		rightwardVel = currentVel.x * rightwardX + currentVel.z * rightwardZ;
+
+
 
 		// Evaluate the direction the player is inputting
 		// Input normally goes up to about 0.98, so this multiplication brings it up close to a clean 1.0
@@ -166,20 +187,20 @@ public class MarioClient {
 
 	public static Vec3d capAcceleration(Vec3d currentVel, Vec3d newVel, double cap) {
 		// I have to do it like this with a hundred thousand variables or the math gets wonky!
-		double newVelHorizLenSquared = newVel.horizontalLengthSquared();
-		double currentVelHorizLenSquared = currentVel.horizontalLengthSquared();
+		double newVelHorizontalLenSquared = newVel.horizontalLengthSquared();
+		double currentVelHorizontalLenSquared = currentVel.horizontalLengthSquared();
 
 		double epsilon = 0.01;
 
-		double deltaSpeed = newVelHorizLenSquared - currentVelHorizLenSquared;
+		double deltaSpeed = newVelHorizontalLenSquared - currentVelHorizontalLenSquared;
 		if(deltaSpeed > epsilon) {
 			double capSquared = cap * cap;
 
-			double speedUnderCapDifference = currentVelHorizLenSquared - capSquared;
+			double speedUnderCapDifference = currentVelHorizontalLenSquared - capSquared;
 			if(speedUnderCapDifference > epsilon) {
 				// We're already moving too fast, so just use the new angle and don't increase magnitude
 				return newVel.normalize().multiply(currentVel.horizontalLength());
-			} else if((newVelHorizLenSquared - capSquared) > -epsilon) {
+			} else if((newVelHorizontalLenSquared - capSquared) > -epsilon) {
 				// We're just about to pass our speed cap, so limit our speed to match it
 				return newVel.normalize().multiply(cap);
 			}

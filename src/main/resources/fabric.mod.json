@@ -1,14 +1,15 @@
 {
   "schemaVersion": 1,
-  "id": "squake",
+  "id": "qua_mario",
   "version": "${version}",
 
-  "name": "Squake",
-  "description": "Quake-style movement (bunnyhopping, etc) in Minecraft",
+  "name": "Mario qua Mario",
+  "description": "Super Mario's moveset and mechanics in Minecraft.",
   "authors": [
     "squeek502",
     "ThatTrollzer/CoolMineman",
-    "adryd"
+    "adryd",
+    "floralQuaFloral"
   ],
   "contact": {
     "sources": "https://github.com/adryd325/Squake"

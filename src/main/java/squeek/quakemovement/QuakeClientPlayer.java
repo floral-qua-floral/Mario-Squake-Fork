@@ -49,7 +49,7 @@ public class QuakeClientPlayer {
 
 //        return quake_travel(player, movementInput);
 		if (player instanceof ClientPlayerEntity clientPlayer) {
-			return MarioClient.mario_travel(clientPlayer, movementInput);
+//			return MarioClient.mario_travel(clientPlayer, movementInput);
 		}
 		return false;
 //		return false;
