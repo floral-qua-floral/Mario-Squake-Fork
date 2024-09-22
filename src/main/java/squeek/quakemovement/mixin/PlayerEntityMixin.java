@@ -12,7 +12,7 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
-import squeek.quakemovement.MarioClientTravel;
+import squeek.quakemovement.MarioClient;
 import squeek.quakemovement.ModQuakeMovement;
 import squeek.quakemovement.QuakeClientPlayer;
 import squeek.quakemovement.QuakeClientPlayer.IsJumpingGetter;
@@ -24,7 +24,7 @@ public abstract class PlayerEntityMixin extends LivingEntity implements IsJumpin
 	}
 
 	@Inject(at = @At("HEAD"), method = "travel(Lnet/minecraft/util/math/Vec3d;)V", cancellable = true)
-	private void travel(Vec3d movementInput, CallbackInfo info) throws MarioClientTravel.InvalidMarioStateException {
+	private void travel(Vec3d movementInput, CallbackInfo info) {
 		if (!ModQuakeMovement.CONFIG.isEnabled())
 			return;
 

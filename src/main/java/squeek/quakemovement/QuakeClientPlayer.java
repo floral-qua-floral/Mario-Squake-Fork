@@ -31,14 +31,14 @@ public class QuakeClientPlayer {
 	private static Random random = new Random();
 	private static List<double[]> baseVelocities = new ArrayList<>();
 
-	public static boolean travel(PlayerEntity player, Vec3d movementInput) throws MarioClientTravel.InvalidMarioStateException {
+	public static boolean travel(PlayerEntity player, Vec3d movementInput) {
 		// don't do special movement if this is running server-side
 		if (!player.getWorld().isClient) return false;
 
 		// don't do special movement if special movement is disabled
 		if (!ModQuakeMovement.CONFIG.isEnabled()) return false;
 
-		// don't do special movement if the player is flying or gliding with an Elytra
+		// don't do special movement if the player is flying, or gliding with an Elytra
 		if (player.getAbilities().flying || player.isFallFlying()) return false;
 
 		// don't do special movement if the player is in a vehicle
@@ -49,7 +49,7 @@ public class QuakeClientPlayer {
 
 //        return quake_travel(player, movementInput);
 		if (player instanceof ClientPlayerEntity clientPlayer) {
-			return MarioClientTravel.mario_travel(clientPlayer, movementInput);
+			return MarioClient.mario_travel(clientPlayer, movementInput);
 		}
 		return false;
 //		return false;
