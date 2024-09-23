@@ -1,5 +1,6 @@
 package squeek.quakemovement.mixin;
 
+import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.render.Camera;
 import org.joml.Quaternionf;
 import org.joml.Vector3f;
@@ -38,11 +39,10 @@ public abstract class CameraMixin {
 			return;
 		}
 
-
-
 		if(thirdPerson) return;
 
-		double[] rotations = MarioClient.marioCameraAnim.getRotations(MarioClient.cameraAnimTimer / MarioClient.marioCameraAnim.duration);
+		double progress = Math.min(1.0, MarioClient.cameraAnimTimer / MarioClient.marioCameraAnim.duration);
+		double[] rotations = MarioClient.marioCameraAnim.getRotations(progress);
 
 		this.rotation.rotationYXZ(
 				(float) (Math.PI - Math.toRadians(yaw + rotations[0])),
@@ -52,6 +52,9 @@ public abstract class CameraMixin {
         HORIZONTAL.rotate(this.rotation, this.horizontalPlane);
         VERTICAL.rotate(this.rotation, this.verticalPlane);
         DIAGONAL.rotate(this.rotation, this.diagonalPlane);
+
+		MinecraftClient.getInstance().worldRenderer.scheduleTerrainUpdate();
+
 		ci.cancel();
 	}
 	
