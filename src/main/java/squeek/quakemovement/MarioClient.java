@@ -5,6 +5,7 @@ import net.minecraft.entity.MovementType;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.util.math.Vec3d;
 import org.slf4j.Logger;
+import squeek.quakemovement.cameraanims.CameraAnim;
 import squeek.quakemovement.mariostates.MarioGrounded;
 import squeek.quakemovement.mariostates.MarioState;
 
@@ -23,6 +24,13 @@ public class MarioClient {
 	public static void changeState(MarioState newState) {
 		stateTimer = 0;
 		marioState = newState;
+	}
+
+	public static CameraAnim marioCameraAnim = null;
+	public static float cameraAnimTimer = 0;
+	public static void changeCameraAnim(CameraAnim newAnim) {
+		cameraAnimTimer = 0;
+		marioCameraAnim = newAnim;
 	}
 
 	public static boolean attempt_travel(PlayerEntity player, Vec3d movementInput) {
@@ -67,8 +75,6 @@ public class MarioClient {
 		forwardVel = currentVel.x * forwardX + currentVel.z * forwardZ;
 		rightwardVel = currentVel.x * rightwardX + currentVel.z * rightwardZ;
 
-
-
 		// Evaluate the direction the player is inputting
 		// Input normally goes up to about 0.98, so this multiplication brings it up close to a clean 1.0
 		forwardInput = (Math.abs(movementInput.z) < 0.1) ? 0.0 : movementInput.z * 1.02040816327;
@@ -78,9 +84,9 @@ public class MarioClient {
 		yVel = currentVel.y;
 
 		// Execute Mario's state behavior
-		marioState = marioState.evaluateTransitions(marioState.preTickTransitions);
+		marioState.evaluateTransitions(marioState.preTickTransitions);
 		marioState.tick();
-		marioState = marioState.evaluateTransitions(marioState.postTickTransitions);
+		marioState.evaluateTransitions(marioState.postTickTransitions);
 
 		// Apply new y velocity
 		Vec3d newVel = player.getVelocity();
@@ -88,7 +94,7 @@ public class MarioClient {
 
 		// Use velocities
 		player.move(MovementType.SELF, player.getVelocity());
-		marioState = marioState.evaluateTransitions(marioState.postMoveTransitions);
+		marioState.evaluateTransitions(marioState.postMoveTransitions);
 
 		// Finish
 		player.updateLimbs(false);

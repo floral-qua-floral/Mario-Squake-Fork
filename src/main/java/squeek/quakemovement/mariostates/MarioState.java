@@ -22,15 +22,15 @@ public abstract class MarioState {
 	public ArrayList<MarioStateTransition> postTickTransitions;
 	public ArrayList<MarioStateTransition> postMoveTransitions;
 
-	public MarioState evaluateTransitions(ArrayList<MarioStateTransition> transitions) {
+	public void evaluateTransitions(ArrayList<MarioStateTransition> transitions) {
 		if(transitions != null) for (MarioStateTransition transition : transitions) {
 			MarioState nextState = transition.evaluate();
 			if (nextState != null) {
 				MarioClient.stateTimer = 0;
-				return nextState;
+				MarioClient.changeState(nextState);
+				return;
 			}
 		}
-		return this; // Stay in the same state if no transition occurs
 	}
 
 	public abstract void tick();

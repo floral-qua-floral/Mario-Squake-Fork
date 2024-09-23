@@ -9,6 +9,7 @@ import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
+import squeek.quakemovement.MarioClient;
 
 @Mixin(Camera.class)
 public abstract class CameraMixin {
@@ -23,19 +24,31 @@ public abstract class CameraMixin {
 
 	@Shadow private boolean thirdPerson;
 
+	@Shadow private float lastTickDelta;
+
 	@Inject(method = "setRotation", at = @At(value = "INVOKE", target =
 		"Lorg/joml/Quaternionf;rotationYXZ(FFF)Lorg/joml/Quaternionf;"
 		), require = 1, cancellable = true)
 	protected void setRotation(float yaw, float pitch, CallbackInfo ci) {
+		if(MarioClient.marioCameraAnim == null) return;
 
-		if(this.thirdPerson) {
+		MarioClient.cameraAnimTimer += lastTickDelta;
+		if(MarioClient.cameraAnimTimer > MarioClient.marioCameraAnim.duration) {
+			MarioClient.marioCameraAnim = null;
 			return;
 		}
 
-		float roll = (float) Math.toRadians(0);
-//		if (!CoolElytraClient.isFrontView) roll = -roll;
 
-		this.rotation.rotationYXZ((float)(Math.PI - Math.toRadians(yaw)), (float)Math.toRadians(-pitch), roll);
+
+		if(thirdPerson) return;
+
+		double[] rotations = MarioClient.marioCameraAnim.getRotations(MarioClient.cameraAnimTimer / MarioClient.marioCameraAnim.duration);
+
+		this.rotation.rotationYXZ(
+				(float) (Math.PI - Math.toRadians(yaw + rotations[0])),
+				(float) Math.toRadians((pitch + rotations[1]) * -1),
+				(float) Math.toRadians(rotations[2]));
+
         HORIZONTAL.rotate(this.rotation, this.horizontalPlane);
         VERTICAL.rotate(this.rotation, this.verticalPlane);
         DIAGONAL.rotate(this.rotation, this.diagonalPlane);
