@@ -1,4 +1,4 @@
-package squeek.quakemovement;
+package fqf.qua_mario;
 
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockRenderType;

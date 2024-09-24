@@ -1,8 +1,8 @@
-package squeek.quakemovement.mariostates;
+package fqf.qua_mario.mariostates;
 
-import squeek.quakemovement.MarioClient;
-import squeek.quakemovement.MarioInputs;
-import squeek.quakemovement.cameraanims.CameraSideflip;
+import fqf.qua_mario.MarioClient;
+import fqf.qua_mario.MarioInputs;
+import fqf.qua_mario.cameraanims.CameraSideflip;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -34,7 +34,7 @@ public class MarioSkid extends MarioState {
 						MarioClient.setMotion(-0.3, 0.0);
 						MarioClient.player.setYaw(MarioClient.player.getYaw() + 180);
 						LOGGER.info("\nPitch: " + MarioClient.player.getPitch() + "\nDelta: " + ((-180) - (2 * MarioClient.player.getPitch())));
-						CameraSideflip.deltaPitch = (-180) - (2 * MarioClient.player.getPitch());
+//						CameraSideflip.deltaPitch = (-180) - (2 * MarioClient.player.getPitch());
 						MarioClient.changeCameraAnim(CameraSideflip.INSTANCE);
 						return MarioSideflip.INSTANCE;
 					}

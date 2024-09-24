@@ -1,6 +1,6 @@
-package squeek.quakemovement.mariostates;
+package fqf.qua_mario.mariostates;
 
-import squeek.quakemovement.MarioClient;
+import fqf.qua_mario.MarioClient;
 
 import java.util.ArrayList;
 import java.util.Arrays;

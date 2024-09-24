@@ -1,11 +1,11 @@
-package squeek.quakemovement.mariostates;
+package fqf.qua_mario.mariostates;
 
 import net.minecraft.entity.MovementType;
 import net.minecraft.registry.tag.FluidTags;
 import org.slf4j.Logger;
-import squeek.quakemovement.MarioClient;
-import squeek.quakemovement.MarioInputs;
-import squeek.quakemovement.ModQuakeMovement;
+import fqf.qua_mario.MarioClient;
+import fqf.qua_mario.MarioInputs;
+import fqf.qua_mario.ModQuakeMovement;
 
 import java.util.ArrayList;
 

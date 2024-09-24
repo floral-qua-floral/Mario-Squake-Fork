@@ -1,4 +1,4 @@
-package squeek.quakemovement;
+package fqf.qua_mario;
 
 import me.shedaniel.autoconfig.AutoConfig;
 import me.shedaniel.autoconfig.ConfigData;

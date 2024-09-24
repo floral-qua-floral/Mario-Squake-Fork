@@ -12,7 +12,7 @@
     "floralQuaFloral"
   ],
   "contact": {
-    "sources": "https://github.com/adryd325/Squake"
+    "sources": "https://github.com/floral-qua-floral/SquakeTestFork"
   },
 
   "license": "Unlicense",
@@ -21,14 +21,14 @@
   "environment": "*",
   "entrypoints": {
     "client": [
-      "squeek.quakemovement.ModQuakeMovement"
+      "fqf.qua_mario.ModQuakeMovement"
     ],
     "modmenu" : [
-      "squeek.quakemovement.ModMenuIntegration"
+      "fqf.qua_mario.ModMenuIntegration"
     ]
   },
   "mixins": [
-    "squake.mixins.json"
+    "qua_mario.mixins.json"
   ],
 
   "depends": {

@@ -1,4 +1,4 @@
-package squeek.quakemovement;
+package fqf.qua_mario;
 
 import net.minecraft.client.network.ClientPlayerEntity;
 
@@ -11,7 +11,9 @@ public class MarioInputs {
 		LEFT,
 		RIGHT,
 		JUMP,
-		SNEAK
+		SNEAK,
+
+		SPIN
 	}
 
 	private static final EnumMap<Key, Boolean> HELD = new EnumMap<>(Key.class);
@@ -27,21 +29,28 @@ public class MarioInputs {
 
 		update(Key.JUMP, player.input.jumping);
 		update(Key.SNEAK, player.input.sneaking);
+
+		HELD.put(Key.SPIN, isHeld(Key.LEFT) && isHeld(Key.RIGHT));
+		if(isPressed(Key.LEFT, false) && isPressed(Key.RIGHT, false) && isHeld(Key.LEFT) && isHeld(Key.RIGHT))
+			PRESSED_BUFFERS.put(Key.SPIN, BUFFER_LENGTH);
+		else
+			decrementBuffer(Key.SPIN);
 	}
 
 	private static void update(Key key, boolean keyDown) {
-		if (keyDown && HELD.get(key) != null && !HELD.get(key)) {
-			// The button was just pressed!
+		if (keyDown && HELD.get(key) != null && !HELD.get(key))
 			PRESSED_BUFFERS.put(key, BUFFER_LENGTH);
-		} else {
-			Integer bufferValue = PRESSED_BUFFERS.get(key);
-			if (bufferValue == null)
-				PRESSED_BUFFERS.put(key, 0);
-			else if (bufferValue > 0)
-				PRESSED_BUFFERS.put(key, bufferValue - 1);
-		}
+		else
+			decrementBuffer(key);
 
 		HELD.put(key, keyDown);
+	}
+	private static void decrementBuffer(Key key) {
+		Integer bufferValue = PRESSED_BUFFERS.get(key);
+		if (bufferValue == null)
+			PRESSED_BUFFERS.put(key, 0);
+		else if (bufferValue > 0)
+			PRESSED_BUFFERS.put(key, bufferValue - 1);
 	}
 
 	public static boolean isHeld(Key input) {

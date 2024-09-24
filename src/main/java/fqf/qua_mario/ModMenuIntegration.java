@@ -1,4 +1,4 @@
-package squeek.quakemovement;
+package fqf.qua_mario;
 
 import com.terraformersmc.modmenu.api.ConfigScreenFactory;
 import com.terraformersmc.modmenu.api.ModMenuApi;

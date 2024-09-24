@@ -1,13 +1,14 @@
-package squeek.quakemovement;
+package fqf.qua_mario;
 
+import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.entity.MovementType;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.util.math.Vec3d;
 import org.slf4j.Logger;
-import squeek.quakemovement.cameraanims.CameraAnim;
-import squeek.quakemovement.mariostates.MarioGrounded;
-import squeek.quakemovement.mariostates.MarioState;
+import fqf.qua_mario.cameraanims.CameraAnim;
+import fqf.qua_mario.mariostates.MarioGrounded;
+import fqf.qua_mario.mariostates.MarioState;
 
 public class MarioClient {
 	private static final Logger LOGGER = ModQuakeMovement.LOGGER;
@@ -28,9 +29,13 @@ public class MarioClient {
 
 	public static CameraAnim marioCameraAnim = null;
 	public static float cameraAnimTimer = 0;
+	public static float animStartTime;
+	public static float animEndTime;
 	public static void changeCameraAnim(CameraAnim newAnim) {
 		cameraAnimTimer = 0;
 		marioCameraAnim = newAnim;
+		animStartTime = player.getWorld().getTime() + MinecraftClient.getInstance().getRenderTickCounter().getTickDelta(false);
+		animEndTime = (float) (animStartTime + newAnim.duration);
 	}
 
 	public static boolean attempt_travel(PlayerEntity player, Vec3d movementInput) {

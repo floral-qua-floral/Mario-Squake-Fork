@@ -1,0 +1,15 @@
+{
+  "required": true,
+  "package": "fqf.qua_mario.mixin",
+  "compatibilityLevel": "JAVA_8",
+  "mixins": [
+	"PlayerEntityMixin"
+  ],
+  "injectors": {
+	"defaultRequire": 1
+  },
+  "client": [
+	"InGameHudMixin",
+	"CameraMixin"
+  ]
+}

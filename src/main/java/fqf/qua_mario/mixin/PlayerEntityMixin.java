@@ -1,5 +1,6 @@
-package squeek.quakemovement.mixin;
+package fqf.qua_mario.mixin;
 
+import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.damage.DamageSource;
@@ -12,10 +13,10 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
-import squeek.quakemovement.MarioClient;
-import squeek.quakemovement.ModQuakeMovement;
-import squeek.quakemovement.QuakeClientPlayer;
-import squeek.quakemovement.QuakeClientPlayer.IsJumpingGetter;
+import fqf.qua_mario.MarioClient;
+import fqf.qua_mario.ModQuakeMovement;
+import fqf.qua_mario.QuakeClientPlayer;
+import fqf.qua_mario.QuakeClientPlayer.IsJumpingGetter;
 
 @Mixin(PlayerEntity.class)
 public abstract class PlayerEntityMixin extends LivingEntity implements IsJumpingGetter {
@@ -24,12 +25,17 @@ public abstract class PlayerEntityMixin extends LivingEntity implements IsJumpin
 	}
 
 	@Inject(at = @At("HEAD"), method = "travel(Lnet/minecraft/util/math/Vec3d;)V", cancellable = true)
-	private void travel(Vec3d movementInput, CallbackInfo info) {
+	private void travel(Vec3d movementInput, CallbackInfo ci) {
 		if (!ModQuakeMovement.CONFIG.isEnabled())
 			return;
 
 		if (MarioClient.attempt_travel((PlayerEntity) (Object) this, movementInput))
-			info.cancel();
+			ci.cancel();
+	}
+
+	@Inject(at = @At("HEAD"), method = "collideWithEntity(Lnet/minecraft/entity/Entity;)V", cancellable = true)
+	private void collideWithEntity(Entity entity, CallbackInfo ci) {
+		ModQuakeMovement.LOGGER.info("UWU COLLISION UWU?");
 	}
 
 	@Inject(at = @At("HEAD"), method = "tick()V")
