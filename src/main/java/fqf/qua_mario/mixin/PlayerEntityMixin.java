@@ -30,4 +30,9 @@ public abstract class PlayerEntityMixin extends LivingEntity {
 		if (MarioClient.attempt_travel((PlayerEntity) (Object) this, movementInput))
 			ci.cancel();
 	}
+
+	@Inject(at = @At("TAIL"), method = "jump()V")
+	private void afterJump(CallbackInfo info) {
+		MarioClient.afterJump((PlayerEntity) (Object) this);
+	}
 }

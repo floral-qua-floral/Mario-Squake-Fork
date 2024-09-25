@@ -5,7 +5,7 @@ import me.shedaniel.autoconfig.ConfigData;
 import me.shedaniel.autoconfig.annotation.Config;
 import me.shedaniel.autoconfig.annotation.ConfigEntry;
 
-@Config(name = "squake")
+@Config(name = "qua_mario")
 public class ModConfig implements ConfigData {
     private boolean enabled = true;
 

@@ -2,16 +2,17 @@ package fqf.qua_mario;
 
 import fqf.qua_mario.characters.CharaMario;
 import fqf.qua_mario.characters.MarioCharacter;
+import fqf.qua_mario.mariostates.MarioDebug;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.MovementType;
 import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
-import org.slf4j.Logger;
 import fqf.qua_mario.cameraanims.CameraAnim;
-import fqf.qua_mario.mariostates.MarioGrounded;
 import fqf.qua_mario.mariostates.MarioState;
+import org.joml.Vector2d;
 
 import java.util.List;
 
@@ -25,7 +26,7 @@ public class MarioClient {
 	public static double forwardInput;
 	public static double rightwardInput;
 
-	private static MarioState marioState = MarioGrounded.INSTANCE;
+	private static MarioState marioState = MarioDebug.INSTANCE;
 	public static int stateTimer = 0;
 	public static void changeState(MarioState newState) {
 		stateTimer = 0;
@@ -45,31 +46,39 @@ public class MarioClient {
 
 	public static MarioCharacter character = CharaMario.INSTANCE;
 
-	public static boolean attempt_travel(PlayerEntity player, Vec3d movementInput) {
+	public static boolean useMarioPhysics(PlayerEntity player) {
 		// don't do special movement if this is running server-side
-		if (!player.getWorld().isClient) return false;
+		if(!player.getWorld().isClient) return false;
 
-		// don't do special movement if the server hasn't told us whether we're Mario
+		// don't do special movement if we're not Mario
 		if(!isMario) return false;
 
-		// don't do special movement if special movement is disabled
-		if (!ModQuakeMovement.CONFIG.isEnabled()) return false;
-
 		// don't do special movement if the player is flying, or gliding with an Elytra
-		if (player.getAbilities().flying || player.isFallFlying()) return false;
+		if(player.getAbilities().flying || player.isFallFlying()) return false;
 
 		// don't do special movement if the player is in a vehicle
-		if (player.hasVehicle()) return false;
+		if(player.hasVehicle()) return false;
 
 		// don't do special movement if the player is climbing
-		if (player.isClimbing()) return false;
+		if(player.isClimbing()) return false;
 
-//        return quake_travel(player, movementInput);
-		if (player instanceof ClientPlayerEntity clientPlayer) {
+		return true;
+	};
+
+	public static boolean attempt_travel(PlayerEntity player, Vec3d movementInput) {
+		if(useMarioPhysics(player) && player instanceof ClientPlayerEntity clientPlayer) {
 			return mario_travel(clientPlayer, movementInput);
 		}
 		return false;
 //		return false;
+	}
+
+	public static void afterJump(PlayerEntity player) {
+		if(useMarioPhysics(player) && player.isSprinting()) {
+			float bunnyhopSpeedBonus = player.getYaw() * 0.017453292F;
+			Vec3d deltaVelocity = new Vec3d(MathHelper.sin(bunnyhopSpeedBonus) * 0.2F, 0, -(MathHelper.cos(bunnyhopSpeedBonus) * 0.2F));
+			player.setVelocity(player.getVelocity().add(deltaVelocity));
+		}
 	}
 
 	private static boolean mario_travel(ClientPlayerEntity player, Vec3d movementInput) {
@@ -237,5 +246,84 @@ public class MarioClient {
 		}
 
 		return newVel;
+	}
+
+	public static void accelerate(
+			double forwardTarget, double strafeTarget,
+			double maxLongitudinalDelta, double maxStrafeDelta,
+			double forwardInfluence, double strafeInfluence,
+			double maxSpeedIncrease, double maxSpeedDecrease) {
+
+		// Weight the forward and strafe influences
+		Vector2d influences = new Vector2d(forwardInfluence, strafeInfluence);
+		double influencesLength = influences.length();
+		influences.x *= Math.min(Math.abs(1000 * forwardTarget - 1000 * forwardVel), 1);
+		influences.y *= Math.min(Math.abs(1000 * strafeTarget - 1000 * rightwardVel), 1);
+		influences.normalize(influencesLength);
+		forwardInfluence = influences.x;
+		strafeInfluence = influences.y;
+
+//		if(MathHelper.approximatelyEquals(rightwardVel, strafeTarget)) strafeInfluence = 0;
+
+		// Get accelerated velocities as a vector
+		Vector2d oldVel = new Vector2d(forwardVel, rightwardVel);
+
+		Vector2d newVel = new Vector2d(
+				forwardVel + forwardInfluence * Math.signum(forwardTarget - forwardVel),
+				rightwardVel + strafeInfluence * Math.signum(strafeTarget - rightwardVel));
+
+		// Calculate magnitude of new speed
+		double oldMagnitudeSquared = oldVel.lengthSquared();
+		double newMagnitudeSquared = newVel.lengthSquared();
+		double deltaMagnitudeSquared = newMagnitudeSquared - oldMagnitudeSquared;
+
+		// If magnitude has increased by more than maxSpeedIncrease, cap the new magnitude
+		if(deltaMagnitudeSquared > maxSpeedIncrease * maxSpeedIncrease) {
+			newVel.normalize(Math.sqrt(oldMagnitudeSquared) + maxSpeedIncrease);
+		}
+		// If magnitude has decreased by more than maxSpeedDecrease, apply minimum to the new magnitude
+		else if(deltaMagnitudeSquared < -(maxSpeedDecrease * maxSpeedDecrease)) {
+			newVel.normalize(Math.sqrt(oldMagnitudeSquared) - maxSpeedDecrease);
+		}
+
+		// Cap maximum deltas so Mario won't accelerate past his target velocity
+		maxLongitudinalDelta = Math.min(maxLongitudinalDelta, Math.abs(forwardTarget - forwardVel));
+		maxStrafeDelta = Math.min(maxStrafeDelta, Math.abs(strafeTarget - rightwardVel));
+
+		// Calculate strafe delta
+		double strafeDelta = Math.abs(newVel.y - oldVel.y);
+		// If strafe delta is above maxStrafeDelta, new strafe speed is adjusted to
+		// 		rightwardVel + Math.signum(strafeTarget - rightwardVel) * maxStrafeDelta
+		if(strafeDelta > maxStrafeDelta) {
+			newVel.y = oldVel.y + (maxStrafeDelta * Math.signum(strafeTarget - rightwardVel));
+		}
+
+		// Calculate longitudinal delta
+		// If longitudinal delta is above maxLongitudinalDelta, new longitudinal speed is adjusted to
+		//		forwardVel + Math.signum(forwardTarget - forwardVel) * maxLongitudinalDelta
+		double longitudinalDelta = Math.abs(newVel.x - oldVel.x);
+		print(
+			"forwardVel: " + forwardVel
+			+ "\nforwardTarget: " + forwardTarget
+			+ "\nnewVel F: " + newVel.x
+			+ "\nlongitudinalDelta: " + longitudinalDelta
+			+ "\nmaxLongDelta: " + maxLongitudinalDelta);
+
+		if(longitudinalDelta > maxLongitudinalDelta) {
+			newVel.x = oldVel.x + (maxLongitudinalDelta * Math.signum(forwardTarget - forwardVel));
+		}
+
+		// Calculate forward and sideways vector components
+		double yawRad = Math.toRadians(player.getYaw());
+		double forwardX = -Math.sin(yawRad);
+		double forwardZ = Math.cos(yawRad);
+		double rightwardX = forwardZ;
+		double rightwardZ = -forwardX;
+
+		player.setVelocity(forwardX * newVel.x + rightwardX * newVel.y, yVel, forwardZ * newVel.x + rightwardZ * newVel.y);
+	}
+
+	private static void print(String printules) {
+		ModQuakeMovement.LOGGER.info("\n" + printules);
 	}
 }
