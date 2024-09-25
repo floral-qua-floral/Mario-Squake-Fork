@@ -12,7 +12,5 @@
     "PlayerEntityMixin",
 	"InGameHudMixin",
 	"CameraMixin"
-  ],
-  "server": [
   ]
 }
