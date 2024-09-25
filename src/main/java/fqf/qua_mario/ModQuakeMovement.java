@@ -71,30 +71,30 @@ public class ModQuakeMovement implements ModInitializer {
 			setMarioPacket(handler.player, playerDataSaver.getPersistentData().getBoolean("isMario"));
 		});
 
-		CommandRegistrationCallback.EVENT.register((dispatcher, registryAccess, environment) ->
+		CommandRegistrationCallback.EVENT.register((dispatcher, registryAccess, environment) -> {
 			dispatcher.register(literal("mario")
-				.executes(context -> {
-					context.getSource().sendFeedback(() -> Text.literal("Called /mario with no arguments"), true);
-					return 1;
-				})
-				.then(literal("setEnabled")
-					.then(argument("value", BoolArgumentType.bool())
-							.executes(context -> {
-								String feedback = setMarioCommand(context, false);
-								context.getSource().sendFeedback(() -> Text.literal(feedback), true);
-								return 1;
-							})
-								.then(argument("whoThough", EntityArgumentType.player())
-										.executes(context -> {
-											String feedback = setMarioCommand(context, true);
-											context.getSource().sendFeedback(() -> Text.literal(feedback), true);
-											return 1;
-										})
-								)
+					.executes(context -> {
+						context.getSource().sendFeedback(() -> Text.literal("Called /mario with no arguments"), true);
+						return 1;
+					})
+					.then(literal("setEnabled")
+							.then(argument("value", BoolArgumentType.bool())
+									.executes(context -> {
+										String feedback = setMarioCommand(context, false);
+										context.getSource().sendFeedback(() -> Text.literal(feedback), true);
+										return 1;
+									})
+									.then(argument("whoThough", EntityArgumentType.player())
+											.executes(context -> {
+												String feedback = setMarioCommand(context, true);
+												context.getSource().sendFeedback(() -> Text.literal(feedback), true);
+												return 1;
+											})
+									)
+							)
 					)
-				)
-			)
-		);
+			);
+		});
 	}
 
 }

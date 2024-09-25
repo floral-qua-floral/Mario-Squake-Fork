@@ -46,6 +46,8 @@ public class MarioClient {
 	public static MarioCharacter character = CharaMario.INSTANCE;
 
 	public static boolean attempt_travel(PlayerEntity player, Vec3d movementInput) {
+		ModQuakeMovement.LOGGER.info("Hewwo? " + isMario);
+
 		// don't do special movement if this is running server-side
 		if (!player.getWorld().isClient) {
 			ModQuakeMovement.LOGGER.info("HEY WHAT?!?!???");

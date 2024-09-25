@@ -15,11 +15,9 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import fqf.qua_mario.MarioClient;
 import fqf.qua_mario.ModQuakeMovement;
-import fqf.qua_mario.QuakeClientPlayer;
-import fqf.qua_mario.QuakeClientPlayer.IsJumpingGetter;
 
 @Mixin(PlayerEntity.class)
-public abstract class PlayerEntityMixin extends LivingEntity implements IsJumpingGetter {
+public abstract class PlayerEntityMixin extends LivingEntity {
 	private PlayerEntityMixin(EntityType<? extends LivingEntity> entityType, World world) {
 		super(entityType, world);
 	}
@@ -31,54 +29,5 @@ public abstract class PlayerEntityMixin extends LivingEntity implements IsJumpin
 
 		if (MarioClient.attempt_travel((PlayerEntity) (Object) this, movementInput))
 			ci.cancel();
-	}
-
-//	@Inject(at = @At("HEAD"), method = "collideWithEntity(Lnet/minecraft/entity/Entity;)V", cancellable = true)
-//	private void collideWithEntity(Entity entity, CallbackInfo ci) {
-//		ModQuakeMovement.LOGGER.info("UWU COLLISION UWU?");
-//	}
-
-	@Inject(at = @At("HEAD"), method = "tick()V")
-	private void beforeUpdate(CallbackInfo info)
-	{
-		QuakeClientPlayer.beforeOnLivingUpdate((PlayerEntity) (Object) this);
-	}
-
-//	@Inject(at = @At("TAIL"), method = "jump()V")
-//	private void afterJump(CallbackInfo info)
-//	{
-//		QuakeClientPlayer.afterJump((PlayerEntity) (Object) this);
-//	}
-
-//	@Override
-//	public void updateVelocity(float speed, Vec3d movementInput) {
-//		if (!ModQuakeMovement.CONFIG.isEnabled() || !this.getWorld().isClient) {
-//			super.updateVelocity(speed, movementInput);
-//			return;
-//		}
-//
-//		if (QuakeClientPlayer.updateVelocity(this, movementInput, speed)) {
-//			return;
-//		}
-//		super.updateVelocity(speed, movementInput);
-//	}
-//
-//	@Override
-//	public boolean isJumping()
-//	{
-//		return this.jumping;
-//	}
-
-	//Fixes Fall Damage Negating Speed See: https://github.com/CoolMineman/Squake/commit/61c4622bca4209d60c7e7d61a59e5a5933ae844a#commitcomment-41109936
-	boolean velocityHack = false;
-
-	@Inject(at = @At("HEAD"), method = "handleFallDamage")
-	private void preHandleFallDamage(float fallDistance, float damageMultiplier, DamageSource damageSource, CallbackInfoReturnable<Boolean> cir) {
-		velocityHack = velocityModified;
-	}
-	
-	@Inject(at = @At("RETURN"), method = "handleFallDamage")
-	private void postHandleFallDamage(float fallDistance, float damageMultiplier, DamageSource damageSource, CallbackInfoReturnable<Boolean> cir) {
-		if (!this.getWorld().isClient) velocityModified = velocityHack;
 	}
 }
