@@ -33,10 +33,10 @@ public abstract class PlayerEntityMixin extends LivingEntity implements IsJumpin
 			ci.cancel();
 	}
 
-	@Inject(at = @At("HEAD"), method = "collideWithEntity(Lnet/minecraft/entity/Entity;)V", cancellable = true)
-	private void collideWithEntity(Entity entity, CallbackInfo ci) {
-		ModQuakeMovement.LOGGER.info("UWU COLLISION UWU?");
-	}
+//	@Inject(at = @At("HEAD"), method = "collideWithEntity(Lnet/minecraft/entity/Entity;)V", cancellable = true)
+//	private void collideWithEntity(Entity entity, CallbackInfo ci) {
+//		ModQuakeMovement.LOGGER.info("UWU COLLISION UWU?");
+//	}
 
 	@Inject(at = @At("HEAD"), method = "tick()V")
 	private void beforeUpdate(CallbackInfo info)
@@ -44,30 +44,30 @@ public abstract class PlayerEntityMixin extends LivingEntity implements IsJumpin
 		QuakeClientPlayer.beforeOnLivingUpdate((PlayerEntity) (Object) this);
 	}
 
-	@Inject(at = @At("TAIL"), method = "jump()V")
-	private void afterJump(CallbackInfo info)
-	{
-		QuakeClientPlayer.afterJump((PlayerEntity) (Object) this);
-	}
+//	@Inject(at = @At("TAIL"), method = "jump()V")
+//	private void afterJump(CallbackInfo info)
+//	{
+//		QuakeClientPlayer.afterJump((PlayerEntity) (Object) this);
+//	}
 
-	@Override
-	public void updateVelocity(float speed, Vec3d movementInput) {
-		if (!ModQuakeMovement.CONFIG.isEnabled() || !this.getWorld().isClient) {
-			super.updateVelocity(speed, movementInput);
-			return;
-		}
-
-		if (QuakeClientPlayer.updateVelocity(this, movementInput, speed)) {
-			return;
-		}
-		super.updateVelocity(speed, movementInput);
-	}
-
-	@Override
-	public boolean isJumping()
-	{
-		return this.jumping;
-	}
+//	@Override
+//	public void updateVelocity(float speed, Vec3d movementInput) {
+//		if (!ModQuakeMovement.CONFIG.isEnabled() || !this.getWorld().isClient) {
+//			super.updateVelocity(speed, movementInput);
+//			return;
+//		}
+//
+//		if (QuakeClientPlayer.updateVelocity(this, movementInput, speed)) {
+//			return;
+//		}
+//		super.updateVelocity(speed, movementInput);
+//	}
+//
+//	@Override
+//	public boolean isJumping()
+//	{
+//		return this.jumping;
+//	}
 
 	//Fixes Fall Damage Negating Speed See: https://github.com/CoolMineman/Squake/commit/61c4622bca4209d60c7e7d61a59e5a5933ae844a#commitcomment-41109936
 	boolean velocityHack = false;

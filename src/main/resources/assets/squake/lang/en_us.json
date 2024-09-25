@@ -18,6 +18,7 @@
     
     "fabric.mods.squake": "Squake",
     "fabric.mods.squake.enable": "Toggle Squake Movement",
+    "fabric.mods.squake.spin": "Spin",
 
     "squake.key.toggle.enabled": "Squake Movement: Enabled",
     "squake.key.toggle.disabled": "Squake Movement: Disabled"

@@ -20,8 +20,11 @@
 
   "environment": "*",
   "entrypoints": {
-    "client": [
+    "main": [
       "fqf.qua_mario.ModQuakeMovement"
+    ],
+    "client": [
+      "fqf.qua_mario.ModQuakeMovementClient"
     ],
     "modmenu" : [
       "fqf.qua_mario.ModMenuIntegration"

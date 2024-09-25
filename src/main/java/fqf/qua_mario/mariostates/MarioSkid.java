@@ -13,22 +13,22 @@ public class MarioSkid extends MarioState {
 	private MarioSkid() {
 		this.name = "Skid";
 
-		preTickTransitions = new ArrayList<MarioStateTransition>(Arrays.asList(new MarioStateTransition[]{
+		preTickTransitions = new ArrayList<>(Arrays.asList(
 				CommonTransitions.FALL,
 				() -> {
 					// Stop skidding
-					if(MarioClient.stateTimer > 60 || MarioClient.forwardInput >= 0 || MarioClient.forwardVel < -0.05) {
+					if (MarioClient.stateTimer > 60 || MarioClient.forwardInput >= 0 || MarioClient.forwardVel < -0.05) {
 						LOGGER.info("\n" + MarioClient.stateTimer + "\n" + MarioClient.forwardInput + "\n" + MarioClient.forwardVel);
 						return MarioGrounded.INSTANCE;
 					}
 					return null;
-				},
-		}));
+				}
+		));
 
-		postTickTransitions = new ArrayList<MarioStateTransition>(Arrays.asList(new MarioStateTransition[]{
+		postTickTransitions = new ArrayList<>(Arrays.asList(
 				() -> {
 					// Sideflip
-					if(MarioInputs.isPressed(MarioInputs.Key.JUMP)) {
+					if (MarioInputs.isPressed(MarioInputs.Key.JUMP)) {
 						MarioInputs.unbuffer(MarioInputs.Key.JUMP);
 						MarioClient.yVel = 1.15;
 						MarioClient.setMotion(-0.3, 0.0);
@@ -39,8 +39,8 @@ public class MarioSkid extends MarioState {
 						return MarioSideflip.INSTANCE;
 					}
 					return null;
-				},
-		}));
+				}
+		));
 
 
 	}

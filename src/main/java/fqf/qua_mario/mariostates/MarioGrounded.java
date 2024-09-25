@@ -11,13 +11,13 @@ public class MarioGrounded extends MarioState {
 	private MarioGrounded() {
 		this.name = "Grounded";
 
-		preTickTransitions = new ArrayList<MarioStateTransition>(Arrays.asList(new MarioStateTransition[]{
-				CommonTransitions.FALL,
-		}));
+		preTickTransitions = new ArrayList<>(Arrays.asList(
+			CommonTransitions.FALL
+		));
 
-		postTickTransitions = new ArrayList<MarioStateTransition>(Arrays.asList(new MarioStateTransition[]{
-				CommonTransitions.JUMP,
-		}));
+		postTickTransitions = new ArrayList<>(Arrays.asList(
+			CommonTransitions.JUMP
+		));
 	}
 
 	@Override
@@ -25,12 +25,15 @@ public class MarioGrounded extends MarioState {
 		double strafeSpeed = MarioClient.rightwardInput * 0.275;
 		double strafeAccel = 0.065;
 		if(MarioClient.forwardInput > 0) {
-			double forwardMoveSpeed = MarioClient.forwardInput * (MarioClient.player.isSprinting() ? 0.45: 0.275);
-			if (MarioClient.forwardVel <= 0.23) {
+			double forwardMoveSpeed = MarioClient.forwardInput * (MarioClient.player.isSprinting() ? 0.45: 0.265);
+			if (MarioClient.forwardVel > 0.275) {
+				// Sprint Accel
+				MarioClient.groundedAccel(forwardMoveSpeed, strafeSpeed, 0.025, strafeAccel);
+			} else if (MarioClient.forwardVel <= 0.12) {
 				// Walk Accel From Standstill or Backpedal
 				MarioClient.groundedAccel(forwardMoveSpeed, strafeSpeed, 0.125, strafeAccel);
 			}
-			else if (MarioClient.forwardVel <= MarioClient.forwardInput * 0.6) {
+			else if (MarioClient.forwardVel <= forwardMoveSpeed * 1.015) {
 				// Walk Accel
 				MarioClient.groundedAccel(forwardMoveSpeed, strafeSpeed, 0.045, strafeAccel);
 			} else {

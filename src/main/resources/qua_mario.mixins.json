@@ -3,13 +3,16 @@
   "package": "fqf.qua_mario.mixin",
   "compatibilityLevel": "JAVA_8",
   "mixins": [
-	"PlayerEntityMixin"
+    "EntityDataSaverMixin"
   ],
   "injectors": {
 	"defaultRequire": 1
   },
   "client": [
+    "PlayerEntityMixin",
 	"InGameHudMixin",
 	"CameraMixin"
+  ],
+  "server": [
   ]
 }

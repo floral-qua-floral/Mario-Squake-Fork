@@ -11,9 +11,9 @@ public class MarioAerial extends MarioState {
 	private MarioAerial() {
 		this.name = "Aerial";
 
-		preTickTransitions = new ArrayList<MarioStateTransition>(Arrays.asList(new MarioStateTransition[]{
-				CommonTransitions.LANDING,
-		}));
+		preTickTransitions = new ArrayList<>(Arrays.asList(
+				CommonTransitions.LANDING
+		));
 	}
 
 	@Override

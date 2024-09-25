@@ -12,9 +12,9 @@ public class MarioSideflip extends MarioState {
 	private MarioSideflip() {
 		this.name = "Sideflip";
 
-		preTickTransitions = new ArrayList<MarioStateTransition>(Arrays.asList(new MarioStateTransition[]{
-				CommonTransitions.LANDING,
-		}));
+		preTickTransitions = new ArrayList<>(Arrays.asList(
+				CommonTransitions.LANDING
+		));
 	}
 
 	@Override

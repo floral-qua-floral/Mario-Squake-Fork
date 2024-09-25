@@ -8,6 +8,7 @@ import fqf.qua_mario.MarioInputs;
 import fqf.qua_mario.ModQuakeMovement;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 
 public abstract class MarioState {
 	@FunctionalInterface
@@ -20,7 +21,10 @@ public abstract class MarioState {
 	public String name;
 	public ArrayList<MarioStateTransition> preTickTransitions;
 	public ArrayList<MarioStateTransition> postTickTransitions;
-	public ArrayList<MarioStateTransition> postMoveTransitions;
+	public ArrayList<MarioStateTransition> postMoveTransitions = new ArrayList<>(Arrays.asList(
+			CommonTransitions.LAVA_BOOST,
+			CommonTransitions.ENTER_WATER
+	));
 
 	public void evaluateTransitions(ArrayList<MarioStateTransition> transitions) {
 		if(transitions != null) for (MarioStateTransition transition : transitions) {

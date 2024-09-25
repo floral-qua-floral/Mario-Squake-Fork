@@ -1,7 +1,10 @@
 package fqf.qua_mario;
 
+import fqf.qua_mario.characters.CharaMario;
+import fqf.qua_mario.characters.MarioCharacter;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.network.ClientPlayerEntity;
+import net.minecraft.entity.Entity;
 import net.minecraft.entity.MovementType;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.util.math.Vec3d;
@@ -10,10 +13,12 @@ import fqf.qua_mario.cameraanims.CameraAnim;
 import fqf.qua_mario.mariostates.MarioGrounded;
 import fqf.qua_mario.mariostates.MarioState;
 
-public class MarioClient {
-	private static final Logger LOGGER = ModQuakeMovement.LOGGER;
+import java.util.List;
 
+public class MarioClient {
 	public static ClientPlayerEntity player;
+	public static boolean isMario;
+
 	public static double forwardVel;
 	public static double rightwardVel;
 	public static double yVel;
@@ -38,9 +43,17 @@ public class MarioClient {
 		animEndTime = (float) (animStartTime + newAnim.duration);
 	}
 
+	public static MarioCharacter character = CharaMario.INSTANCE;
+
 	public static boolean attempt_travel(PlayerEntity player, Vec3d movementInput) {
 		// don't do special movement if this is running server-side
-		if (!player.getWorld().isClient) return false;
+		if (!player.getWorld().isClient) {
+			ModQuakeMovement.LOGGER.info("HEY WHAT?!?!???");
+			return false;
+		}
+
+		// don't do special movement if the server hasn't told us whether we're Mario
+		if(!isMario) return false;
 
 		// don't do special movement if special movement is disabled
 		if (!ModQuakeMovement.CONFIG.isEnabled()) return false;
@@ -104,6 +117,15 @@ public class MarioClient {
 		// Finish
 		player.updateLimbs(false);
 		return true;
+	}
+
+	public static List<Entity> getStompTargets(boolean onlyFromAbove) {
+		List<Entity> stompTargets = MarioClient.player.getWorld().getOtherEntities(MarioClient.player, MarioClient.player.getBoundingBox());
+
+		if(onlyFromAbove)
+			stompTargets.removeIf(stompTarget -> MarioClient.player.getY() - MarioClient.yVel < stompTarget.getY() + stompTarget.getHeight());
+
+		return stompTargets;
 	}
 
 	public static void setMotion(double forward, double rightward) {

@@ -1,70 +1,100 @@
 package fqf.qua_mario;
 
+import com.mojang.brigadier.arguments.BoolArgumentType;
+import com.mojang.brigadier.context.CommandContext;
+import com.mojang.brigadier.exceptions.CommandSyntaxException;
+import fqf.qua_mario.util.IEntityDataSaver;
 import me.shedaniel.autoconfig.AutoConfig;
 import me.shedaniel.autoconfig.serializer.GsonConfigSerializer;
-import net.fabricmc.api.ClientModInitializer;
-import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
-import net.fabricmc.fabric.api.client.keybinding.v1.KeyBindingHelper;
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.font.TextRenderer;
-import net.minecraft.client.gui.DrawContext;
-import net.minecraft.client.network.ClientPlayerEntity;
-import net.minecraft.client.option.KeyBinding;
-import net.minecraft.client.util.InputUtil;
+import net.fabricmc.api.ModInitializer;
+import net.fabricmc.fabric.api.command.v2.CommandRegistrationCallback;
+import net.fabricmc.fabric.api.networking.v1.PayloadTypeRegistry;
+import net.fabricmc.fabric.api.networking.v1.ServerPlayConnectionEvents;
+import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
+import net.minecraft.command.argument.EntityArgumentType;
+import net.minecraft.network.RegistryByteBuf;
+import net.minecraft.network.codec.PacketCodec;
+import net.minecraft.network.codec.PacketCodecs;
+import net.minecraft.network.packet.CustomPayload;
+import net.minecraft.server.command.ServerCommandSource;
+import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.text.Text;
-import net.minecraft.util.math.Vec3d;
-import org.lwjgl.glfw.GLFW;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import static net.minecraft.server.command.CommandManager.*;
+import net.minecraft.util.Identifier;
 
-public class ModQuakeMovement implements ClientModInitializer {
-    public static final String MODID = "squake";
-    public static final Logger LOGGER = LoggerFactory.getLogger(MODID);
-    public static final ModConfig CONFIG;
-    public static final String CATEGORY = "fabric.mods." + MODID;
-    private static final KeyBinding toggleEnabled = new KeyBinding(CATEGORY + "." + "enable", InputUtil.Type.KEYSYM, GLFW.GLFW_KEY_UNKNOWN, CATEGORY);
+public class ModQuakeMovement implements ModInitializer {
+	public static final String MOD_ID = "qua_mario";
+	public static final Logger LOGGER = LoggerFactory.getLogger(MOD_ID);
 
-    static {
-        AutoConfig.register(ModConfig.class, GsonConfigSerializer::new);
-        CONFIG = AutoConfig.getConfigHolder(ModConfig.class).getConfig();
-    }
+	public static final ModConfig CONFIG;
+	static {
+		AutoConfig.register(ModConfig.class, GsonConfigSerializer::new);
+		CONFIG = AutoConfig.getConfigHolder(ModConfig.class).getConfig();
+	}
 
-    @Override
-    public void onInitializeClient() {
-        KeyBindingHelper.registerKeyBinding(toggleEnabled);
+	public record SetMarioEnabledPayload(boolean isMario) implements CustomPayload {
+		public static final CustomPayload.Id<SetMarioEnabledPayload> ID = new CustomPayload.Id<>(Identifier.of(MOD_ID, "set_mario_enabled"));
+		public static final PacketCodec<RegistryByteBuf, SetMarioEnabledPayload> CODEC = PacketCodec.tuple(PacketCodecs.BOOL, SetMarioEnabledPayload::isMario, SetMarioEnabledPayload::new);
 
-        ClientTickEvents.END_CLIENT_TICK.register(client -> {
-            while (toggleEnabled.wasPressed()) {
-                ModQuakeMovement.CONFIG.setEnabled(!ModQuakeMovement.CONFIG.isEnabled());
-                Text message = ModQuakeMovement.CONFIG.isEnabled() ? Text.translatable("squake.key.toggle.enabled") : Text.translatable("squake.key.toggle.disabled");
-                client.player.sendMessage(message, true);
-            }
-        });
-    }
+		@Override
+		public Id<? extends CustomPayload> getId() { return ID; }
+	}
 
-    public static void drawSpeedometer(DrawContext context) {
-        if (CONFIG.getSpeedometerPosition() == ModConfig.SpeedometerPosition.OFF) {
-            return;
-        }
-        MinecraftClient client = MinecraftClient.getInstance();
-        ClientPlayerEntity player = client.player;
-        Vec3d pos = player.getPos();
-        TextRenderer textRenderer = client.textRenderer;
+	public String setMarioCommand(CommandContext<ServerCommandSource> context, boolean playerArg) throws CommandSyntaxException {
+		boolean isMario = BoolArgumentType.getBool(context, "value");
 
-        double dx = pos.x - player.lastRenderX;
-        double dz = pos.z - player.lastRenderZ;
-        String speedStr = String.format("Speed: %.2f", Math.sqrt(dx * dx + dz * dz) * 20);
+		ServerPlayerEntity player;
+		if(playerArg) player = context.getSource().getPlayerOrThrow();
+		else player = EntityArgumentType.getPlayer(context, "whoThough");
 
-        int textX = 2;
-        int textY = 2;
+		setMarioPacket(player, isMario);
 
-        if (CONFIG.getSpeedometerPosition() == ModConfig.SpeedometerPosition.BOTTOM_RIGHT || CONFIG.getSpeedometerPosition() == ModConfig.SpeedometerPosition.BOTTOM_LEFT) {
-            textY = context.getScaledWindowHeight() - textRenderer.fontHeight - 2;
-        }
-        if (CONFIG.getSpeedometerPosition() == ModConfig.SpeedometerPosition.TOP_RIGHT || CONFIG.getSpeedometerPosition() == ModConfig.SpeedometerPosition.BOTTOM_RIGHT) {
-            textX = context.getScaledWindowWidth() - textRenderer.getWidth(speedStr) - 2;
-        }
+		IEntityDataSaver playerDataSaver = (IEntityDataSaver) player;
+		playerDataSaver.getPersistentData().putBoolean("isMario", isMario);
 
-        context.drawText(textRenderer, speedStr, textX, textY, 0xFFFFFFFF, true);
-    }
+		return "Toggled Mario " + (isMario ? "on" : "off") + " for " + player.getName();
+	}
+
+	public void setMarioPacket(ServerPlayerEntity player, boolean isMario) {
+		ServerPlayNetworking.send(player, new SetMarioEnabledPayload(isMario));
+	}
+
+	@Override
+	public void onInitialize() {
+		PayloadTypeRegistry.playS2C().register(SetMarioEnabledPayload.ID, SetMarioEnabledPayload.CODEC);
+//		PayloadTypeRegistry.playC2S().register
+
+		ServerPlayConnectionEvents.JOIN.register((handler, sender, server) -> {
+			IEntityDataSaver playerDataSaver = (IEntityDataSaver) (handler.player);
+			setMarioPacket(handler.player, playerDataSaver.getPersistentData().getBoolean("isMario"));
+		});
+
+		CommandRegistrationCallback.EVENT.register((dispatcher, registryAccess, environment) ->
+			dispatcher.register(literal("mario")
+				.executes(context -> {
+					context.getSource().sendFeedback(() -> Text.literal("Called /mario with no arguments"), true);
+					return 1;
+				})
+				.then(literal("setEnabled")
+					.then(argument("value", BoolArgumentType.bool())
+							.executes(context -> {
+								String feedback = setMarioCommand(context, false);
+								context.getSource().sendFeedback(() -> Text.literal(feedback), true);
+								return 1;
+							})
+								.then(argument("whoThough", EntityArgumentType.player())
+										.executes(context -> {
+											String feedback = setMarioCommand(context, true);
+											context.getSource().sendFeedback(() -> Text.literal(feedback), true);
+											return 1;
+										})
+								)
+					)
+				)
+			)
+		);
+	}
+
 }
