@@ -1,10 +1,13 @@
 package fqf.qua_mario.mixin;
 
+import fqf.qua_mario.MarioClient;
 import fqf.qua_mario.ModQuakeMovement;
 import fqf.qua_mario.util.IEntityDataSaver;
 import net.minecraft.entity.Entity;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.nbt.NbtElement;
+import net.minecraft.util.math.Vec3d;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;

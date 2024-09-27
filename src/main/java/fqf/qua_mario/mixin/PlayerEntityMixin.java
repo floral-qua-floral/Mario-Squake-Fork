@@ -24,9 +24,6 @@ public abstract class PlayerEntityMixin extends LivingEntity {
 
 	@Inject(at = @At("HEAD"), method = "travel(Lnet/minecraft/util/math/Vec3d;)V", cancellable = true)
 	private void travel(Vec3d movementInput, CallbackInfo ci) {
-		if (!ModQuakeMovement.CONFIG.isEnabled())
-			return;
-
 		if (MarioClient.attempt_travel((PlayerEntity) (Object) this, movementInput))
 			ci.cancel();
 	}

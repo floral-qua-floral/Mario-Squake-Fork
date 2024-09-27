@@ -10,6 +10,7 @@
   },
   "client": [
     "PlayerEntityMixin",
+    "EntitySwimPreventionMixin",
 	"InGameHudMixin",
 	"CameraMixin"
   ]

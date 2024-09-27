@@ -23,24 +23,24 @@ public class MarioJump extends MarioState {
 				}
 		));
 
-		postMoveTransitions = new ArrayList<>(Arrays.asList(
-				() -> {
-					if (MarioClient.yVel > 0 || MarioClient.yVel <= 0) return null;
-
-					List<Entity> stompTargets = MarioClient.getStompTargets(true);
-					for (Entity stompTarget : stompTargets) {
-						LOGGER.info("Attempt stomp against " + stompTarget);
-						if (false) {
-							double desiredY = stompTarget.getY() + stompTarget.getHeight();
-							double deltaY = MarioClient.player.getY() - desiredY;
-							MarioClient.player.move(MovementType.SELF, new Vec3d(0, deltaY, 0));
-							return MarioAerial.INSTANCE;
-						}
-					}
-
-					return null;
-				}
-		));
+//		postMoveTransitions = new ArrayList<>(Arrays.asList(
+//				() -> {
+//					if (MarioClient.yVel > 0 || MarioClient.yVel <= 0) return null;
+//
+//					List<Entity> stompTargets = MarioClient.getStompTargets(true);
+//					for (Entity stompTarget : stompTargets) {
+//						LOGGER.info("Attempt stomp against " + stompTarget);
+//						if (false) {
+//							double desiredY = stompTarget.getY() + stompTarget.getHeight();
+//							double deltaY = MarioClient.player.getY() - desiredY;
+//							MarioClient.player.move(MovementType.SELF, new Vec3d(0, deltaY, 0));
+//							return MarioAerial.INSTANCE;
+//						}
+//					}
+//
+//					return null;
+//				}
+//		));
 	}
 
 	@Override

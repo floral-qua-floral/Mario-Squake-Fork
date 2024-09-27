@@ -57,7 +57,7 @@ public class MarioInputs {
 		return HELD.get(input);
 	}
 
-	public static boolean isPressed(Key input) { return isPressed(input, false); }
+	public static boolean isPressed(Key input) { return isPressed(input, true); }
 
 	public static void unbuffer(Key input) {
 		PRESSED_BUFFERS.put(input, 0);

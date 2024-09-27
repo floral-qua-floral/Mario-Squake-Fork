@@ -60,7 +60,6 @@ public abstract class MarioState {
 
 		protected static final MarioStateTransition JUMP = () -> {
 			if(MarioInputs.isPressed(MarioInputs.Key.JUMP)) {
-				MarioInputs.unbuffer(MarioInputs.Key.JUMP);
 				MarioClient.yVel = 0.95;
 				return MarioJump.INSTANCE;
 			}
@@ -76,7 +75,7 @@ public abstract class MarioState {
 
 		protected static final MarioStateTransition ENTER_WATER = () -> {
 			if(MarioClient.player.getFluidHeight(FluidTags.WATER) > 0.5) {
-				MarioClient.yVel = 1;
+				return MarioUnderwater.INSTANCE;
 			}
 			return null;
 		};

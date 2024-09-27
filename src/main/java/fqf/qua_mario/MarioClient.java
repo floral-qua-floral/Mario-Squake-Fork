@@ -3,6 +3,7 @@ package fqf.qua_mario;
 import fqf.qua_mario.characters.CharaMario;
 import fqf.qua_mario.characters.MarioCharacter;
 import fqf.qua_mario.mariostates.MarioDebug;
+import fqf.qua_mario.mariostates.MarioGrounded;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.entity.Entity;
@@ -26,7 +27,7 @@ public class MarioClient {
 	public static double forwardInput;
 	public static double rightwardInput;
 
-	private static MarioState marioState = MarioDebug.INSTANCE;
+	public static MarioState marioState = MarioDebug.INSTANCE;
 	public static int stateTimer = 0;
 	public static void changeState(MarioState newState) {
 		stateTimer = 0;
@@ -84,15 +85,19 @@ public class MarioClient {
 	private static boolean mario_travel(ClientPlayerEntity player, Vec3d movementInput) {
 		MarioClient.player = player;
 
+		// Update Mario's custom inputs class
+		MarioInputs.update(player);
+
+		// Undo vanilla vertical swimming
+		if(player.isTouchingWater())
+			MarioClient.yVel += (MarioInputs.isHeld(MarioInputs.Key.SNEAK) ? 0.04 : 0.0) - (MarioInputs.isHeld(MarioInputs.Key.JUMP) ? 0.04 : 0.0);
+
 		// Calculate forward and sideways vector components
 		double yawRad = Math.toRadians(player.getYaw());
 		double forwardX = -Math.sin(yawRad);
 		double forwardZ = Math.cos(yawRad);
-		double rightwardX = forwardZ;
+		double rightwardX = 1 * forwardZ;
 		double rightwardZ = -forwardX;
-
-		// Update Mario's custom inputs class
-		MarioInputs.update(player);
 
 		// Calculate current forwards and sideways velocity
 		Vec3d currentVel = player.getVelocity();
@@ -248,12 +253,91 @@ public class MarioClient {
 		return newVel;
 	}
 
+	public static void accelAerial(
+			double forwardAccel, double forwardMax, double backwardMax,
+			double strafeAccel, double strafeMax,
+			double forwardInfluence, double strafeInfluence
+	) {
+
+	}
+
+	public static void accelInfluence(
+			double forwardAccel, double forwardTarget,
+			double strafeAccel, double strafeTarget,
+			double forwardInfluence, double strafeInfluence
+	) {
+		// Save current velocity
+		Vector2d oldVel = new Vector2d(forwardVel, rightwardVel);
+
+		// Ensure forwardAccel and strafeAccel are positive
+		forwardAccel = Math.abs(forwardAccel);
+		strafeAccel = Math.abs(strafeAccel);
+
+		// Calculate which way to accelerate
+		double forwardAccelDir, strafeAccelDir;
+
+		double forwardDifference = forwardTarget - forwardVel;
+		if(MathHelper.approximatelyEquals(forwardDifference, 0))
+			forwardAccelDir = 0;
+		else if(forwardAccel < Math.abs(forwardDifference))
+			forwardAccelDir = Math.signum(forwardDifference);
+		else {
+			forwardAccelDir = 0;
+			forwardVel = forwardTarget;
+		}
+
+		double strafeDifference = strafeTarget - rightwardVel;
+		if(MathHelper.approximatelyEquals(strafeDifference, 0))
+			strafeAccelDir = 0;
+		else if(strafeAccel < Math.abs(strafeDifference))
+			strafeAccelDir = Math.signum(strafeDifference);
+		else {
+			strafeAccelDir = 0;
+			rightwardVel = strafeTarget;
+		}
+
+		// Calculate the vector representing what direction the player will go in
+		Vector2d newVelDir = new Vector2d(
+				forwardVel + forwardInfluence * forwardAccelDir,
+				rightwardVel + strafeInfluence * strafeAccelDir);
+
+		// Calculate the vector for the player's magnitude
+		Vector2d accelVector = new Vector2d(
+				forwardAccel * forwardAccelDir,
+				strafeAccel * strafeAccelDir
+		);
+		if(accelVector.x != 0 || accelVector.y != 0) accelVector.normalize(Math.max(forwardAccel, strafeAccel));
+
+		Vector2d newVelMagnitude = new Vector2d(
+			forwardVel + accelVector.x,
+			rightwardVel + accelVector.y
+		);
+
+		double speedCap = Math.max(forwardTarget, strafeTarget);
+		double speedCapSquared = speedCap * speedCap;
+		if(newVelMagnitude.lengthSquared() > oldVel.lengthSquared()) {
+			if(oldVel.lengthSquared() > speedCapSquared) {
+				newVelMagnitude = oldVel;
+			}
+			else if(newVelMagnitude.lengthSquared() > speedCapSquared) {
+				newVelMagnitude.normalize(speedCap);
+			}
+		}
+
+		// Redefine newVelDir's length to the length of newVelMagnitude
+		if(newVelDir.x != 0 || newVelDir.y != 0) newVelDir.normalize(newVelMagnitude.length());
+		else newVelDir = newVelMagnitude.normalize(speedCap);
+
+		// Assign the new velocity
+		assignForwardStrafeVelocities(newVelDir.x, newVelDir.y);
+	}
+
 	public static void accelerate(
 			double forwardTarget, double strafeTarget,
 			double maxLongitudinalDelta, double maxStrafeDelta,
 			double forwardInfluence, double strafeInfluence,
-			double maxSpeedIncrease, double maxSpeedDecrease) {
-
+			double maxSpeedIncrease, double maxSpeedDecrease
+	) {
 		// Weight the forward and strafe influences
 		Vector2d influences = new Vector2d(forwardInfluence, strafeInfluence);
 		double influencesLength = influences.length();
@@ -323,7 +407,22 @@ public class MarioClient {
 		player.setVelocity(forwardX * newVel.x + rightwardX * newVel.y, yVel, forwardZ * newVel.x + rightwardZ * newVel.y);
 	}
 
+	private static void assignForwardStrafeVelocities(double forward, double strafe) {
+		// Calculate forward and sideways vector components
+		double yawRad = Math.toRadians(player.getYaw());
+		double forwardX = -Math.sin(yawRad);
+		double forwardZ = Math.cos(yawRad);
+		double rightwardX = forwardZ;
+		double rightwardZ = -forwardX;
+
+		player.setVelocity(forward * forwardX + strafe * rightwardX, yVel, forward * forwardZ + strafe * rightwardZ);
+	}
+
+	private static double clampulus(double value, double min, double max) {
+		return(Math.min(max, Math.max(min, value)));
+	}
+
 	private static void print(String printules) {
-		ModQuakeMovement.LOGGER.info("\n" + printules);
+		ModQuakeMovement.LOGGER.info("\n{}", printules);
 	}
 }

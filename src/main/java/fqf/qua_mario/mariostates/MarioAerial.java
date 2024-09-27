@@ -14,6 +14,10 @@ public class MarioAerial extends MarioState {
 		preTickTransitions = new ArrayList<>(Arrays.asList(
 				CommonTransitions.LANDING
 		));
+
+		postTickTransitions = new ArrayList<>(Arrays.asList(
+				CommonTransitions.ENTER_WATER
+		));
 	}
 
 	@Override

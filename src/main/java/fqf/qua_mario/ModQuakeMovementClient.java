@@ -51,6 +51,7 @@ public class ModQuakeMovementClient implements ClientModInitializer {
 		double dx = pos.x - player.lastRenderX;
 		double dz = pos.z - player.lastRenderZ;
 		String speedStr = String.format("Speed: %.2f", Math.sqrt(dx * dx + dz * dz) * 20);
+		String stateStr = "State: " + MarioClient.marioState.name;
 
 		int textX = 2;
 		int textY = 2;
@@ -59,9 +60,10 @@ public class ModQuakeMovementClient implements ClientModInitializer {
 			textY = context.getScaledWindowHeight() - textRenderer.fontHeight - 2;
 		}
 		if (ModQuakeMovement.CONFIG.getSpeedometerPosition() == ModConfig.SpeedometerPosition.TOP_RIGHT || ModQuakeMovement.CONFIG.getSpeedometerPosition() == ModConfig.SpeedometerPosition.BOTTOM_RIGHT) {
-			textX = context.getScaledWindowWidth() - textRenderer.getWidth(speedStr) - 2;
+			textX = context.getScaledWindowWidth() - textRenderer.getWidth(stateStr) - 2;
 		}
 
-		context.drawText(textRenderer, speedStr, textX, textY, 0xFFFFFFFF, true);
+		context.drawText(textRenderer, speedStr, textX, textY - textRenderer.fontHeight - 2, 0xFFFFFFFF, true);
+		context.drawText(textRenderer, stateStr, textX, textY, 0xFFFFFFFF, true);
 	}
 }
