@@ -3,7 +3,6 @@ package fqf.qua_mario;
 import fqf.qua_mario.characters.CharaMario;
 import fqf.qua_mario.characters.MarioCharacter;
 import fqf.qua_mario.mariostates.MarioDebug;
-import fqf.qua_mario.mariostates.MarioGrounded;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.entity.Entity;
@@ -253,21 +252,25 @@ public class MarioClient {
 		return newVel;
 	}
 
-	public static void accelAerial(
-			double forwardAccel, double forwardMax, double backwardMax,
-			double strafeAccel, double strafeMax,
-			double forwardInfluence, double strafeInfluence
+	public static void approachAngleAndAccel(
+			double forwardAccel, double forwardTarget, double forwardAngleContribution,
+			double strafeAccel, double strafeTarget, double strafeAngleContribution,
+			double redirectDelta
 	) {
+		Vector2d redirectedVel;
 
-	}
+		if(redirectDelta == 0 || (forwardAngleContribution == 0 && strafeAngleContribution == 0) ||
+				(MathHelper.approximatelyEquals(forwardVel, 0) && MathHelper.approximatelyEquals(rightwardVel, 0) )) {
+			redirectedVel = new Vector2d(forwardVel, rightwardVel);
+		}
+		else {
+			Vector2d currentVel = new Vector2d(forwardVel, rightwardVel);
+			Vector2d intendedAngle = new Vector2d(forwardAngleContribution, strafeAngleContribution);
 
-	public static void accelInfluence(
-			double forwardAccel, double forwardTarget,
-			double strafeAccel, double strafeTarget,
-			double forwardInfluence, double strafeInfluence
-	) {
-		// Save current velocity
-		Vector2d oldVel = new Vector2d(forwardVel, rightwardVel);
+			if(redirectDelta > 0) redirectedVel = slerp(currentVel, intendedAngle, redirectDelta);
+			else redirectedVel = intendedAngle.normalize(currentVel.length()); // redirectAngle < 0 for instant redirection
+		}
+
 
 		// Ensure forwardAccel and strafeAccel are positive
 		forwardAccel = Math.abs(forwardAccel);
@@ -275,139 +278,98 @@ public class MarioClient {
 
 		// Calculate which way to accelerate
 		double forwardAccelDir, strafeAccelDir;
-
-		double forwardDifference = forwardTarget - forwardVel;
+		double forwardDifference = forwardTarget - redirectedVel.x;
 		if(MathHelper.approximatelyEquals(forwardDifference, 0))
 			forwardAccelDir = 0;
 		else if(forwardAccel < Math.abs(forwardDifference))
 			forwardAccelDir = Math.signum(forwardDifference);
 		else {
 			forwardAccelDir = 0;
-			forwardVel = forwardTarget;
+			redirectedVel.x = forwardTarget;
 		}
-
-		double strafeDifference = strafeTarget - rightwardVel;
+		double strafeDifference = strafeTarget - redirectedVel.y;
 		if(MathHelper.approximatelyEquals(strafeDifference, 0))
 			strafeAccelDir = 0;
 		else if(strafeAccel < Math.abs(strafeDifference))
 			strafeAccelDir = Math.signum(strafeDifference);
 		else {
 			strafeAccelDir = 0;
-			rightwardVel = strafeTarget;
+			redirectedVel.y = strafeTarget;
 		}
 
-		// Calculate the vector representing what direction the player will go in
-		Vector2d newVelDir = new Vector2d(
-				forwardVel + forwardInfluence * forwardAccelDir,
-				rightwardVel + strafeInfluence * strafeAccelDir);
-
-		// Calculate the vector for the player's magnitude
+		// Calculate the acceleration vector and normalize it, so the player won't get extra acceleration by strafing
 		Vector2d accelVector = new Vector2d(
 				forwardAccel * forwardAccelDir,
 				strafeAccel * strafeAccelDir
 		);
 		if(accelVector.x != 0 || accelVector.y != 0) accelVector.normalize(Math.max(forwardAccel, strafeAccel));
 
-		Vector2d newVelMagnitude = new Vector2d(
-			forwardVel + accelVector.x,
-			rightwardVel + accelVector.y
+		// Calculate the new velocity
+		Vector2d newVel = new Vector2d(
+				redirectedVel.x + accelVector.x,
+				redirectedVel.y + accelVector.y
 		);
 
-		double speedCap = Math.max(forwardTarget, strafeTarget);
+		// Calculate & apply soft speed cap
+		double speedCap = Math.max(Math.abs(forwardTarget), Math.abs(strafeTarget));
 		double speedCapSquared = speedCap * speedCap;
-		if(newVelMagnitude.lengthSquared() > oldVel.lengthSquared()) {
-			if(oldVel.lengthSquared() > speedCapSquared) {
-				newVelMagnitude = oldVel;
-			}
-			else if(newVelMagnitude.lengthSquared() > speedCapSquared) {
-				newVelMagnitude.normalize(speedCap);
-			}
+		double oldVelLengthSquared = Vector2d.lengthSquared(forwardVel, rightwardVel);
+
+		if(newVel.lengthSquared() > oldVelLengthSquared) {
+			if(oldVelLengthSquared > speedCapSquared)
+				newVel.normalize(Vector2d.length(forwardVel, rightwardVel));
+			else if(newVel.lengthSquared() > speedCapSquared)
+				newVel.normalize(speedCap);
 		}
 
-		// Redefine newVelDir's length to the length of newVelMagnitude
-		if(newVelDir.x != 0 || newVelDir.y != 0) newVelDir.normalize(newVelMagnitude.length());
-		else newVelDir = newVelMagnitude.normalize(speedCap);
-
-		// Assign the new velocity
-		assignForwardStrafeVelocities(newVelDir.x, newVelDir.y);
+		// Assign velocities
+		assignForwardStrafeVelocities(newVel.x, newVel.y);
 	}
 
-	public static void accelerate(
-			double forwardTarget, double strafeTarget,
-			double maxLongitudinalDelta, double maxStrafeDelta,
-			double forwardInfluence, double strafeInfluence,
-			double maxSpeedIncrease, double maxSpeedDecrease
-	) {
-		// Weight the forward and strafe influences
-		Vector2d influences = new Vector2d(forwardInfluence, strafeInfluence);
-		double influencesLength = influences.length();
-		influences.x *= Math.min(Math.abs(1000 * forwardTarget - 1000 * forwardVel), 1);
-		influences.y *= Math.min(Math.abs(1000 * strafeTarget - 1000 * rightwardVel), 1);
-		influences.normalize(influencesLength);
-		forwardInfluence = influences.x;
-		strafeInfluence = influences.y;
+	// Function to perform SLERP on 2D vectors
+	private static Vector2d slerp(Vector2d currentVelocity, Vector2d intendedAngle, double turnSpeedDegrees) {
+		// Convert turnSpeed to radians
+		double turnSpeedRadians = Math.toRadians(turnSpeedDegrees);
 
-//		if(MathHelper.approximatelyEquals(rightwardVel, strafeTarget)) strafeInfluence = 0;
+		// Normalize the input vectors (slerp typically operates on normalized vectors)
+		Vector2d currentDir = new Vector2d(currentVelocity).normalize();
+		Vector2d intendedDir = new Vector2d(intendedAngle).normalize();
 
-		// Get accelerated velocities as a vector
-		Vector2d oldVel = new Vector2d(forwardVel, rightwardVel);
+		// Calculate the angle between the two vectors using the dot product
+		double dotProduct = currentDir.dot(intendedDir);
+		// Clamp the dot product to ensure it's within the valid range for acos [-1, 1]
+		dotProduct = MathHelper.clamp(dotProduct, 0.0, 1.0);
 
-		Vector2d newVel = new Vector2d(
-				forwardVel + forwardInfluence * Math.signum(forwardTarget - forwardVel),
-				rightwardVel + strafeInfluence * Math.signum(strafeTarget - rightwardVel));
+		// Calculate the angle between the vectors
+		double angleBetween = Math.acos(dotProduct);
 
-		// Calculate magnitude of new speed
-		double oldMagnitudeSquared = oldVel.lengthSquared();
-		double newMagnitudeSquared = newVel.lengthSquared();
-		double deltaMagnitudeSquared = newMagnitudeSquared - oldMagnitudeSquared;
+		// If the angle is very small, just return the current velocity (no need to slerp)
+		if(angleBetween < MathHelper.EPSILON || MathHelper.approximatelyEquals(angleBetween, MathHelper.PI))
+			return new Vector2d(currentVelocity);
 
-		// If magnitude has increased by more than maxSpeedIncrease, cap the new magnitude
-		if(deltaMagnitudeSquared > maxSpeedIncrease * maxSpeedIncrease) {
-			newVel.normalize(Math.sqrt(oldMagnitudeSquared) + maxSpeedIncrease);
-		}
-		// If magnitude has decreased by more than maxSpeedDecrease, apply minimum to the new magnitude
-		else if(deltaMagnitudeSquared < -(maxSpeedDecrease * maxSpeedDecrease)) {
-			newVel.normalize(Math.sqrt(oldMagnitudeSquared) - maxSpeedDecrease);
-		}
+		// Calculate the fraction of the way we want to rotate (clamp to 0.0 to 1.0)
+		double t = Math.min(1.0, turnSpeedRadians / angleBetween);
 
-		// Cap maximum deltas so Mario won't accelerate past his target velocity
-		maxLongitudinalDelta = Math.min(maxLongitudinalDelta, Math.abs(forwardTarget - forwardVel));
-		maxStrafeDelta = Math.min(maxStrafeDelta, Math.abs(strafeTarget - rightwardVel));
+		// Slerp calculation
+		double sinTotal = Math.sin(angleBetween);
+		double ratioA = Math.sin((1 - t) * angleBetween) / sinTotal;
+		double ratioB = Math.sin(t * angleBetween) / sinTotal;
 
-		// Calculate strafe delta
-		double strafeDelta = Math.abs(newVel.y - oldVel.y);
-		// If strafe delta is above maxStrafeDelta, new strafe speed is adjusted to
-		// 		rightwardVel + Math.signum(strafeTarget - rightwardVel) * maxStrafeDelta
-		if(strafeDelta > maxStrafeDelta) {
-			newVel.y = oldVel.y + (maxStrafeDelta * Math.signum(strafeTarget - rightwardVel));
-		}
+		// Compute the new direction as a weighted sum of the two directions
+		Vector2d newDir = new Vector2d(
+				currentDir.x * ratioA + intendedDir.x * ratioB,
+				currentDir.y * ratioA + intendedDir.y * ratioB
+		);
 
-		// Calculate longitudinal delta
-		// If longitudinal delta is above maxLongitudinalDelta, new longitudinal speed is adjusted to
-		//		forwardVel + Math.signum(forwardTarget - forwardVel) * maxLongitudinalDelta
-		double longitudinalDelta = Math.abs(newVel.x - oldVel.x);
-		print(
-			"forwardVel: " + forwardVel
-			+ "\nforwardTarget: " + forwardTarget
-			+ "\nnewVel F: " + newVel.x
-			+ "\nlongitudinalDelta: " + longitudinalDelta
-			+ "\nmaxLongDelta: " + maxLongitudinalDelta);
+		// Maintain the original magnitude of the velocity
+		double magnitude = currentVelocity.length();
+		ModQuakeMovement.LOGGER.info("" + newDir.lengthSquared());
+		newDir.mul(magnitude); // Scale the new direction by the original magnitude
 
-		if(longitudinalDelta > maxLongitudinalDelta) {
-			newVel.x = oldVel.x + (maxLongitudinalDelta * Math.signum(forwardTarget - forwardVel));
-		}
-
-		// Calculate forward and sideways vector components
-		double yawRad = Math.toRadians(player.getYaw());
-		double forwardX = -Math.sin(yawRad);
-		double forwardZ = Math.cos(yawRad);
-		double rightwardX = forwardZ;
-		double rightwardZ = -forwardX;
-
-		player.setVelocity(forwardX * newVel.x + rightwardX * newVel.y, yVel, forwardZ * newVel.x + rightwardZ * newVel.y);
+		return newDir; // Return the interpolated direction with original magnitude
 	}
 
-	private static void assignForwardStrafeVelocities(double forward, double strafe) {
+	public static void assignForwardStrafeVelocities(double forward, double strafe) {
 		// Calculate forward and sideways vector components
 		double yawRad = Math.toRadians(player.getYaw());
 		double forwardX = -Math.sin(yawRad);
@@ -416,13 +378,5 @@ public class MarioClient {
 		double rightwardZ = -forwardX;
 
 		player.setVelocity(forward * forwardX + strafe * rightwardX, yVel, forward * forwardZ + strafe * rightwardZ);
-	}
-
-	private static double clampulus(double value, double min, double max) {
-		return(Math.min(max, Math.max(min, value)));
-	}
-
-	private static void print(String printules) {
-		ModQuakeMovement.LOGGER.info("\n{}", printules);
 	}
 }

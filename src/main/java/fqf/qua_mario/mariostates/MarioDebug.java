@@ -18,11 +18,17 @@ public class MarioDebug extends MarioState {
 	public void tick() {
 		MarioClient.yVel = 0;
 
-		MarioClient.accelInfluence(
-				0.01, MarioClient.forwardInput * 0.55,
-				0.01, MarioClient.rightwardInput * 0.55,
-				0.02, 0.02
+		MarioClient.approachAngleAndAccel(
+				0.01, MarioClient.forwardInput * 0.5, MarioClient.forwardInput,
+				0.01, MarioClient.rightwardInput * 0.5, MarioClient.rightwardInput,
+				-1
 		);
+
+//		MarioClient.accelInfluence(
+//				0.01, MarioClient.forwardInput * 0.55,
+//				0.01, MarioClient.rightwardInput * 0.55,
+//				0.1, 0.1
+//		);
 
 //		MarioClient.accelerate(
 //				MarioClient.forwardInput * 0.5, MarioClient.rightwardInput * 0.5,
