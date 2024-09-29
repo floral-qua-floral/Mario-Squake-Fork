@@ -9,6 +9,8 @@ import me.shedaniel.autoconfig.annotation.ConfigEntry;
 public class ModConfig implements ConfigData {
     private boolean enabled = true;
 
+
+
     @ConfigEntry.Gui.EnumHandler(option = ConfigEntry.Gui.EnumHandler.EnumDisplayOption.BUTTON)
     private SpeedometerPosition speedometerPosition = SpeedometerPosition.OFF;
 
@@ -20,6 +22,15 @@ public class ModConfig implements ConfigData {
         OFF
     }
 
+    @ConfigEntry.Gui.EnumHandler(option = ConfigEntry.Gui.EnumHandler.EnumDisplayOption.BUTTON)
+    private SpinputType spinputType = SpinputType.LEFTRIGHT;
+
+    public enum SpinputType {
+        LEFTRIGHT,
+        KEYBIND,
+        EITHER
+    }
+
     public void setEnabled(boolean enabled) {
         this.enabled = enabled;
         AutoConfig.getConfigHolder(ModConfig.class).save();
@@ -27,6 +38,10 @@ public class ModConfig implements ConfigData {
 
     public SpeedometerPosition getSpeedometerPosition() {
         return this.speedometerPosition;
+    }
+
+    public SpinputType getSpinputType() {
+        return this.spinputType;
     }
 
     public boolean isEnabled() {

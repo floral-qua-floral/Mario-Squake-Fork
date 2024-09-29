@@ -14,7 +14,7 @@ public abstract class CameraAnim {
 	public abstract double[] getRotations(double progress);
 
 	protected double cappedLerp(double delta, double start, double end) {
-		return MathHelper.lerp(Math.min(Math.max(delta, 0.0), 1.0), start, end);
+		return MathHelper.clampedLerp(start, end, delta);
 	}
 
 //	public static void tick;
