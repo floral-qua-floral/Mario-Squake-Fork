@@ -45,7 +45,7 @@ public abstract class CameraMixin {
 		if(thirdPerson) return;
 
 //		double progress = Math.min(1.0, MarioClient.cameraAnimTimer / MarioClient.cameraAnim.duration);
-		double progress = Math.min(1.0, timeSinceAnimStart / marioCameraAnim.duration);
+		double progress = Math.max(0.0, timeSinceAnimStart / marioCameraAnim.duration);
 		double[] rotations = marioCameraAnim.getRotations(progress);
 
 		this.rotation.rotationYXZ(

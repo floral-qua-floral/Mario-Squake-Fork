@@ -42,33 +42,54 @@ public class ModQuakeMovement implements ModInitializer {
 		public Id<? extends CustomPayload> getId() { return ID; }
 	}
 
+	public record PlayJumpSfxPayload(boolean isSpin) implements CustomPayload {
+		public static final CustomPayload.Id<PlayJumpSfxPayload> ID = new CustomPayload.Id<>(Identifier.of(MOD_ID, "play_jump_sfx"));
+		public static final PacketCodec<RegistryByteBuf, PlayJumpSfxPayload> CODEC = PacketCodec.tuple(PacketCodecs.BOOL, PlayJumpSfxPayload::isSpin, PlayJumpSfxPayload::new);
+
+		@Override
+		public Id<? extends CustomPayload> getId() { return ID; }
+	}
+
 	public String setMarioCommand(CommandContext<ServerCommandSource> context, boolean playerArg) throws CommandSyntaxException {
 		boolean isMario = BoolArgumentType.getBool(context, "value");
 
 		ServerPlayerEntity player;
-		if(playerArg) player = context.getSource().getPlayerOrThrow();
-		else player = EntityArgumentType.getPlayer(context, "whoThough");
+		if(playerArg) player = EntityArgumentType.getPlayer(context, "whoThough");
+		else player = context.getSource().getPlayerOrThrow();
 
-		setMarioPacket(player, isMario);
+		sendMarioPacket(player, isMario);
 
 		IEntityDataSaver playerDataSaver = (IEntityDataSaver) player;
 		playerDataSaver.getPersistentData().putBoolean("isMario", isMario);
 
-		return "Toggled Mario " + (isMario ? "on" : "off") + " for " + player.getName();
+		return (isMario ? "Enabled" : "Disabled") + " Mario mode for " + player + ".";
 	}
 
-	public void setMarioPacket(ServerPlayerEntity player, boolean isMario) {
+	public void sendMarioPacket(ServerPlayerEntity player, boolean isMario) {
 		ServerPlayNetworking.send(player, new SetMarioEnabledPayload(isMario));
 	}
 
 	@Override
 	public void onInitialize() {
 		PayloadTypeRegistry.playS2C().register(SetMarioEnabledPayload.ID, SetMarioEnabledPayload.CODEC);
+		PayloadTypeRegistry.playS2C().register(StompAttack.affirmStompPayload.ID, StompAttack.affirmStompPayload.CODEC);
+
+		PayloadTypeRegistry.playC2S().register(PlayJumpSfxPayload.ID, PlayJumpSfxPayload.CODEC);
+		PayloadTypeRegistry.playC2S().register(StompAttack.requestStompPayload.ID, StompAttack.requestStompPayload.CODEC);
 //		PayloadTypeRegistry.playC2S().register
 
 		ServerPlayConnectionEvents.JOIN.register((handler, sender, server) -> {
 			IEntityDataSaver playerDataSaver = (IEntityDataSaver) (handler.player);
-			setMarioPacket(handler.player, playerDataSaver.getPersistentData().getBoolean("isMario"));
+			sendMarioPacket(handler.player, playerDataSaver.getPersistentData().getBoolean("isMario"));
+		});
+
+		ServerPlayNetworking.registerGlobalReceiver(PlayJumpSfxPayload.ID, (payload, context) -> {
+			LOGGER.info("Received the packet asking to play a sound effect");
+		});
+
+		ServerPlayNetworking.registerGlobalReceiver(StompAttack.requestStompPayload.ID, (payload, context) -> {
+			LOGGER.info("Received the packet asking to stomp something");
+			StompAttack.server_receive(payload, context);
 		});
 
 		CommandRegistrationCallback.EVENT.register((dispatcher, registryAccess, environment) -> {

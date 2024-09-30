@@ -1,5 +1,7 @@
 package fqf.qua_mario.mariostates;
 
+import fqf.qua_mario.characters.CharaStat;
+import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 import net.minecraft.entity.MovementType;
 import net.minecraft.registry.tag.FluidTags;
 import org.slf4j.Logger;
@@ -60,7 +62,20 @@ public abstract class MarioState {
 
 		protected static final MarioStateTransition JUMP = () -> {
 			if(MarioInputs.isPressed(MarioInputs.Key.JUMP)) {
-				MarioClient.yVel = 0.95;
+				// Normal jump
+
+				// Apply upward velocity
+				double momentum = Math.max(0, MarioClient.forwardVel / MarioClient.getStat(CharaStat.RUN_SPEED));
+				MarioClient.yVel = MarioClient.getStat(CharaStat.JUMP_VELOCITY)
+						+ (momentum * MarioClient.getStat(CharaStat.JUMP_MOMENTUM_ADDEND));
+
+				// Reduce horizontal velocities
+				MarioClient.forwardVel *= 0.85;
+				MarioClient.rightwardVel *= 0.85;
+
+				// Send packet to play the jump sound
+				ClientPlayNetworking.send(new ModQuakeMovement.PlayJumpSfxPayload(false));
+
 				return MarioJump.INSTANCE;
 			}
 			return null;

@@ -17,8 +17,18 @@ public class MarioJump extends MarioState {
 		this.name = "Jump";
 
 		preTickTransitions = new ArrayList<>(Arrays.asList(
-				CommonTransitions.LANDING,
 				() -> {
+					MarioState landingResult = CommonTransitions.LANDING.evaluate();
+					if(landingResult != null) {
+						MarioClient.jumpLandingTime = 6;
+						return landingResult;
+					}
+					return null;
+				},
+				() -> {
+					if(MarioInputs.isPressed(MarioInputs.Key.SNEAK)) {
+						// Initiate ground pound
+					}
 					return null;
 				}
 		));

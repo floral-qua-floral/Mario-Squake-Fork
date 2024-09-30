@@ -39,6 +39,9 @@ public class MarioClient {
 	}
 	public static MarioState getState() { return(marioState); }
 
+	public static int jumpLandingTime = 0;
+	public static int doubleJumpLandingTime = 0;
+
 	private static CameraAnim cameraAnim = null;
 	public static float cameraAnimTimer = 0;
 	public static float animStartTime;
@@ -46,7 +49,8 @@ public class MarioClient {
 	public static void setCameraAnim(@Nullable CameraAnim newAnim) {
 		cameraAnimTimer = 0;
 		cameraAnim = newAnim;
-		animStartTime = player.getWorld().getTime() + MinecraftClient.getInstance().getRenderTickCounter().getTickDelta(false);
+//		animStartTime = player.getWorld().getTime() + MinecraftClient.getInstance().getRenderTickCounter().getTickDelta(false);
+		animStartTime = player.getWorld().getTime() + 1;
 		animEndTime = (float) (animStartTime + (newAnim == null ? 0 : newAnim.duration));
 	}
 	public static CameraAnim getCameraAnim() { return cameraAnim; }
@@ -128,6 +132,10 @@ public class MarioClient {
 		player.move(MovementType.SELF, player.getVelocity());
 		marioState.evaluateTransitions(marioState.postMoveTransitions);
 
+		// Decrement timers
+		jumpLandingTime--;
+		doubleJumpLandingTime--;
+
 		// Finish
 		player.updateLimbs(false);
 		return true;
@@ -138,6 +146,8 @@ public class MarioClient {
 
 		if(onlyFromAbove)
 			stompTargets.removeIf(stompTarget -> MarioClient.player.prevY < stompTarget.getY() + stompTarget.getHeight());
+
+
 
 		return stompTargets;
 	}

@@ -38,6 +38,7 @@ public enum CharaStat {
 	DRIFT_REDIRECTION(0),
 
 	JUMP_VELOCITY(0),
+	JUMP_MOMENTUM_ADDEND(0),
 	JUMP_CAP(0),
 	GRAVITY(0),
 
