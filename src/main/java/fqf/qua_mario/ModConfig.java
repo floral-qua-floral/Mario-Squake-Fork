@@ -31,6 +31,21 @@ public class ModConfig implements ConfigData {
         EITHER
     }
 
+    @ConfigEntry.Gui.EnumHandler(option = ConfigEntry.Gui.EnumHandler.EnumDisplayOption.BUTTON)
+    private CameraAnimType sideflipAnimType = CameraAnimType.AUTHENTIC;
+
+    @ConfigEntry.Gui.EnumHandler(option = ConfigEntry.Gui.EnumHandler.EnumDisplayOption.BUTTON)
+    private CameraAnimType backflipAnimType = CameraAnimType.AUTHENTIC;
+
+    @ConfigEntry.Gui.EnumHandler(option = ConfigEntry.Gui.EnumHandler.EnumDisplayOption.BUTTON)
+    private CameraAnimType tripleJumpAnimType = CameraAnimType.GENTLE;
+
+    public enum CameraAnimType {
+        AUTHENTIC,
+        GENTLE,
+        NO_FUN_ALLOWED
+    }
+
     public void setEnabled(boolean enabled) {
         this.enabled = enabled;
         AutoConfig.getConfigHolder(ModConfig.class).save();
@@ -44,8 +59,19 @@ public class ModConfig implements ConfigData {
         return this.spinputType;
     }
 
+    public CameraAnimType getSideflipAnimType() {
+        return this.sideflipAnimType;
+    }
+
+    public CameraAnimType getBackflipAnimType() {
+        return this.backflipAnimType;
+    }
+
+    public CameraAnimType getTripleJumpAnimType() {
+        return this.tripleJumpAnimType;
+    }
+
     public boolean isEnabled() {
         return this.enabled;
     }
-
 }

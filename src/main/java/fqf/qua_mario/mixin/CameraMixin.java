@@ -1,6 +1,6 @@
 package fqf.qua_mario.mixin;
 
-import fqf.qua_mario.ModQuakeMovement;
+import fqf.qua_mario.cameraanims.CameraAnim;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.render.Camera;
 import org.joml.Quaternionf;
@@ -30,22 +30,23 @@ public abstract class CameraMixin {
 		"Lorg/joml/Quaternionf;rotationYXZ(FFF)Lorg/joml/Quaternionf;"
 		), require = 1, cancellable = true)
 	protected void setRotation(float yaw, float pitch, CallbackInfo ci) {
-		if(MarioClient.marioCameraAnim == null) return;
+		CameraAnim marioCameraAnim = MarioClient.getCameraAnim();
+		if(marioCameraAnim == null) return;
 
 		float rightNow = MarioClient.player.getWorld().getTime() + lastTickDelta;
 		float timeSinceAnimStart = rightNow - MarioClient.animStartTime;
 
 		MarioClient.cameraAnimTimer += MinecraftClient.getInstance().getRenderTickCounter().getTickDelta(false);
 		if(rightNow > MarioClient.animEndTime) {
-			MarioClient.marioCameraAnim = null;
+			MarioClient.setCameraAnim(null);
 			return;
 		}
 
 		if(thirdPerson) return;
 
-//		double progress = Math.min(1.0, MarioClient.cameraAnimTimer / MarioClient.marioCameraAnim.duration);
-		double progress = Math.min(1.0, timeSinceAnimStart / MarioClient.marioCameraAnim.duration);
-		double[] rotations = MarioClient.marioCameraAnim.getRotations(progress);
+//		double progress = Math.min(1.0, MarioClient.cameraAnimTimer / MarioClient.cameraAnim.duration);
+		double progress = Math.min(1.0, timeSinceAnimStart / marioCameraAnim.duration);
+		double[] rotations = marioCameraAnim.getRotations(progress);
 
 		this.rotation.rotationYXZ(
 				(float) (Math.PI - Math.toRadians(yaw + rotations[0])),

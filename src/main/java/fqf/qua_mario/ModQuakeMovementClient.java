@@ -51,19 +51,25 @@ public class ModQuakeMovementClient implements ClientModInitializer {
 		double dx = pos.x - player.lastRenderX;
 		double dz = pos.z - player.lastRenderZ;
 		String speedStr = String.format("Speed: %.2f", Math.sqrt(dx * dx + dz * dz) * 20);
-		String stateStr = "State: " + MarioClient.marioState.name;
+		String stateStr = "State: " + MarioClient.getState().name;
+		String animStr = "Camnim: " + MarioClient.getCameraAnim();
+		String accelStr = "Accel: " + MarioClient.lastUsedAccelStat;
 
 		int textX = 2;
 		int textY = 2;
 
 		if (ModQuakeMovement.CONFIG.getSpeedometerPosition() == ModConfig.SpeedometerPosition.BOTTOM_RIGHT || ModQuakeMovement.CONFIG.getSpeedometerPosition() == ModConfig.SpeedometerPosition.BOTTOM_LEFT) {
-			textY = context.getScaledWindowHeight() - textRenderer.fontHeight - 2;
+			textY = context.getScaledWindowHeight() - (4 * textRenderer.fontHeight) - 2;
 		}
 		if (ModQuakeMovement.CONFIG.getSpeedometerPosition() == ModConfig.SpeedometerPosition.TOP_RIGHT || ModQuakeMovement.CONFIG.getSpeedometerPosition() == ModConfig.SpeedometerPosition.BOTTOM_RIGHT) {
-			textX = context.getScaledWindowWidth() - textRenderer.getWidth(stateStr) - 2;
+			int widestWidth = Math.max(textRenderer.getWidth(speedStr), Math.max(textRenderer.getWidth(stateStr), Math.max(textRenderer.getWidth(animStr), textRenderer.getWidth(accelStr))));
+
+			textX = context.getScaledWindowWidth() - widestWidth - 2;
 		}
 
-		context.drawText(textRenderer, speedStr, textX, textY - textRenderer.fontHeight - 2, 0xFFFFFFFF, true);
-		context.drawText(textRenderer, stateStr, textX, textY, 0xFFFFFFFF, true);
+		context.drawText(textRenderer, speedStr, textX, textY, 0xFFFFFFFF, true);
+		context.drawText(textRenderer, stateStr, textX, textY + textRenderer.fontHeight, 0xFFFFFFFF, true);
+		context.drawText(textRenderer, animStr, textX, textY + 2 * textRenderer.fontHeight, 0xFFFFFFFF, true);
+		context.drawText(textRenderer, accelStr, textX, textY + 3 * textRenderer.fontHeight, 0xFFFFFFFF, true);
 	}
 }

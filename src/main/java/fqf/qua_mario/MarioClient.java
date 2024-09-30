@@ -1,17 +1,21 @@
 package fqf.qua_mario;
 
 import fqf.qua_mario.characters.CharaMario;
-import fqf.qua_mario.characters.MarioCharacter;
+import fqf.qua_mario.characters.CharaStat;
+import fqf.qua_mario.characters.Character;
 import fqf.qua_mario.mariostates.MarioDebug;
+import fqf.qua_mario.mariostates.MarioGrounded;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.MovementType;
 import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
 import fqf.qua_mario.cameraanims.CameraAnim;
 import fqf.qua_mario.mariostates.MarioState;
+import org.jetbrains.annotations.Nullable;
 import org.joml.Vector2d;
 
 import java.util.List;
@@ -25,45 +29,46 @@ public class MarioClient {
 	public static double yVel;
 	public static double forwardInput;
 	public static double rightwardInput;
+	private static final double INPUT_FACTOR = 1.02040816327;
 
-	public static MarioState marioState = MarioDebug.INSTANCE;
+	private static MarioState marioState = MarioGrounded.INSTANCE;
 	public static int stateTimer = 0;
 	public static void changeState(MarioState newState) {
 		stateTimer = 0;
 		marioState = newState;
 	}
+	public static MarioState getState() { return(marioState); }
 
-	public static CameraAnim marioCameraAnim = null;
+	private static CameraAnim cameraAnim = null;
 	public static float cameraAnimTimer = 0;
 	public static float animStartTime;
 	public static float animEndTime;
-	public static void changeCameraAnim(CameraAnim newAnim) {
+	public static void setCameraAnim(@Nullable CameraAnim newAnim) {
 		cameraAnimTimer = 0;
-		marioCameraAnim = newAnim;
+		cameraAnim = newAnim;
 		animStartTime = player.getWorld().getTime() + MinecraftClient.getInstance().getRenderTickCounter().getTickDelta(false);
-		animEndTime = (float) (animStartTime + newAnim.duration);
+		animEndTime = (float) (animStartTime + (newAnim == null ? 0 : newAnim.duration));
 	}
+	public static CameraAnim getCameraAnim() { return cameraAnim; }
 
-	public static MarioCharacter character = CharaMario.INSTANCE;
+	public static Character character = CharaMario.INSTANCE;
+	public static boolean useCharacterStats = true;
+	public static CharaStat lastUsedAccelStat;
 
 	public static boolean useMarioPhysics(PlayerEntity player) {
-		// don't do special movement if this is running server-side
-		if(!player.getWorld().isClient) return false;
-
-		// don't do special movement if we're not Mario
-		if(!isMario) return false;
-
-		// don't do special movement if the player is flying, or gliding with an Elytra
-		if(player.getAbilities().flying || player.isFallFlying()) return false;
-
-		// don't do special movement if the player is in a vehicle
-		if(player.hasVehicle()) return false;
-
-		// don't do special movement if the player is climbing
-		if(player.isClimbing()) return false;
-
-		return true;
-	};
+		return(
+				// Has to be client side
+				player.getWorld().isClient
+				// Has to be Mario (duh)
+				&& isMario
+				// Can't be creative-flying or gliding with an Elytra
+				&& !player.getAbilities().flying && !player.isFallFlying()
+				// Can't be in a vehicle
+				&& !player.hasVehicle()
+				// Can't be climbing
+				&& !player.isClimbing()
+		);
+	}
 
 	public static boolean attempt_travel(PlayerEntity player, Vec3d movementInput) {
 		if(useMarioPhysics(player) && player instanceof ClientPlayerEntity clientPlayer) {
@@ -95,7 +100,7 @@ public class MarioClient {
 		double yawRad = Math.toRadians(player.getYaw());
 		double forwardX = -Math.sin(yawRad);
 		double forwardZ = Math.cos(yawRad);
-		double rightwardX = 1 * forwardZ;
+		double rightwardX = forwardZ;
 		double rightwardZ = -forwardX;
 
 		// Calculate current forwards and sideways velocity
@@ -104,9 +109,8 @@ public class MarioClient {
 		rightwardVel = currentVel.x * rightwardX + currentVel.z * rightwardZ;
 
 		// Evaluate the direction the player is inputting
-		// Input normally goes up to about 0.98, so this multiplication brings it up close to a clean 1.0
-		forwardInput = (Math.abs(movementInput.z) < 0.1) ? 0.0 : movementInput.z * 1.02040816327;
-		rightwardInput = (Math.abs(movementInput.x) < 0.1) ? 0.0 : movementInput.x * 1.02040816327;
+		forwardInput = (Math.abs(movementInput.z) < 0.1) ? 0.0 : movementInput.z * INPUT_FACTOR;
+		rightwardInput = (Math.abs(movementInput.x) < 0.1) ? 0.0 : movementInput.x * INPUT_FACTOR;
 
 		// Store y velocity to modify it separately from X and Z velocity
 		yVel = currentVel.y;
@@ -133,7 +137,7 @@ public class MarioClient {
 		List<Entity> stompTargets = MarioClient.player.getWorld().getOtherEntities(MarioClient.player, MarioClient.player.getBoundingBox());
 
 		if(onlyFromAbove)
-			stompTargets.removeIf(stompTarget -> MarioClient.player.getY() - MarioClient.yVel < stompTarget.getY() + stompTarget.getHeight());
+			stompTargets.removeIf(stompTarget -> MarioClient.player.prevY < stompTarget.getY() + stompTarget.getHeight());
 
 		return stompTargets;
 	}
@@ -302,7 +306,11 @@ public class MarioClient {
 				forwardAccel * forwardAccelDir,
 				strafeAccel * strafeAccelDir
 		);
-		if(accelVector.x != 0 || accelVector.y != 0) accelVector.normalize(Math.max(forwardAccel, strafeAccel));
+		if(accelVector.x != 0 || accelVector.y != 0) {
+			double accelVectorMaxLength = Math.max(forwardAccel, strafeAccel);
+			if(accelVector.lengthSquared() > accelVectorMaxLength * accelVectorMaxLength)
+				accelVector.normalize(accelVectorMaxLength);
+		}
 
 		// Calculate the new velocity
 		Vector2d newVel = new Vector2d(
@@ -362,9 +370,7 @@ public class MarioClient {
 		);
 
 		// Maintain the original magnitude of the velocity
-		double magnitude = currentVelocity.length();
-		ModQuakeMovement.LOGGER.info("" + newDir.lengthSquared());
-		newDir.mul(magnitude); // Scale the new direction by the original magnitude
+		newDir.mul(currentVelocity.length());
 
 		return newDir; // Return the interpolated direction with original magnitude
 	}
@@ -378,5 +384,46 @@ public class MarioClient {
 		double rightwardZ = -forwardX;
 
 		player.setVelocity(forward * forwardX + strafe * rightwardX, yVel, forward * forwardZ + strafe * rightwardZ);
+	}
+
+	public static void groundAccel(
+			CharaStat accelStat, CharaStat speedStat, double forwardAngleContribution,
+			CharaStat strafeAccelStat, CharaStat strafeSpeedStat, double strafeAngleContribution,
+			CharaStat redirectStat
+	) {
+		// Get slipperiness
+		float slipperiness;
+		if(player.isOnGround()) {
+			BlockPos blockPos = player.getVelocityAffectingPos();
+			slipperiness = player.getWorld().getBlockState(blockPos).getBlock().getSlipperiness();
+		}
+		else slipperiness = 0.6F;
+
+		double slipFactor = Math.pow(0.6 / slipperiness, 3);
+
+		lastUsedAccelStat = accelStat;
+
+		approachAngleAndAccel(
+				getStat(accelStat) * slipFactor, getStat(speedStat) * forwardInput, forwardAngleContribution,
+				getStat(strafeAccelStat) * slipFactor, getStat(strafeSpeedStat) * rightwardInput, strafeAngleContribution,
+				getStat(redirectStat) * slipFactor
+		);
+	}
+
+	public static double getStat(CharaStat stat) {
+		if(useCharacterStats) return character.getStatValue(stat);
+		else return stat.getDefaultValue();
+	}
+
+	public static double getStatBuffer(CharaStat stat) {
+		return getStat(stat) * 1.015;
+	}
+
+	public static double getStatThreshold(CharaStat stat) {
+		return getStat(stat) * 0.99;
+	}
+
+	public static void voiceLine(VoiceLine line) {
+		// Send C2S packet with ordinal of the voice line so the server can handle playing the sound
 	}
 }
