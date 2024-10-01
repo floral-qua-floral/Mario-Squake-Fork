@@ -3,7 +3,8 @@
   "package": "fqf.qua_mario.mixin",
   "compatibilityLevel": "JAVA_8",
   "mixins": [
-    "EntityDataSaverMixin"
+    "EntityDataSaverMixin",
+    "DamageSourceMixin"
   ],
   "injectors": {
 	"defaultRequire": 1

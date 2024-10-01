@@ -4,6 +4,7 @@ import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
 import net.fabricmc.fabric.api.client.keybinding.v1.KeyBindingHelper;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
+import net.fabricmc.fabric.api.networking.v1.PayloadTypeRegistry;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gui.DrawContext;
@@ -16,22 +17,14 @@ import org.lwjgl.glfw.GLFW;
 
 public class ModQuakeMovementClient implements ClientModInitializer {
 	public static final String CATEGORY = "fabric.mods." + ModQuakeMovement.MOD_ID;
-	private static final KeyBinding toggleEnabled = new KeyBinding(CATEGORY + "." + "enable", InputUtil.Type.KEYSYM, GLFW.GLFW_KEY_UNKNOWN, CATEGORY);
 	private static final KeyBinding spin = new KeyBinding(CATEGORY + "." + "spin", InputUtil.Type.KEYSYM, GLFW.GLFW_KEY_LEFT_ALT, CATEGORY);
 
 	@Override
 	public void onInitializeClient() {
-		KeyBindingHelper.registerKeyBinding(toggleEnabled);
 		KeyBindingHelper.registerKeyBinding(spin);
 
-		ClientTickEvents.END_CLIENT_TICK.register(client -> {
-			while (toggleEnabled.wasPressed()) {
-				ModQuakeMovement.CONFIG.setEnabled(!ModQuakeMovement.CONFIG.isEnabled());
-				Text message = ModQuakeMovement.CONFIG.isEnabled() ? Text.translatable("squake.key.toggle.enabled") : Text.translatable("squake.key.toggle.disabled");
-				assert client.player != null;
-				client.player.sendMessage(message, true);
-			}
-		});
+//		PayloadTypeRegistry.playC2S().register(ModQuakeMovement.PlayJumpSfxPayload.ID, ModQuakeMovement.PlayJumpSfxPayload.CODEC);
+//		PayloadTypeRegistry.playC2S().register(StompAttack.requestStompPayload.ID, StompAttack.requestStompPayload.CODEC);
 
 		ClientPlayNetworking.registerGlobalReceiver(ModQuakeMovement.SetMarioEnabledPayload.ID, (payload, context) -> {
 			ModQuakeMovement.LOGGER.info("Received the packet client-side! " + payload.isMario());

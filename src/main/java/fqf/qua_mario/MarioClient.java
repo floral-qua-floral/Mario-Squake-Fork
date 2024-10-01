@@ -170,38 +170,6 @@ public class MarioClient {
 		player.setVelocity(newXVel, yVel, newZVel);
 	}
 
-	public static void groundedAccel(double intendedForward, double intendedStrafe, double accel, double strafeAccel) {
-		// Calculate forward and sideways vector components
-		double yawRad = Math.toRadians(player.getYaw());
-		double forwardX = -Math.sin(yawRad);
-		double forwardZ = Math.cos(yawRad);
-		double rightwardX = forwardZ;
-		double rightwardZ = -forwardX;
-
-		// Make relative velocities approach intended relative velocities
-		double deltaForwardVel = accel * Math.signum(intendedForward - forwardVel);
-		if(Math.abs(deltaForwardVel) >= Math.abs(forwardVel - intendedForward))
-			forwardVel = intendedForward;
-		else
-			forwardVel += deltaForwardVel;
-
-		double deltaRightwardVel = strafeAccel * Math.signum(intendedStrafe - rightwardVel);
-		if(Math.abs(deltaRightwardVel) >= Math.abs(rightwardVel - intendedStrafe))
-			rightwardVel = intendedStrafe;
-		else
-			rightwardVel += deltaRightwardVel;
-
-		// Calculate new cardinal velocities and apply speed cap
-		double newXVel = forwardX * forwardVel + rightwardX * rightwardVel;
-		double newZVel = forwardZ * forwardVel + rightwardZ * rightwardVel;
-		Vec3d currentVel = player.getVelocity();
-		Vec3d newVel = capAcceleration(currentVel, new Vec3d(newXVel, 0, newZVel), Math.max(Math.abs(intendedForward), Math.abs(intendedStrafe)));
-
-		// Assign and use the new velocity
-		player.setVelocity(newVel.x, currentVel.y, newVel.z);
-//		player.setVelocity(intendedForward, currentVel.y, intendedStrafe);
-	}
-
 	public static void aerialAccel(double forward, double rightward, double forwardCap, double backwardCap, double sideCap) {
 		// Calculate forward and sideways vector components
 		double yawRad = Math.toRadians(player.getYaw());

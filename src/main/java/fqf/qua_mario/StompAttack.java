@@ -23,8 +23,8 @@ public class StompAttack {
 	}
 	private static final StompType[] STOMP_TYPE_VALUES = StompType.values();
 
-	public static void client_send(UUID target, StompType stompType) {
-		ClientPlayNetworking.send(new requestStompPayload(target, stompType.ordinal()));
+	public static void client_send(Entity target, StompType stompType) {
+		ClientPlayNetworking.send(new requestStompPayload(target.getUuid(), stompType.ordinal()));
 	}
 
 	public static void server_receive(requestStompPayload payload, ServerPlayNetworking.Context context) {
@@ -56,7 +56,7 @@ public class StompAttack {
 	}
 
 	public record requestStompPayload(UUID target, int stompType) implements CustomPayload {
-		public static final Id<requestStompPayload> ID = new Id<>(Identifier.of(ModQuakeMovement.MOD_ID, "play_jump_sfx"));
+		public static final Id<requestStompPayload> ID = new Id<>(Identifier.of(ModQuakeMovement.MOD_ID, "request_stomp"));
 		public static final PacketCodec<RegistryByteBuf, requestStompPayload> CODEC = PacketCodec.tuple(
 				Uuids.PACKET_CODEC,
 				requestStompPayload::target,
@@ -70,7 +70,7 @@ public class StompAttack {
 	}
 
 	public record affirmStompPayload(UUID target, int stompType) implements CustomPayload {
-		public static final Id<affirmStompPayload> ID = new Id<>(Identifier.of(ModQuakeMovement.MOD_ID, "play_jump_sfx"));
+		public static final Id<affirmStompPayload> ID = new Id<>(Identifier.of(ModQuakeMovement.MOD_ID, "affirm_stomp"));
 		public static final PacketCodec<RegistryByteBuf, affirmStompPayload> CODEC = PacketCodec.tuple(
 				Uuids.PACKET_CODEC,
 				affirmStompPayload::target,
