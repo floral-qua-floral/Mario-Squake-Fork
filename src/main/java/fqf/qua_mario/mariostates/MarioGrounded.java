@@ -1,6 +1,7 @@
 package fqf.qua_mario.mariostates;
 
 import fqf.qua_mario.MarioClient;
+import fqf.qua_mario.MarioInputs;
 import fqf.qua_mario.characters.CharaStat;
 
 import java.util.ArrayList;
@@ -13,7 +14,15 @@ public class MarioGrounded extends MarioState {
 		this.name = "Grounded";
 
 		preTickTransitions = new ArrayList<>(Arrays.asList(
-			CommonTransitions.FALL
+			CommonTransitions.FALL,
+				() -> {
+					// Skid
+					if(MarioInputs.isPressed(MarioInputs.Key.BACKWARD)
+							&& MarioClient.forwardVel > MarioClient.getStat(CharaStat.SKID_THRESHOLD)) {
+						return MarioSkid.INSTANCE;
+					}
+					return null;
+				}
 		));
 
 		postTickTransitions = new ArrayList<>(Arrays.asList(
@@ -76,11 +85,7 @@ public class MarioGrounded extends MarioState {
 			}
 		}
 		else if(MarioClient.forwardInput < 0) {
-			if(MarioClient.forwardVel > MarioClient.getStat(CharaStat.SKID_THRESHOLD)) {
-				// Transition to skid!
-				MarioClient.changeState(MarioSkid.INSTANCE);
-			}
-			else if(MarioClient.forwardVel < MarioClient.getStatBuffer(CharaStat.BACKPEDAL_SPEED)) {
+			if(MarioClient.forwardVel < MarioClient.getStatBuffer(CharaStat.BACKPEDAL_SPEED)) {
 				// Over-backpedal
 				MarioClient.groundAccel(
 						CharaStat.OVERBACKPEDAL_ACCEL, CharaStat.BACKPEDAL_SPEED, MarioClient.forwardInput,

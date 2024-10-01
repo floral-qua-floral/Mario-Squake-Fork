@@ -3,9 +3,7 @@ package fqf.qua_mario;
 import fqf.qua_mario.characters.CharaMario;
 import fqf.qua_mario.characters.CharaStat;
 import fqf.qua_mario.characters.Character;
-import fqf.qua_mario.mariostates.MarioDebug;
 import fqf.qua_mario.mariostates.MarioGrounded;
-import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.MovementType;
@@ -59,10 +57,10 @@ public class MarioClient {
 	public static boolean useCharacterStats = true;
 	public static CharaStat lastUsedAccelStat;
 
-	public static boolean useMarioPhysics(PlayerEntity player) {
+	public static boolean useMarioPhysics(PlayerEntity player, boolean mustBeClient) {
 		return(
-				// Has to be client side
-				player.getWorld().isClient
+				// Has to be client-side if required by parameter
+				(mustBeClient && player.getWorld().isClient)
 				// Has to be Mario (duh)
 				&& isMario
 				// Can't be creative-flying or gliding with an Elytra
@@ -75,16 +73,19 @@ public class MarioClient {
 	}
 
 	public static boolean attempt_travel(PlayerEntity player, Vec3d movementInput) {
-		if(useMarioPhysics(player) && player instanceof ClientPlayerEntity clientPlayer) {
-			return mario_travel(clientPlayer, movementInput);
+		if(useMarioPhysics(player, true) && player instanceof ClientPlayerEntity clientPlayer) {
+			clientPlayer.getWorld().getProfiler().push("marioTravel");
+			boolean travelResult = mario_travel(clientPlayer, movementInput);
+			clientPlayer.getWorld().getProfiler().pop();
+			return travelResult;
 		}
 		return false;
 //		return false;
 	}
 
 	public static void afterJump(PlayerEntity player) {
-		if(useMarioPhysics(player) && player.isSprinting()) {
-			float bunnyhopSpeedBonus = player.getYaw() * 0.017453292F;
+		if(useMarioPhysics(player, true) && player.isSprinting()) {
+			float bunnyhopSpeedBonus = (float) Math.toRadians(player.getYaw());
 			Vec3d deltaVelocity = new Vec3d(MathHelper.sin(bunnyhopSpeedBonus) * 0.2F, 0, -(MathHelper.cos(bunnyhopSpeedBonus) * 0.2F));
 			player.setVelocity(player.getVelocity().add(deltaVelocity));
 		}

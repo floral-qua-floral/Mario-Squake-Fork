@@ -21,5 +21,8 @@
     "fabric.mods.qua_mario.spin": "Spin",
 
     "qua_mario.key.toggle.enabled": "Squake Movement: Enabled",
-    "qua_mario.key.toggle.disabled": "Squake Movement: Disabled"
+    "qua_mario.key.toggle.disabled": "Squake Movement: Disabled",
+
+	"death.attack.stomp": "%s was stomped by %s",
+	"death.attack.stomp.item": "%s was stomped by %s using %s"
 }
