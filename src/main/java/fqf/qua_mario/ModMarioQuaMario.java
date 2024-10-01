@@ -12,6 +12,7 @@ import net.fabricmc.fabric.api.networking.v1.PayloadTypeRegistry;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayConnectionEvents;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 import net.minecraft.command.argument.EntityArgumentType;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.network.RegistryByteBuf;
 import net.minecraft.network.codec.PacketCodec;
 import net.minecraft.network.codec.PacketCodecs;
@@ -24,7 +25,7 @@ import org.slf4j.LoggerFactory;
 import static net.minecraft.server.command.CommandManager.*;
 import net.minecraft.util.Identifier;
 
-public class ModQuakeMovement implements ModInitializer {
+public class ModMarioQuaMario implements ModInitializer {
 	public static final String MOD_ID = "qua_mario";
 	public static final Logger LOGGER = LoggerFactory.getLogger(MOD_ID);
 
@@ -32,6 +33,21 @@ public class ModQuakeMovement implements ModInitializer {
 	static {
 		AutoConfig.register(ModConfig.class, GsonConfigSerializer::new);
 		CONFIG = AutoConfig.getConfigHolder(ModConfig.class).getConfig();
+	}
+
+	public static boolean useMarioPhysics(PlayerEntity player, boolean mustBeClient) {
+		return(
+				// Has to be client-side if required by parameter
+				(mustBeClient && player.getWorld().isClient)
+				// Has to be Mario (duh)
+				&& (player.getWorld().isClient ? MarioClient.isMario : ((IEntityDataSaver) player).getPersistentData().getBoolean("isMario"))
+				// Can't be creative-flying or gliding with an Elytra
+				&& !player.getAbilities().flying && !player.isFallFlying()
+				// Can't be in a vehicle
+				&& !player.hasVehicle()
+				// Can't be climbing
+				&& !player.isClimbing()
+		);
 	}
 
 	public record SetMarioEnabledPayload(boolean isMario) implements CustomPayload {

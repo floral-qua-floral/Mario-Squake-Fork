@@ -1,4 +1,6 @@
-package fqf.qua_mario.cameraanims;
+package fqf.qua_mario.cameraanims.animations;
+
+import fqf.qua_mario.cameraanims.CameraAnim;
 
 public class CameraSideflipGentle extends CameraAnim {
 	public static final CameraSideflipGentle INSTANCE = new CameraSideflipGentle();

@@ -1,4 +1,7 @@
-package fqf.qua_mario.characters;
+package fqf.qua_mario.characters.characters;
+
+import fqf.qua_mario.characters.CharaStat;
+import fqf.qua_mario.characters.Character;
 
 import java.util.EnumMap;
 

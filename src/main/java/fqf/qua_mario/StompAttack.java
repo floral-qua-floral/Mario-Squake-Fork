@@ -3,13 +3,10 @@ package fqf.qua_mario;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 import net.minecraft.entity.Entity;
-import net.minecraft.entity.damage.DamageSource;
-import net.minecraft.entity.damage.DamageSources;
 import net.minecraft.network.RegistryByteBuf;
 import net.minecraft.network.codec.PacketCodec;
 import net.minecraft.network.codec.PacketCodecs;
 import net.minecraft.network.packet.CustomPayload;
-import net.minecraft.registry.DynamicRegistryManager;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.Uuids;
 
@@ -56,7 +53,7 @@ public class StompAttack {
 	}
 
 	public record requestStompPayload(UUID target, int stompType) implements CustomPayload {
-		public static final Id<requestStompPayload> ID = new Id<>(Identifier.of(ModQuakeMovement.MOD_ID, "request_stomp"));
+		public static final Id<requestStompPayload> ID = new Id<>(Identifier.of(ModMarioQuaMario.MOD_ID, "request_stomp"));
 		public static final PacketCodec<RegistryByteBuf, requestStompPayload> CODEC = PacketCodec.tuple(
 				Uuids.PACKET_CODEC,
 				requestStompPayload::target,
@@ -70,7 +67,7 @@ public class StompAttack {
 	}
 
 	public record affirmStompPayload(UUID target, int stompType) implements CustomPayload {
-		public static final Id<affirmStompPayload> ID = new Id<>(Identifier.of(ModQuakeMovement.MOD_ID, "affirm_stomp"));
+		public static final Id<affirmStompPayload> ID = new Id<>(Identifier.of(ModMarioQuaMario.MOD_ID, "affirm_stomp"));
 		public static final PacketCodec<RegistryByteBuf, affirmStompPayload> CODEC = PacketCodec.tuple(
 				Uuids.PACKET_CODEC,
 				affirmStompPayload::target,

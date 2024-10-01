@@ -1,9 +1,9 @@
 package fqf.qua_mario;
 
-import fqf.qua_mario.characters.CharaMario;
+import fqf.qua_mario.characters.characters.CharaMario;
 import fqf.qua_mario.characters.CharaStat;
 import fqf.qua_mario.characters.Character;
-import fqf.qua_mario.mariostates.MarioGrounded;
+import fqf.qua_mario.mariostates.states.Debug;
 import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.MovementType;
@@ -29,7 +29,7 @@ public class MarioClient {
 	public static double rightwardInput;
 	private static final double INPUT_FACTOR = 1.02040816327;
 
-	private static MarioState marioState = MarioGrounded.INSTANCE;
+	private static MarioState marioState = Debug.INSTANCE;
 	public static int stateTimer = 0;
 	public static void changeState(MarioState newState) {
 		stateTimer = 0;
@@ -57,49 +57,34 @@ public class MarioClient {
 	public static boolean useCharacterStats = true;
 	public static CharaStat lastUsedAccelStat;
 
-	public static boolean useMarioPhysics(PlayerEntity player, boolean mustBeClient) {
-		return(
-				// Has to be client-side if required by parameter
-				(mustBeClient && player.getWorld().isClient)
-				// Has to be Mario (duh)
-				&& isMario
-				// Can't be creative-flying or gliding with an Elytra
-				&& !player.getAbilities().flying && !player.isFallFlying()
-				// Can't be in a vehicle
-				&& !player.hasVehicle()
-				// Can't be climbing
-				&& !player.isClimbing()
-		);
-	}
-
-	public static boolean attempt_travel(PlayerEntity player, Vec3d movementInput) {
-		if(useMarioPhysics(player, true) && player instanceof ClientPlayerEntity clientPlayer) {
+	public static boolean attemptMarioTravel(PlayerEntity player, Vec3d movementInput) {
+		if(ModMarioQuaMario.useMarioPhysics(player, true) && player instanceof ClientPlayerEntity clientPlayer) {
 			clientPlayer.getWorld().getProfiler().push("marioTravel");
-			boolean travelResult = mario_travel(clientPlayer, movementInput);
+			boolean travelResult = marioTravel(clientPlayer, movementInput);
 			clientPlayer.getWorld().getProfiler().pop();
 			return travelResult;
 		}
 		return false;
-//		return false;
 	}
 
 	public static void afterJump(PlayerEntity player) {
-		if(useMarioPhysics(player, true) && player.isSprinting()) {
+		if(ModMarioQuaMario.useMarioPhysics(player, true) && player.isSprinting()) {
 			float bunnyhopSpeedBonus = (float) Math.toRadians(player.getYaw());
 			Vec3d deltaVelocity = new Vec3d(MathHelper.sin(bunnyhopSpeedBonus) * 0.2F, 0, -(MathHelper.cos(bunnyhopSpeedBonus) * 0.2F));
 			player.setVelocity(player.getVelocity().add(deltaVelocity));
 		}
 	}
 
-	private static boolean mario_travel(ClientPlayerEntity player, Vec3d movementInput) {
+	private static boolean marioTravel(ClientPlayerEntity player, Vec3d movementInput) {
 		MarioClient.player = player;
 
 		// Update Mario's custom inputs class
 		MarioInputs.update(player);
+		Input.update(player.input);
 
 		// Undo vanilla vertical swimming
 		if(player.isTouchingWater())
-			MarioClient.yVel += (MarioInputs.isHeld(MarioInputs.Key.SNEAK) ? 0.04 : 0.0) - (MarioInputs.isHeld(MarioInputs.Key.JUMP) ? 0.04 : 0.0);
+			MarioClient.yVel += (player.input.sneaking ? 0.04 : 0.0) - (player.input.jumping ? 0.04 : 0.0);
 
 		// Calculate forward and sideways vector components
 		double yawRad = Math.toRadians(player.getYaw());
@@ -381,6 +366,14 @@ public class MarioClient {
 		double slipFactor = Math.pow(0.6 / slipperiness, 3);
 
 		lastUsedAccelStat = accelStat;
+
+		ModMarioQuaMario.LOGGER.info(
+				"\nUSING STATS:" +
+				"\nforwardAccel: " + getStat(accelStat) +
+				"\nforwardTarget: " + getStat(speedStat) +
+				"\nForwardAngleContribution: " + forwardAngleContribution +
+				"\nslipFactor: " + slipFactor
+		);
 
 		approachAngleAndAccel(
 				getStat(accelStat) * slipFactor, getStat(speedStat) * forwardInput, forwardAngleContribution,

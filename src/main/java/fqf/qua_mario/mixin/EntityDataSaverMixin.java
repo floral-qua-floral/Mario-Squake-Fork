@@ -1,13 +1,10 @@
 package fqf.qua_mario.mixin;
 
-import fqf.qua_mario.MarioClient;
-import fqf.qua_mario.ModQuakeMovement;
+import fqf.qua_mario.ModMarioQuaMario;
 import fqf.qua_mario.util.IEntityDataSaver;
 import net.minecraft.entity.Entity;
-import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.nbt.NbtElement;
-import net.minecraft.util.math.Vec3d;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
@@ -17,7 +14,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 @Mixin(Entity.class)
 public abstract class EntityDataSaverMixin implements IEntityDataSaver {
 	private NbtCompound persistentData;
-	private final String MOD_DATA_NAME = ModQuakeMovement.MOD_ID + ".data";
+	private final String MOD_DATA_NAME = ModMarioQuaMario.MOD_ID + ".data";
 
 	@Override
 	public NbtCompound getPersistentData() {

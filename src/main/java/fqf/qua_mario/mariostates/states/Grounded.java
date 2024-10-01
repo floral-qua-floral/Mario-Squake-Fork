@@ -1,16 +1,17 @@
-package fqf.qua_mario.mariostates;
+package fqf.qua_mario.mariostates.states;
 
 import fqf.qua_mario.MarioClient;
 import fqf.qua_mario.MarioInputs;
 import fqf.qua_mario.characters.CharaStat;
+import fqf.qua_mario.mariostates.MarioState;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 
-public class MarioGrounded extends MarioState {
-	public static final MarioGrounded INSTANCE = new MarioGrounded();
+public class Grounded extends MarioState {
+	public static final Grounded INSTANCE = new Grounded();
 
-	private MarioGrounded() {
+	private Grounded() {
 		this.name = "Grounded";
 
 		preTickTransitions = new ArrayList<>(Arrays.asList(
@@ -19,7 +20,7 @@ public class MarioGrounded extends MarioState {
 					// Skid
 					if(MarioInputs.isPressed(MarioInputs.Key.BACKWARD)
 							&& MarioClient.forwardVel > MarioClient.getStat(CharaStat.SKID_THRESHOLD)) {
-						return MarioSkid.INSTANCE;
+						return Skid.INSTANCE;
 					}
 					return null;
 				}

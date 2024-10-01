@@ -1,6 +1,6 @@
-package fqf.qua_mario.cameraanims;
+package fqf.qua_mario.cameraanims.animations;
 
-import net.minecraft.util.math.MathHelper;
+import fqf.qua_mario.cameraanims.CameraAnim;
 
 public class CameraSideflip extends CameraAnim {
 	public static final CameraSideflip INSTANCE = new CameraSideflip();

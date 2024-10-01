@@ -1,39 +1,36 @@
 package fqf.qua_mario;
 
 import net.fabricmc.api.ClientModInitializer;
-import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
 import net.fabricmc.fabric.api.client.keybinding.v1.KeyBindingHelper;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
-import net.fabricmc.fabric.api.networking.v1.PayloadTypeRegistry;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.client.option.KeyBinding;
 import net.minecraft.client.util.InputUtil;
-import net.minecraft.text.Text;
 import net.minecraft.util.math.Vec3d;
 import org.lwjgl.glfw.GLFW;
 
-public class ModQuakeMovementClient implements ClientModInitializer {
-	public static final String CATEGORY = "fabric.mods." + ModQuakeMovement.MOD_ID;
-	private static final KeyBinding spin = new KeyBinding(CATEGORY + "." + "spin", InputUtil.Type.KEYSYM, GLFW.GLFW_KEY_LEFT_ALT, CATEGORY);
+public class ModMarioQuaMarioClient implements ClientModInitializer {
+	public static final String CATEGORY = "fabric.mods." + ModMarioQuaMario.MOD_ID;
+	public static final KeyBinding spinBinding = new KeyBinding(CATEGORY + "." + "spin", InputUtil.Type.KEYSYM, GLFW.GLFW_KEY_LEFT_ALT, CATEGORY);
 
 	@Override
 	public void onInitializeClient() {
-		KeyBindingHelper.registerKeyBinding(spin);
+		KeyBindingHelper.registerKeyBinding(spinBinding);
 
-//		PayloadTypeRegistry.playC2S().register(ModQuakeMovement.PlayJumpSfxPayload.ID, ModQuakeMovement.PlayJumpSfxPayload.CODEC);
+//		PayloadTypeRegistry.playC2S().register(ModMarioQuaMario.PlayJumpSfxPayload.ID, ModMarioQuaMario.PlayJumpSfxPayload.CODEC);
 //		PayloadTypeRegistry.playC2S().register(StompAttack.requestStompPayload.ID, StompAttack.requestStompPayload.CODEC);
 
-		ClientPlayNetworking.registerGlobalReceiver(ModQuakeMovement.SetMarioEnabledPayload.ID, (payload, context) -> {
-			ModQuakeMovement.LOGGER.info("Received the packet client-side! " + payload.isMario());
+		ClientPlayNetworking.registerGlobalReceiver(ModMarioQuaMario.SetMarioEnabledPayload.ID, (payload, context) -> {
+			ModMarioQuaMario.LOGGER.info("Received the packet client-side! " + payload.isMario());
 			MarioClient.isMario = payload.isMario();
 		});
 	}
 
 	public static void drawSpeedometer(DrawContext context) {
-		if (ModQuakeMovement.CONFIG.getSpeedometerPosition() == ModConfig.SpeedometerPosition.OFF) {
+		if (ModMarioQuaMario.CONFIG.getSpeedometerPosition() == ModConfig.SpeedometerPosition.OFF) {
 			return;
 		}
 		MinecraftClient client = MinecraftClient.getInstance();
@@ -51,10 +48,10 @@ public class ModQuakeMovementClient implements ClientModInitializer {
 		int textX = 2;
 		int textY = 2;
 
-		if (ModQuakeMovement.CONFIG.getSpeedometerPosition() == ModConfig.SpeedometerPosition.BOTTOM_RIGHT || ModQuakeMovement.CONFIG.getSpeedometerPosition() == ModConfig.SpeedometerPosition.BOTTOM_LEFT) {
+		if (ModMarioQuaMario.CONFIG.getSpeedometerPosition() == ModConfig.SpeedometerPosition.BOTTOM_RIGHT || ModMarioQuaMario.CONFIG.getSpeedometerPosition() == ModConfig.SpeedometerPosition.BOTTOM_LEFT) {
 			textY = context.getScaledWindowHeight() - (4 * textRenderer.fontHeight) - 2;
 		}
-		if (ModQuakeMovement.CONFIG.getSpeedometerPosition() == ModConfig.SpeedometerPosition.TOP_RIGHT || ModQuakeMovement.CONFIG.getSpeedometerPosition() == ModConfig.SpeedometerPosition.BOTTOM_RIGHT) {
+		if (ModMarioQuaMario.CONFIG.getSpeedometerPosition() == ModConfig.SpeedometerPosition.TOP_RIGHT || ModMarioQuaMario.CONFIG.getSpeedometerPosition() == ModConfig.SpeedometerPosition.BOTTOM_RIGHT) {
 			int widestWidth = Math.max(textRenderer.getWidth(speedStr), Math.max(textRenderer.getWidth(stateStr), Math.max(textRenderer.getWidth(animStr), textRenderer.getWidth(accelStr))));
 
 			textX = context.getScaledWindowWidth() - widestWidth - 2;

@@ -1,21 +1,21 @@
-package fqf.qua_mario.mariostates;
+package fqf.qua_mario.mariostates.states;
 
 import fqf.qua_mario.MarioClient;
 import fqf.qua_mario.MarioInputs;
-import fqf.qua_mario.ModConfig;
-import fqf.qua_mario.ModQuakeMovement;
-import fqf.qua_mario.cameraanims.CameraSideflip;
-import fqf.qua_mario.cameraanims.CameraSideflipGentle;
-import fqf.qua_mario.cameraanims.CameraSideflipNoFunAllowed;
+import fqf.qua_mario.ModMarioQuaMario;
+import fqf.qua_mario.cameraanims.animations.CameraSideflip;
+import fqf.qua_mario.cameraanims.animations.CameraSideflipGentle;
+import fqf.qua_mario.cameraanims.animations.CameraSideflipNoFunAllowed;
+import fqf.qua_mario.characters.CharaStat;
+import fqf.qua_mario.mariostates.MarioState;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.List;
 
-public class MarioSkid extends MarioState {
-	public static final MarioSkid INSTANCE = new MarioSkid();
+public class Skid extends MarioState {
+	public static final Skid INSTANCE = new Skid();
 
-	private MarioSkid() {
+	private Skid() {
 		this.name = "Skid";
 
 		preTickTransitions = new ArrayList<>(Arrays.asList(
@@ -24,7 +24,7 @@ public class MarioSkid extends MarioState {
 					// Stop skidding
 					if (MarioClient.stateTimer > 60 || MarioClient.forwardInput >= 0 || MarioClient.forwardVel < -0.05) {
 						LOGGER.info("\n" + MarioClient.stateTimer + "\n" + MarioClient.forwardInput + "\n" + MarioClient.forwardVel);
-						return MarioGrounded.INSTANCE;
+						return Grounded.INSTANCE;
 					}
 					return null;
 				}
@@ -38,11 +38,12 @@ public class MarioSkid extends MarioState {
 					// Sideflip
 					if (MarioInputs.isPressed(MarioInputs.Key.JUMP)) {
 						MarioInputs.unbuffer(MarioInputs.Key.JUMP);
+						ModMarioQuaMario.LOGGER.info("yVel: " + MarioClient.getStat(CharaStat.JUMP_VELOCITY));
 						MarioClient.yVel = 1.15;
 						MarioClient.setMotion(-0.3, 0.0);
 						MarioClient.player.setYaw(MarioClient.player.getYaw() + 180);
 
-						switch(ModQuakeMovement.CONFIG.getSideflipAnimType()) {
+						switch(ModMarioQuaMario.CONFIG.getSideflipAnimType()) {
 							case AUTHENTIC:
 								MarioClient.setCameraAnim(CameraSideflip.INSTANCE);
 								break;
@@ -58,7 +59,7 @@ public class MarioSkid extends MarioState {
 						}
 
 						MarioClient.setCameraAnim(CameraSideflip.INSTANCE);
-						return MarioSideflip.INSTANCE;
+						return Sideflip.INSTANCE;
 					}
 					return null;
 				}

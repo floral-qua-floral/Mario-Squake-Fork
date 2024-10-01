@@ -1,19 +1,16 @@
-package fqf.qua_mario.mariostates;
+package fqf.qua_mario.mariostates.states;
 
 import fqf.qua_mario.MarioClient;
 import fqf.qua_mario.MarioInputs;
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.MovementType;
-import net.minecraft.util.math.Vec3d;
+import fqf.qua_mario.mariostates.MarioState;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.List;
 
-public class MarioJump extends MarioState {
-	public static final MarioJump INSTANCE = new MarioJump();
+public class Jump extends MarioState {
+	public static final Jump INSTANCE = new Jump();
 
-	private MarioJump() {
+	private Jump() {
 		this.name = "Jump";
 
 		preTickTransitions = new ArrayList<>(Arrays.asList(
@@ -44,7 +41,7 @@ public class MarioJump extends MarioState {
 //							double desiredY = stompTarget.getY() + stompTarget.getHeight();
 //							double deltaY = MarioClient.player.getY() - desiredY;
 //							MarioClient.player.move(MovementType.SELF, new Vec3d(0, deltaY, 0));
-//							return MarioAerial.INSTANCE;
+//							return Aerial.INSTANCE;
 //						}
 //					}
 //

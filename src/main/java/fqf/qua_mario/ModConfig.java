@@ -18,6 +18,8 @@ public class ModConfig implements ConfigData {
         OFF
     }
 
+    private int bufferLength = 6;
+
     @ConfigEntry.Gui.EnumHandler(option = ConfigEntry.Gui.EnumHandler.EnumDisplayOption.BUTTON)
     private SpinputType spinputType = SpinputType.LEFTRIGHT;
 
@@ -44,6 +46,10 @@ public class ModConfig implements ConfigData {
 
     public SpeedometerPosition getSpeedometerPosition() {
         return this.speedometerPosition;
+    }
+
+    public int getBufferLength() {
+        return Math.max(0, this.bufferLength);
     }
 
     public SpinputType getSpinputType() {

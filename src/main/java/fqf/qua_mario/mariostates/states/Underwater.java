@@ -1,25 +1,26 @@
-package fqf.qua_mario.mariostates;
+package fqf.qua_mario.mariostates.states;
 
 import fqf.qua_mario.MarioClient;
 import fqf.qua_mario.MarioInputs;
+import fqf.qua_mario.mariostates.MarioState;
 import net.minecraft.registry.tag.FluidTags;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 
-public class MarioUnderwater extends MarioState {
-	public static final MarioUnderwater INSTANCE = new MarioUnderwater();
+public class Underwater extends MarioState {
+	public static final Underwater INSTANCE = new Underwater();
 
 	private static int ticksSincePaddle = 1;
 
-	private MarioUnderwater() {
+	private Underwater() {
 		this.name = "Underwater";
 
 		preTickTransitions = new ArrayList<>(Arrays.asList(
 				() -> {
 					if(MarioClient.player.getFluidHeight(FluidTags.WATER) < 0.4) {
 						MarioClient.yVel = Math.max(MarioClient.yVel, 0.65);
-						return MarioAerial.INSTANCE;
+						return Aerial.INSTANCE;
 					}
 					return null;
 				}

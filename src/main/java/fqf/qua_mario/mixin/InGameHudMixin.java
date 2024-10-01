@@ -1,6 +1,6 @@
 package fqf.qua_mario.mixin;
 
-import fqf.qua_mario.ModQuakeMovementClient;
+import fqf.qua_mario.ModMarioQuaMarioClient;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.hud.InGameHud;
 import net.minecraft.client.render.RenderTickCounter;
@@ -13,6 +13,6 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 public class InGameHudMixin {
     @Inject(method = "renderStatusEffectOverlay", at = @At("HEAD"))
     private void renderStatusEffectOverlay(DrawContext context, RenderTickCounter tickCounter, CallbackInfo ci) {
-        ModQuakeMovementClient.drawSpeedometer(context);
+        ModMarioQuaMarioClient.drawSpeedometer(context);
     }
 }

@@ -1,14 +1,12 @@
-package fqf.qua_mario.mariostates;
+package fqf.qua_mario.mariostates.states;
 
 import fqf.qua_mario.MarioClient;
+import fqf.qua_mario.mariostates.MarioState;
 
-import java.util.ArrayList;
-import java.util.Arrays;
+public class Debug extends MarioState {
+	public static final Debug INSTANCE = new Debug();
 
-public class MarioDebug extends MarioState {
-	public static final MarioDebug INSTANCE = new MarioDebug();
-
-	private MarioDebug() {
+	private Debug() {
 		this.name = "Debug";
 
 		postMoveTransitions = null;

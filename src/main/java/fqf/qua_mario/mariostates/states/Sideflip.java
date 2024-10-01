@@ -1,15 +1,16 @@
-package fqf.qua_mario.mariostates;
+package fqf.qua_mario.mariostates.states;
 
 import fqf.qua_mario.MarioClient;
 import fqf.qua_mario.MarioInputs;
+import fqf.qua_mario.mariostates.MarioState;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 
-public class MarioSideflip extends MarioState {
-	public static final MarioSideflip INSTANCE = new MarioSideflip();
+public class Sideflip extends MarioState {
+	public static final Sideflip INSTANCE = new Sideflip();
 
-	private MarioSideflip() {
+	private Sideflip() {
 		this.name = "Sideflip";
 
 		preTickTransitions = new ArrayList<>(Arrays.asList(

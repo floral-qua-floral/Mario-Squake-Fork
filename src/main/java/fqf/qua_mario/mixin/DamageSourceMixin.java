@@ -1,6 +1,6 @@
 package fqf.qua_mario.mixin;
 
-import fqf.qua_mario.ModQuakeMovement;
+import fqf.qua_mario.ModMarioQuaMario;
 import net.minecraft.component.DataComponentTypes;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EquipmentSlot;
@@ -33,7 +33,7 @@ public abstract class DamageSourceMixin {
 	@Inject(at = @At("HEAD"), method = "getDeathMessage", cancellable = true)
 	protected void getDeathMessage(LivingEntity killed, CallbackInfoReturnable<Text> ci) {
 
-		ModQuakeMovement.LOGGER.info("Damage type: " + getName());
+		ModMarioQuaMario.LOGGER.info("Damage type: " + getName());
 
 		String name = getType().msgId();
 

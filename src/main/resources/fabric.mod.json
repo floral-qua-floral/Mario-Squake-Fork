@@ -16,15 +16,15 @@
   },
 
   "license": "Unlicense",
-  "icon": "assets/squake/icon.png",
+  "icon": "assets/qua_mario/icon.png",
 
   "environment": "*",
   "entrypoints": {
     "main": [
-      "fqf.qua_mario.ModQuakeMovement"
+      "fqf.qua_mario.ModMarioQuaMario"
     ],
     "client": [
-      "fqf.qua_mario.ModQuakeMovementClient"
+      "fqf.qua_mario.ModMarioQuaMarioClient"
     ],
     "modmenu" : [
       "fqf.qua_mario.ModMenuIntegration"
