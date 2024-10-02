@@ -4,6 +4,9 @@ import fqf.qua_mario.characters.CharaStat;
 import fqf.qua_mario.characters.MarioCharacter;
 import fqf.qua_mario.characters.characters.CharaMario;
 import fqf.qua_mario.powerups.PowerUp;
+import fqf.qua_mario.powerups.forms.FireForm;
+import fqf.qua_mario.powerups.forms.SmallForm;
+import fqf.qua_mario.powerups.forms.SuperForm;
 import fqf.qua_mario.util.MarioDataSaver;
 import me.shedaniel.autoconfig.AutoConfig;
 import me.shedaniel.autoconfig.serializer.GsonConfigSerializer;
@@ -32,10 +35,9 @@ public class ModMarioQuaMario implements ModInitializer {
 	public static final String MOD_ID = "qua_mario";
 	public static final Logger LOGGER = LoggerFactory.getLogger(MOD_ID);
 
-//	RegistryKey<Registry<String>> registryKey = RegistryKey. ofRegistry(Identifier. of(MOD_ID, "power_ups"));
-//	Registry<String> registry = FabricRegistryBuilder.createSimple(registryKey)
-//			.attribute(RegistryAttribute.SYNCED)
-//			.buildAndRegister();
+
+
+
 
 //	Registry.register()
 
@@ -94,23 +96,6 @@ public class ModMarioQuaMario implements ModInitializer {
 		return player + " will now be " + powerUp.getFormName(((MarioDataSaver) player).marioQuaMario$getCharacter());
 	}
 
-	public static MarioCharacter getCharacterFromID(String id) {
-		for(MarioCharacter checkCharacter : MarioCharacter.CHILDREN) {
-			if(checkCharacter.getID().toString().equals(id)) {
-				return(checkCharacter);
-			}
-		}
-		return null;
-	}
-	public static PowerUp getPowerUpFromID(String id) {
-		for(PowerUp checkPowerUp : PowerUp.CHILDREN) {
-			if(checkPowerUp.getID().toString().equals(id)) {
-				return(checkPowerUp);
-			}
-		}
-		return null;
-	}
-
 	@Override
 	public void onInitialize() {
 		PayloadTypeRegistry.playS2C().register(SetMarioEnabledPayload.ID, SetMarioEnabledPayload.CODEC);
@@ -119,6 +104,11 @@ public class ModMarioQuaMario implements ModInitializer {
 		PayloadTypeRegistry.playC2S().register(PlayJumpSfxPayload.ID, PlayJumpSfxPayload.CODEC);
 		PayloadTypeRegistry.playC2S().register(StompAttack.requestStompPayload.ID, StompAttack.requestStompPayload.CODEC);
 
+//		Registry.register(POWER_UPS, SmallForm.INSTANCE.getID(), SmallForm.INSTANCE);
+//		Registry.register(POWER_UPS, SuperForm.INSTANCE.getID(), SuperForm.INSTANCE);
+//		Registry.register(POWER_UPS, FireForm.INSTANCE.getID(), FireForm.INSTANCE);
+
+		MarioRegistries.register();
 
 		ServerPlayConnectionEvents.JOIN.register((handler, sender, server) -> {
 			MarioDataSaver playerDataSaver = (MarioDataSaver) (handler.player);

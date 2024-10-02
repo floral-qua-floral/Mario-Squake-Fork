@@ -10,8 +10,6 @@ import java.util.EnumMap;
 public class CharaMario extends MarioCharacter {
 	public static final CharaMario INSTANCE = new CharaMario();
 	private CharaMario() {
-		ModMarioQuaMario.LOGGER.info("Registered Mario as a character.");
-//		MarioCharacter.CHILDREN.add(this);
 		this.ID = Identifier.of(ModMarioQuaMario.MOD_ID, "mario");
 		this.name = "Mario";
 
