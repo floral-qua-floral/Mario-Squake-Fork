@@ -1,8 +1,10 @@
 package fqf.qua_mario.mixin;
 
+import fqf.qua_mario.ModMarioQuaMario;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
 
@@ -26,6 +28,11 @@ public abstract class PlayerEntityMixin extends LivingEntity {
 
 	@Inject(at = @At("TAIL"), method = "jump()V")
 	private void afterJump(CallbackInfo info) {
-		MarioClient.afterJump((PlayerEntity) (Object) this);
+		PlayerEntity player = (PlayerEntity) (Object) this;
+		if(ModMarioQuaMario.useMarioPhysics(player, false) && player.isSprinting()) {
+			float bunnyhopSpeedBonus = (float) Math.toRadians(player.getYaw());
+			Vec3d deltaVelocity = new Vec3d(MathHelper.sin(bunnyhopSpeedBonus) * 0.2F, 0, -(MathHelper.cos(bunnyhopSpeedBonus) * 0.2F));
+			player.setVelocity(player.getVelocity().add(deltaVelocity));
+		}
 	}
 }

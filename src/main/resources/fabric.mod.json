@@ -6,13 +6,13 @@
   "name": "Mario qua Mario",
   "description": "Super Mario's moveset and mechanics in Minecraft.",
   "authors": [
+    "floralQuaFloral",
     "squeek502",
     "ThatTrollzer/CoolMineman",
-    "adryd",
-    "floralQuaFloral"
+    "adryd"
   ],
   "contact": {
-    "sources": "https://github.com/floral-qua-floral/SquakeTestFork"
+    "sources": "https://github.com/floral-qua-floral/marioQuaMario"
   },
 
   "license": "Unlicense",

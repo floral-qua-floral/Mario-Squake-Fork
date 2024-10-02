@@ -2,8 +2,8 @@ package fqf.qua_mario;
 
 import fqf.qua_mario.characters.characters.CharaMario;
 import fqf.qua_mario.characters.CharaStat;
-import fqf.qua_mario.characters.Character;
-import fqf.qua_mario.mariostates.states.Debug;
+import fqf.qua_mario.characters.MarioCharacter;
+import fqf.qua_mario.mariostates.states.Grounded;
 import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.MovementType;
@@ -29,7 +29,7 @@ public class MarioClient {
 	public static double rightwardInput;
 	private static final double INPUT_FACTOR = 1.02040816327;
 
-	private static MarioState marioState = Debug.INSTANCE;
+	private static MarioState marioState = Grounded.INSTANCE;
 	public static int stateTimer = 0;
 	public static void changeState(MarioState newState) {
 		stateTimer = 0;
@@ -53,7 +53,7 @@ public class MarioClient {
 	}
 	public static CameraAnim getCameraAnim() { return cameraAnim; }
 
-	public static Character character = CharaMario.INSTANCE;
+	public static MarioCharacter character = CharaMario.INSTANCE;
 	public static boolean useCharacterStats = true;
 	public static CharaStat lastUsedAccelStat;
 
@@ -65,14 +65,6 @@ public class MarioClient {
 			return travelResult;
 		}
 		return false;
-	}
-
-	public static void afterJump(PlayerEntity player) {
-		if(ModMarioQuaMario.useMarioPhysics(player, true) && player.isSprinting()) {
-			float bunnyhopSpeedBonus = (float) Math.toRadians(player.getYaw());
-			Vec3d deltaVelocity = new Vec3d(MathHelper.sin(bunnyhopSpeedBonus) * 0.2F, 0, -(MathHelper.cos(bunnyhopSpeedBonus) * 0.2F));
-			player.setVelocity(player.getVelocity().add(deltaVelocity));
-		}
 	}
 
 	private static boolean marioTravel(ClientPlayerEntity player, Vec3d movementInput) {
@@ -367,14 +359,6 @@ public class MarioClient {
 
 		lastUsedAccelStat = accelStat;
 
-		ModMarioQuaMario.LOGGER.info(
-				"\nUSING STATS:" +
-				"\nforwardAccel: " + getStat(accelStat) +
-				"\nforwardTarget: " + getStat(speedStat) +
-				"\nForwardAngleContribution: " + forwardAngleContribution +
-				"\nslipFactor: " + slipFactor
-		);
-
 		approachAngleAndAccel(
 				getStat(accelStat) * slipFactor, getStat(speedStat) * forwardInput, forwardAngleContribution,
 				getStat(strafeAccelStat) * slipFactor, getStat(strafeSpeedStat) * rightwardInput, strafeAngleContribution,
@@ -384,7 +368,7 @@ public class MarioClient {
 
 	public static double getStat(CharaStat stat) {
 		if(useCharacterStats) return character.getStatValue(stat);
-		else return stat.getDefaultValue();
+		return stat.getDefaultValue();
 	}
 
 	public static double getStatBuffer(CharaStat stat) {

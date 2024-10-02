@@ -1,28 +1,25 @@
 package fqf.qua_mario;
 
-import com.mojang.brigadier.arguments.BoolArgumentType;
-import com.mojang.brigadier.context.CommandContext;
-import com.mojang.brigadier.exceptions.CommandSyntaxException;
-import fqf.qua_mario.util.IEntityDataSaver;
+import fqf.qua_mario.characters.CharaStat;
+import fqf.qua_mario.characters.MarioCharacter;
+import fqf.qua_mario.characters.characters.CharaMario;
+import fqf.qua_mario.powerups.PowerUp;
+import fqf.qua_mario.util.MarioDataSaver;
 import me.shedaniel.autoconfig.AutoConfig;
 import me.shedaniel.autoconfig.serializer.GsonConfigSerializer;
 import net.fabricmc.api.ModInitializer;
-import net.fabricmc.fabric.api.command.v2.CommandRegistrationCallback;
 import net.fabricmc.fabric.api.networking.v1.PayloadTypeRegistry;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayConnectionEvents;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
-import net.minecraft.command.argument.EntityArgumentType;
 import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.nbt.NbtCompound;
 import net.minecraft.network.RegistryByteBuf;
 import net.minecraft.network.codec.PacketCodec;
 import net.minecraft.network.codec.PacketCodecs;
 import net.minecraft.network.packet.CustomPayload;
-import net.minecraft.server.command.ServerCommandSource;
 import net.minecraft.server.network.ServerPlayerEntity;
-import net.minecraft.text.Text;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import static net.minecraft.server.command.CommandManager.*;
 import net.minecraft.util.Identifier;
 
 public class ModMarioQuaMario implements ModInitializer {
@@ -38,9 +35,9 @@ public class ModMarioQuaMario implements ModInitializer {
 	public static boolean useMarioPhysics(PlayerEntity player, boolean mustBeClient) {
 		return(
 				// Has to be client-side if required by parameter
-				(mustBeClient && player.getWorld().isClient)
+				(player.getWorld().isClient || !mustBeClient)
 				// Has to be Mario (duh)
-				&& (player.getWorld().isClient ? MarioClient.isMario : ((IEntityDataSaver) player).getPersistentData().getBoolean("isMario"))
+				&& (player.getWorld().isClient ? MarioClient.isMario : ((MarioDataSaver) player).marioQuaMario$getPersistentData().getBoolean("isMario"))
 				// Can't be creative-flying or gliding with an Elytra
 				&& !player.getAbilities().flying && !player.isFallFlying()
 				// Can't be in a vehicle
@@ -48,6 +45,81 @@ public class ModMarioQuaMario implements ModInitializer {
 				// Can't be climbing
 				&& !player.isClimbing()
 		);
+	}
+
+	public static void sendSetMarioPacket(ServerPlayerEntity player, boolean isMario) {
+		ServerPlayNetworking.send(player, new SetMarioEnabledPayload(isMario));
+	}
+
+	public static NbtCompound getMarioPersistentData(ServerPlayerEntity player) {
+		return ((MarioDataSaver) player).marioQuaMario$getPersistentData();
+	}
+
+	public static double getMarioStat(PlayerEntity player, CharaStat stat) {
+		if(player.getWorld().isClient) {
+			return MarioClient.getStat(stat);
+		}
+		else {
+
+			return stat.getDefaultValue();
+		}
+	}
+
+	public static String setCharacter(ServerPlayerEntity player, MarioCharacter character) {
+		((MarioDataSaver) player).marioQuaMario$setCharacter(character);
+		// Change the player's playermodel to the current character & power-up state
+		// Send a "change character" packet
+		return player + " will now be " + character.getName();
+	}
+
+	public static String setPowerUp(ServerPlayerEntity player, PowerUp powerUp) {
+		((MarioDataSaver) player).marioQuaMario$setPowerUp(powerUp);
+		// Change the player's playermodel to the current power-up state
+		// Send a "change power-up" packet
+		return player + " will now be " + powerUp.getFormName(((MarioDataSaver) player).marioQuaMario$getCharacter());
+	}
+
+	public static MarioCharacter getCharacterFromID(String id) {
+		for(MarioCharacter checkCharacter : MarioCharacter.CHILDREN) {
+			if(checkCharacter.getID().toString().equals(id)) {
+				return(checkCharacter);
+			}
+		}
+		return null;
+	}
+	public static PowerUp getPowerUpFromID(String id) {
+		for(PowerUp checkPowerUp : PowerUp.CHILDREN) {
+			if(checkPowerUp.getID().toString().equals(id)) {
+				return(checkPowerUp);
+			}
+		}
+		return null;
+	}
+
+	@Override
+	public void onInitialize() {
+		PayloadTypeRegistry.playS2C().register(SetMarioEnabledPayload.ID, SetMarioEnabledPayload.CODEC);
+		PayloadTypeRegistry.playS2C().register(StompAttack.affirmStompPayload.ID, StompAttack.affirmStompPayload.CODEC);
+
+		PayloadTypeRegistry.playC2S().register(PlayJumpSfxPayload.ID, PlayJumpSfxPayload.CODEC);
+		PayloadTypeRegistry.playC2S().register(StompAttack.requestStompPayload.ID, StompAttack.requestStompPayload.CODEC);
+
+
+		ServerPlayConnectionEvents.JOIN.register((handler, sender, server) -> {
+			MarioDataSaver playerDataSaver = (MarioDataSaver) (handler.player);
+			sendSetMarioPacket(handler.player, playerDataSaver.marioQuaMario$getPersistentData().getBoolean("isMario"));
+		});
+
+		ServerPlayNetworking.registerGlobalReceiver(PlayJumpSfxPayload.ID, (payload, context) -> {
+			LOGGER.info("Received the packet asking to play a sound effect");
+		});
+
+		ServerPlayNetworking.registerGlobalReceiver(StompAttack.requestStompPayload.ID, (payload, context) -> {
+			LOGGER.info("Received the packet asking to stomp something");
+			StompAttack.server_receive(payload, context);
+		});
+
+		MarioCommand.registerMarioCommand();
 	}
 
 	public record SetMarioEnabledPayload(boolean isMario) implements CustomPayload {
@@ -65,73 +137,4 @@ public class ModMarioQuaMario implements ModInitializer {
 		@Override
 		public Id<? extends CustomPayload> getId() { return ID; }
 	}
-
-	public String setMarioCommand(CommandContext<ServerCommandSource> context, boolean playerArg) throws CommandSyntaxException {
-		boolean isMario = BoolArgumentType.getBool(context, "value");
-
-		ServerPlayerEntity player;
-		if(playerArg) player = EntityArgumentType.getPlayer(context, "whoThough");
-		else player = context.getSource().getPlayerOrThrow();
-
-		sendMarioPacket(player, isMario);
-
-		IEntityDataSaver playerDataSaver = (IEntityDataSaver) player;
-		playerDataSaver.getPersistentData().putBoolean("isMario", isMario);
-
-		return (isMario ? "Enabled" : "Disabled") + " Mario mode for " + player + ".";
-	}
-
-	public void sendMarioPacket(ServerPlayerEntity player, boolean isMario) {
-		ServerPlayNetworking.send(player, new SetMarioEnabledPayload(isMario));
-	}
-
-	@Override
-	public void onInitialize() {
-		PayloadTypeRegistry.playS2C().register(SetMarioEnabledPayload.ID, SetMarioEnabledPayload.CODEC);
-		PayloadTypeRegistry.playS2C().register(StompAttack.affirmStompPayload.ID, StompAttack.affirmStompPayload.CODEC);
-
-		PayloadTypeRegistry.playC2S().register(PlayJumpSfxPayload.ID, PlayJumpSfxPayload.CODEC);
-		PayloadTypeRegistry.playC2S().register(StompAttack.requestStompPayload.ID, StompAttack.requestStompPayload.CODEC);
-//		PayloadTypeRegistry.playC2S().register
-
-		ServerPlayConnectionEvents.JOIN.register((handler, sender, server) -> {
-			IEntityDataSaver playerDataSaver = (IEntityDataSaver) (handler.player);
-			sendMarioPacket(handler.player, playerDataSaver.getPersistentData().getBoolean("isMario"));
-		});
-
-		ServerPlayNetworking.registerGlobalReceiver(PlayJumpSfxPayload.ID, (payload, context) -> {
-			LOGGER.info("Received the packet asking to play a sound effect");
-		});
-
-		ServerPlayNetworking.registerGlobalReceiver(StompAttack.requestStompPayload.ID, (payload, context) -> {
-			LOGGER.info("Received the packet asking to stomp something");
-			StompAttack.server_receive(payload, context);
-		});
-
-		CommandRegistrationCallback.EVENT.register((dispatcher, registryAccess, environment) -> {
-			dispatcher.register(literal("mario")
-					.executes(context -> {
-						context.getSource().sendFeedback(() -> Text.literal("Called /mario with no arguments"), true);
-						return 1;
-					})
-					.then(literal("setEnabled")
-							.then(argument("value", BoolArgumentType.bool())
-									.executes(context -> {
-										String feedback = setMarioCommand(context, false);
-										context.getSource().sendFeedback(() -> Text.literal(feedback), true);
-										return 1;
-									})
-									.then(argument("whoThough", EntityArgumentType.player())
-											.executes(context -> {
-												String feedback = setMarioCommand(context, true);
-												context.getSource().sendFeedback(() -> Text.literal(feedback), true);
-												return 1;
-											})
-									)
-							)
-					)
-			);
-		});
-	}
-
 }

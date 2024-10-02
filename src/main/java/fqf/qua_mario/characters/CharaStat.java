@@ -44,10 +44,10 @@ public enum CharaStat {
 
 	JUMP_GRAVITY(-0.115),
 
-	JUMP_HEIGHT(4.34),
-	JUMP_HEIGHT_ADDEND(1.0),
-	JUMP_VELOCITY(JUMP_HEIGHT.getJumpVelocity()),
-	JUMP_VELOCITY_ADDEND(JUMP_HEIGHT_ADDEND.getJumpVelocity()),
+	JUMP_HEIGHT(1.1),
+	JUMP_HEIGHT_ADDEND(0.0),
+	JUMP_VELOCITY(getJumpVelocity(JUMP_HEIGHT)),
+	JUMP_VELOCITY_ADDEND(getJumpVelocity(JUMP_HEIGHT_ADDEND)),
 	JUMP_CAP,
 
 	SIDEFLIP_HEIGHT,
@@ -57,21 +57,21 @@ public enum CharaStat {
 	SIDEFLIP_BACKWARD_SPEED,
 
 	CROUCH_JUMP_HEIGHT,
-	CROUCH_JUMP_VELOCITY(CROUCH_JUMP_HEIGHT.getJumpVelocity()),
+	CROUCH_JUMP_VELOCITY(getJumpVelocity(CROUCH_JUMP_HEIGHT)),
 	CROUCH_JUMP_CAP,
 
 	DOUBLE_JUMP_HEIGHT,
 	DOUBLE_JUMP_HEIGHT_ADDEND,
-	DOUBLE_JUMP_VELOCITY(DOUBLE_JUMP_HEIGHT.getJumpVelocity()),
-	DOUBLE_JUMP_VELOCITY_ADDEND(DOUBLE_JUMP_HEIGHT_ADDEND.getJumpVelocity()),
+	DOUBLE_JUMP_VELOCITY(getJumpVelocity(DOUBLE_JUMP_HEIGHT)),
+	DOUBLE_JUMP_VELOCITY_ADDEND(getJumpVelocity(DOUBLE_JUMP_HEIGHT_ADDEND)),
 	DOUBLE_JUMP_CAP,
 
 	TRIPLE_JUMP_HEIGHT,
-	TRIPLE_JUMP_VELOCITY(TRIPLE_JUMP_HEIGHT.getJumpVelocity()),
+	TRIPLE_JUMP_VELOCITY(getJumpVelocity(TRIPLE_JUMP_HEIGHT)),
 	TRIPLE_JUMP_CAP,
 
 	LONG_JUMP_HEIGHT,
-	LONG_JUMP_VELOCITY(LONG_JUMP_HEIGHT.getJumpVelocity()),
+	LONG_JUMP_VELOCITY(getJumpVelocity(LONG_JUMP_HEIGHT)),
 	LONG_JUMP_CAP,
 	LONG_JUMP_SPEED_FACTOR,
 	LONG_JUMP_SPEED_ADDEND,
@@ -92,8 +92,11 @@ public enum CharaStat {
 		return DEFAULT_VALUE;
 	}
 
-	private double getJumpVelocity() {
-		ModMarioQuaMario.LOGGER.info("\nGravity: " + CharaStat.JUMP_GRAVITY.getDefaultValue() + "\nHeight: " + this.getDefaultValue());
-		return Math.sqrt(-2 * CharaStat.JUMP_GRAVITY.getDefaultValue() * this.getDefaultValue());
+	private static double getJumpVelocity(CharaStat heightStat) {
+		return Math.sqrt(-2 * CharaStat.JUMP_GRAVITY.getDefaultValue() * heightStat.getDefaultValue());
+	}
+
+	public static double getJumpVelocity(double height, double gravity) {
+		return Math.sqrt(2 * Math.abs(gravity) * height);
 	}
 }

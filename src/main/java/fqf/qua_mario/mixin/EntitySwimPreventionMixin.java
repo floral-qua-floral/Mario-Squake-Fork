@@ -1,7 +1,7 @@
 package fqf.qua_mario.mixin;
 
 import fqf.qua_mario.MarioClient;
-import fqf.qua_mario.util.IEntityDataSaver;
+import fqf.qua_mario.util.MarioDataSaver;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.PlayerEntity;
 import org.spongepowered.asm.mixin.Mixin;
@@ -22,7 +22,7 @@ public abstract class EntitySwimPreventionMixin {
 					ci.cancel();
 			}
 			else { // Server-side
-				if(((IEntityDataSaver) playerized).getPersistentData().getBoolean("isMario"))
+				if(((MarioDataSaver) playerized).marioQuaMario$getPersistentData().getBoolean("isMario"))
 					ci.cancel();
 			}
 		}
