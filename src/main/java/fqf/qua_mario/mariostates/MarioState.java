@@ -72,8 +72,7 @@ public abstract class MarioState {
 				// Apply upward velocity
 				double momentum = Math.max(0, MarioClient.forwardVel / MarioClient.getStat(CharaStat.RUN_SPEED));
 				MarioClient.yVel = MarioClient.getStat(CharaStat.JUMP_VELOCITY)
-						+ (momentum * MarioClient.getStat(CharaStat.JUMP_VELOCITY_ADDEND))
-						+ MarioClient.getStat(CharaStat.JUMP_GRAVITY); // Add 1 tick of gravity
+						+ (momentum * MarioClient.getStat(CharaStat.JUMP_VELOCITY_ADDEND));
 
 				// Reduce horizontal velocities
 				MarioClient.forwardVel *= 0.85;

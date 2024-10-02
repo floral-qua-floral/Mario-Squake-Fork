@@ -2,6 +2,7 @@ package fqf.qua_mario.characters;
 
 import com.google.common.collect.Lists;
 import fqf.qua_mario.VoiceLine;
+import fqf.qua_mario.characters.characters.CharaMario;
 import net.minecraft.util.Identifier;
 import org.jetbrains.annotations.Nullable;
 

@@ -40,8 +40,10 @@ public class MarioCommand {
 	private static LiteralArgumentBuilder<ServerCommandSource> marioCharacterCommand() {
 		LiteralArgumentBuilder<ServerCommandSource> setCharacter = literal("setCharacter");
 
+		ModMarioQuaMario.LOGGER.info("Populating setCharacter command.");
 		for(MarioCharacter character : MarioCharacter.CHILDREN) {
-			setCharacter.then(literal(character.getID().toString())
+			ModMarioQuaMario.LOGGER.info("Adding " + character + " to setCharacter command.");
+			setCharacter.then(literal(character.getName())
 				.executes(context -> {
 					String feedback = ModMarioQuaMario.setCharacter(context.getSource().getPlayerOrThrow(), character);
 					context.getSource().sendFeedback(() -> Text.literal(feedback), true);
@@ -63,6 +65,7 @@ public class MarioCommand {
 	private static LiteralArgumentBuilder<ServerCommandSource> marioPowerUpCommand() {
 		LiteralArgumentBuilder<ServerCommandSource> setPowerUp = literal("setPowerUp");
 
+		ModMarioQuaMario.LOGGER.info("Populating setPowerUp command.");
 		for(PowerUp powerUp : PowerUp.CHILDREN) {
 			setPowerUp.then(literal(powerUp.getID().toString())
 				.executes(context -> {
@@ -103,6 +106,7 @@ public class MarioCommand {
 					)
 				)
 				.then(marioCharacterCommand())
+				.then(marioPowerUpCommand())
 			);
 		});
 	}

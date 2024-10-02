@@ -7,7 +7,7 @@ import net.minecraft.util.Identifier;
 public class SuperMario extends PowerUp {
 	public static final SuperMario INSTANCE = new SuperMario();
 	private SuperMario() {
-		PowerUp.CHILDREN.add(this);
+//		PowerUp.CHILDREN.add(this);
 		this.ID = Identifier.of(ModMarioQuaMario.MOD_ID, "super_form");
 		this.prefix = "Super ";
 	}

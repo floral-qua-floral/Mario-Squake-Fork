@@ -8,6 +8,8 @@ import fqf.qua_mario.util.MarioDataSaver;
 import me.shedaniel.autoconfig.AutoConfig;
 import me.shedaniel.autoconfig.serializer.GsonConfigSerializer;
 import net.fabricmc.api.ModInitializer;
+import net.fabricmc.fabric.api.event.registry.FabricRegistryBuilder;
+import net.fabricmc.fabric.api.event.registry.RegistryAttribute;
 import net.fabricmc.fabric.api.networking.v1.PayloadTypeRegistry;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayConnectionEvents;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
@@ -17,6 +19,10 @@ import net.minecraft.network.RegistryByteBuf;
 import net.minecraft.network.codec.PacketCodec;
 import net.minecraft.network.codec.PacketCodecs;
 import net.minecraft.network.packet.CustomPayload;
+import net.minecraft.registry.Registries;
+import net.minecraft.registry.Registry;
+import net.minecraft.registry.RegistryKey;
+import net.minecraft.registry.RegistryKeys;
 import net.minecraft.server.network.ServerPlayerEntity;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -25,6 +31,13 @@ import net.minecraft.util.Identifier;
 public class ModMarioQuaMario implements ModInitializer {
 	public static final String MOD_ID = "qua_mario";
 	public static final Logger LOGGER = LoggerFactory.getLogger(MOD_ID);
+
+//	RegistryKey<Registry<String>> registryKey = RegistryKey. ofRegistry(Identifier. of(MOD_ID, "power_ups"));
+//	Registry<String> registry = FabricRegistryBuilder.createSimple(registryKey)
+//			.attribute(RegistryAttribute.SYNCED)
+//			.buildAndRegister();
+
+//	Registry.register()
 
 	public static final ModConfig CONFIG;
 	static {
@@ -46,6 +59,8 @@ public class ModMarioQuaMario implements ModInitializer {
 				&& !player.isClimbing()
 		);
 	}
+
+//	FabricRegistryBuilder
 
 	public static void sendSetMarioPacket(ServerPlayerEntity player, boolean isMario) {
 		ServerPlayNetworking.send(player, new SetMarioEnabledPayload(isMario));
