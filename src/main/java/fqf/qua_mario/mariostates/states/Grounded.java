@@ -1,12 +1,11 @@
 package fqf.qua_mario.mariostates.states;
 
+import fqf.qua_mario.Input;
 import fqf.qua_mario.MarioClient;
-import fqf.qua_mario.MarioInputs;
 import fqf.qua_mario.characters.CharaStat;
 import fqf.qua_mario.mariostates.MarioState;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 public class Grounded extends MarioState {
@@ -19,8 +18,8 @@ public class Grounded extends MarioState {
 				CommonTransitions.FALL,
 				() -> {
 					// Skid
-					if(MarioInputs.isHeld(MarioInputs.Key.BACKWARD)
-							&& MarioClient.forwardVel > MarioClient.getStat(CharaStat.SKID_THRESHOLD)) {
+					if(Input.BACKWARD.isHeld()
+							&& MarioClient.forwardVel > CharaStat.SKID_THRESHOLD.getValue()) {
 						return Skid.INSTANCE;
 					}
 					return null;
@@ -68,7 +67,7 @@ public class Grounded extends MarioState {
 							CharaStat.WALK_REDIRECTION
 					);
 				}
-				else if(MarioClient.forwardVel <= MarioClient.getStat(CharaStat.WALK_STANDSTILL_THRESHOLD)) {
+				else if(MarioClient.forwardVel <= CharaStat.WALK_STANDSTILL_THRESHOLD.getValue()) {
 					// Walk accel from low velocity
 					MarioClient.groundAccel(
 							CharaStat.WALK_STANDSTILL_ACCEL, CharaStat.WALK_SPEED, 1.0,

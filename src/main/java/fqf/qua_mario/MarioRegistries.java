@@ -2,6 +2,7 @@ package fqf.qua_mario;
 
 import fqf.qua_mario.characters.MarioCharacter;
 import fqf.qua_mario.characters.characters.CharaMario;
+import fqf.qua_mario.characters.characters.Luigi;
 import fqf.qua_mario.powerups.PowerUp;
 import fqf.qua_mario.powerups.forms.FireForm;
 import fqf.qua_mario.powerups.forms.SmallForm;
@@ -10,9 +11,15 @@ import fqf.qua_mario.stomptypes.StompType;
 import fqf.qua_mario.stomptypes.stomptypes.StompBasic;
 import net.fabricmc.fabric.api.event.registry.FabricRegistryBuilder;
 import net.fabricmc.fabric.api.event.registry.RegistryAttribute;
+import net.fabricmc.fabric.api.gamerule.v1.GameRuleFactory;
+import net.fabricmc.fabric.api.gamerule.v1.GameRuleRegistry;
+import net.fabricmc.fabric.api.networking.v1.PlayerLookup;
+import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 import net.minecraft.registry.Registry;
 import net.minecraft.registry.RegistryKey;
+import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.util.Identifier;
+import net.minecraft.world.GameRules;
 
 public class MarioRegistries {
 	public static final RegistryKey<Registry<MarioCharacter>> CHARACTERS_KEY = RegistryKey.ofRegistry(
@@ -33,6 +40,14 @@ public class MarioRegistries {
 			.attribute(RegistryAttribute.SYNCED)
 			.buildAndRegister();
 
+	public static final GameRules.Key<GameRules.BooleanRule> USE_CHARACTER_STATS =
+			GameRuleRegistry.register("useMarioCharacterStats", GameRules.Category.PLAYER,
+					GameRuleFactory.createBooleanRule(true, (server, booleanRule) -> {
+						for(ServerPlayerEntity player : PlayerLookup.all(server)) {
+							ServerPlayNetworking.send(player, new MarioPackets.SetUseCharacterStatsPayload(booleanRule.get()));
+						}
+					}));
+
 	public static void register() {
 		registerCharacters();
 		registerPowerUps();
@@ -41,6 +56,7 @@ public class MarioRegistries {
 
 	public static void registerCharacters() {
 		CharaMario.INSTANCE.register();
+		Luigi.INSTANCE.register();
 	}
 	public static void registerPowerUps() {
 		SmallForm.INSTANCE.register();

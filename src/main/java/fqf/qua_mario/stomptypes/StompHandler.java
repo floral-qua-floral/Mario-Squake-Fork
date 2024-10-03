@@ -4,7 +4,6 @@ import com.google.common.collect.Lists;
 import fqf.qua_mario.MarioClient;
 import fqf.qua_mario.MarioRegistries;
 import fqf.qua_mario.ModMarioQuaMario;
-import fqf.qua_mario.StompAttack;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 import net.minecraft.entity.Entity;

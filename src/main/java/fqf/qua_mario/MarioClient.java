@@ -7,7 +7,6 @@ import fqf.qua_mario.mariostates.states.Grounded;
 import fqf.qua_mario.powerups.PowerUp;
 import fqf.qua_mario.powerups.forms.SuperForm;
 import net.minecraft.client.network.ClientPlayerEntity;
-import net.minecraft.entity.Entity;
 import net.minecraft.entity.MovementType;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.util.math.BlockPos;
@@ -17,8 +16,6 @@ import fqf.qua_mario.cameraanims.CameraAnim;
 import fqf.qua_mario.mariostates.MarioState;
 import org.jetbrains.annotations.Nullable;
 import org.joml.Vector2d;
-
-import java.util.List;
 
 public class MarioClient {
 	public static ClientPlayerEntity player;
@@ -33,6 +30,7 @@ public class MarioClient {
 
 	private static MarioState marioState = Grounded.INSTANCE;
 	public static int stateTimer = 0;
+	public static boolean jumpCapped = false;
 	public static boolean changeState(MarioState newState) {
 		if(newState == null || marioState == newState) return false;
 		stateTimer = 0;
@@ -115,6 +113,7 @@ public class MarioClient {
 		// Use velocities
 		player.move(MovementType.SELF, player.getVelocity());
 		marioState.evaluateTransitions(MarioState.TransitionPhases.POST_MOVE);
+		marioState.evaluateTransitions(MarioState.TransitionPhases.POST_STATE); // only for power-ups
 
 		// Decrement timers
 		jumpLandingTime--;
@@ -123,25 +122,6 @@ public class MarioClient {
 		// Finish
 		player.updateLimbs(false);
 		return true;
-	}
-
-
-
-	public static void setMotion(double forward, double rightward) {
-		// Calculate forward and sideways vector components
-		double yawRad = Math.toRadians(player.getYaw());
-		double forwardX = -Math.sin(yawRad);
-		double forwardZ = Math.cos(yawRad);
-		double rightwardX = forwardZ;
-		double rightwardZ = -forwardX;
-
-		forwardVel = forward;
-		rightwardVel = rightward;
-
-		double newXVel = forwardX * forwardVel + rightwardX * rightwardVel;
-		double newZVel = forwardZ * forwardVel + rightwardZ * rightwardVel;
-
-		player.setVelocity(newXVel, yVel, newZVel);
 	}
 
 	public static void aerialAccel(double forward, double rightward, double forwardCap, double backwardCap, double sideCap) {
@@ -357,23 +337,18 @@ public class MarioClient {
 		lastUsedAccelStat = accelStat;
 
 		approachAngleAndAccel(
-				getStat(accelStat) * slipFactor, getStat(speedStat) * forwardInput, forwardAngleContribution * forwardInput,
-				getStat(strafeAccelStat) * slipFactor, getStat(strafeSpeedStat) * rightwardInput, strafeAngleContribution * rightwardInput,
-				getStat(redirectStat) * slipFactor
+				accelStat.getValue() * slipFactor, speedStat.getValue() * forwardInput, forwardAngleContribution * forwardInput,
+				strafeAccelStat.getValue() * slipFactor, strafeSpeedStat.getValue() * rightwardInput, strafeAngleContribution * rightwardInput,
+				redirectStat.getValue() * slipFactor
 		);
 	}
 
-	public static double getStat(CharaStat stat) {
-		if(useCharacterStats) return character.getStatValue(stat);
-		return stat.getDefaultValue();
-	}
-
 	public static double getStatBuffer(CharaStat stat) {
-		return getStat(stat) * 1.015;
+		return stat.getValue() * 1.015;
 	}
 
 	public static double getStatThreshold(CharaStat stat) {
-		return getStat(stat) * 0.99;
+		return stat.getValue() * 0.99;
 	}
 
 	public static void voiceLine(VoiceLine line) {

@@ -16,9 +16,7 @@ import net.minecraft.util.math.Vec3d;
 import org.apache.commons.compress.utils.Lists;
 import org.lwjgl.glfw.GLFW;
 
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 public class ModMarioQuaMarioClient implements ClientModInitializer {
 	public static final String CATEGORY = "fabric.mods." + ModMarioQuaMario.MOD_ID;
@@ -35,11 +33,7 @@ public class ModMarioQuaMarioClient implements ClientModInitializer {
 			SQUASHED_ENTITIES.remove(entity);
 		});
 
-		ClientPlayNetworking.registerGlobalReceiver(ModMarioQuaMario.SetMarioEnabledPayload.ID, (payload, context) -> {
-			MarioClient.isMario = payload.isMario();
-		});
-
-		ClientPlayNetworking.registerGlobalReceiver(StompHandler.affirmStompPayload.ID, StompHandler::parseAffirmStompPacket);
+		MarioPackets.registerClient();
 	}
 
 	public static void drawSpeedometer(DrawContext context) {

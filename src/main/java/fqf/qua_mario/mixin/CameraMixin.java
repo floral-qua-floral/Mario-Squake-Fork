@@ -23,8 +23,8 @@ public abstract class CameraMixin {
 	@Final @Shadow private Vector3f horizontalPlane;
 	@Final @Shadow private Vector3f verticalPlane;
 	@Final @Shadow private Vector3f diagonalPlane;
-	@Final @Shadow private boolean thirdPerson;
-	@Final @Shadow private float lastTickDelta;
+	@Shadow private boolean thirdPerson;
+	@Shadow private float lastTickDelta;
 
 	@Inject(method = "setRotation", at = @At(value = "INVOKE", target =
 		"Lorg/joml/Quaternionf;rotationYXZ(FFF)Lorg/joml/Quaternionf;"

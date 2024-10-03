@@ -33,16 +33,16 @@ public class Skid extends MarioState {
 		postTickTransitions = new ArrayList<>(Arrays.asList(
 				() -> {
 					// Regular jump
-					return(MarioClient.forwardVel > MarioClient.getStat(CharaStat.SIDEFLIP_THRESHOLD)
+					return(MarioClient.forwardVel > CharaStat.SIDEFLIP_THRESHOLD.getValue()
 							? CommonTransitions.JUMP.evaluate() : null);
 				},
 				() -> {
 					// Sideflip
 					if (MarioInputs.isPressed(MarioInputs.Key.JUMP)) {
 						MarioInputs.unbuffer(MarioInputs.Key.JUMP);
-						ModMarioQuaMario.LOGGER.info("yVel: " + MarioClient.getStat(CharaStat.JUMP_VELOCITY));
-						MarioClient.yVel = 1.15;
-						MarioClient.setMotion(-0.3, 0.0);
+						ModMarioQuaMario.LOGGER.info("yVel: " + CharaStat.JUMP_VELOCITY.getValue());
+						MarioClient.yVel = CharaStat.SIDEFLIP_VELOCITY.getValue();
+						MarioClient.assignForwardStrafeVelocities(CharaStat.SIDEFLIP_BACKWARD_SPEED.getValue(), 0.0);
 						MarioClient.player.setYaw(MarioClient.player.getYaw() + 180);
 
 						switch(ModMarioQuaMario.CONFIG.getSideflipAnimType()) {
@@ -80,7 +80,7 @@ public class Skid extends MarioState {
 				MarioClient.stateTimer++;
 			}
 //			MarioClient.setMotion(MarioClient.forwardVel * 0.9, 0);
-			MarioClient.assignForwardStrafeVelocities(MarioClient.forwardVel * MarioClient.getStat(CharaStat.SKID_FACTOR), MarioClient.rightwardVel * MarioClient.getStat(CharaStat.SKID_FACTOR));
+			MarioClient.assignForwardStrafeVelocities(MarioClient.forwardVel * CharaStat.SKID_FACTOR.getValue(), MarioClient.rightwardVel * CharaStat.SKID_FACTOR.getValue());
 		}
 	}
 }

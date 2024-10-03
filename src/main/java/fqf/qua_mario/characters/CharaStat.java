@@ -1,5 +1,10 @@
 package fqf.qua_mario.characters;
 
+import fqf.qua_mario.MarioClient;
+import net.fabricmc.api.EnvType;
+import net.fabricmc.api.Environment;
+import net.minecraft.server.network.ServerPlayerEntity;
+
 public enum CharaStat {
 	WALK_ACCEL(0.045),
 	WALK_STANDSTILL_ACCEL(0.125),
@@ -45,28 +50,27 @@ public enum CharaStat {
 	JUMP_VELOCITY_ADDEND(0.089),
 	JUMP_CAP(0.275),
 
-	SIDEFLIP_HEIGHT,
 	SIDEFLIP_VELOCITY,
 	SIDEFLIP_CAP,
-	SIDEFLIP_THRESHOLD,
+	SIDEFLIP_THRESHOLD(0.125),
 	SIDEFLIP_BACKWARD_SPEED,
 
 	CROUCH_JUMP_HEIGHT,
-	CROUCH_JUMP_VELOCITY(getJumpVelocity(CROUCH_JUMP_HEIGHT)),
+	CROUCH_JUMP_VELOCITY,
 	CROUCH_JUMP_CAP,
 
 	DOUBLE_JUMP_HEIGHT,
 	DOUBLE_JUMP_HEIGHT_ADDEND,
-	DOUBLE_JUMP_VELOCITY(getJumpVelocity(DOUBLE_JUMP_HEIGHT)),
-	DOUBLE_JUMP_VELOCITY_ADDEND(getJumpVelocity(DOUBLE_JUMP_HEIGHT_ADDEND)),
+	DOUBLE_JUMP_VELOCITY,
+	DOUBLE_JUMP_VELOCITY_ADDEND,
 	DOUBLE_JUMP_CAP,
 
 	TRIPLE_JUMP_HEIGHT,
-	TRIPLE_JUMP_VELOCITY(getJumpVelocity(TRIPLE_JUMP_HEIGHT)),
+	TRIPLE_JUMP_VELOCITY,
 	TRIPLE_JUMP_CAP,
 
 	LONG_JUMP_HEIGHT,
-	LONG_JUMP_VELOCITY(getJumpVelocity(LONG_JUMP_HEIGHT)),
+	LONG_JUMP_VELOCITY,
 	LONG_JUMP_CAP,
 	LONG_JUMP_SPEED_FACTOR,
 	LONG_JUMP_SPEED_ADDEND,
@@ -87,11 +91,16 @@ public enum CharaStat {
 		return DEFAULT_VALUE;
 	}
 
-	private static double getJumpVelocity(CharaStat heightStat) {
-		return Math.sqrt(-2 * CharaStat.JUMP_GRAVITY.getDefaultValue() * heightStat.getDefaultValue());
+	@Environment(EnvType.CLIENT)
+	public double getValue() {
+		// Only use client-side!!!!!!!!!!
+		if(MarioClient.useCharacterStats)
+			return MarioClient.character.getStatValue(this);
+		return getDefaultValue();
 	}
 
-	public static double getJumpVelocity(double height, double gravity) {
-		return Math.sqrt(2 * Math.abs(gravity) * height);
+	public double getValue(ServerPlayerEntity player) {
+
+		return getDefaultValue();
 	}
 }
