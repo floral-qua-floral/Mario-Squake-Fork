@@ -8,6 +8,7 @@ import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.damage.DamageSource;
 import net.minecraft.entity.damage.DamageType;
 import net.minecraft.item.ItemStack;
+import net.minecraft.registry.tag.TagKey;
 import net.minecraft.text.Text;
 import org.jetbrains.annotations.Nullable;
 import org.spongepowered.asm.mixin.Final;
@@ -30,18 +31,16 @@ public abstract class DamageSourceMixin {
 
 	@Shadow public abstract DamageType getType();
 
+	@Shadow public abstract boolean isIn(TagKey<DamageType> tag);
+
 	@Inject(at = @At("HEAD"), method = "getDeathMessage", cancellable = true)
 	protected void getDeathMessage(LivingEntity killed, CallbackInfoReturnable<Text> ci) {
+		boolean useFeetItem = isIn(ModMarioQuaMario.USES_FEET_ITEM_TAG);
+		boolean useLegsItem = isIn(ModMarioQuaMario.USES_LEGS_ITEM_TAG);
 
-		ModMarioQuaMario.LOGGER.info("Damage type: " + getName());
-
-		String name = getType().msgId();
-
-		boolean isStomp = Objects.equals(name, "marioStomp");
-		boolean isGroundPound = Objects.equals(name, "marioHipDrop");
-
-		if((isStomp || isGroundPound) && attacker instanceof LivingEntity livingEntity) {
-			ItemStack itemStack = livingEntity.getEquippedStack(isGroundPound ? EquipmentSlot.LEGS : EquipmentSlot.FEET);
+		if((useFeetItem || useLegsItem) && attacker instanceof LivingEntity livingEntity) {
+			String name = getType().msgId();
+			ItemStack itemStack = livingEntity.getEquippedStack(useLegsItem ? EquipmentSlot.LEGS : EquipmentSlot.FEET);
 
 			if(!itemStack.isEmpty() && itemStack.contains(DataComponentTypes.CUSTOM_NAME)) {
 				ci.setReturnValue(Text.translatable(
