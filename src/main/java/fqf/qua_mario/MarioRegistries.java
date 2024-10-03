@@ -6,6 +6,8 @@ import fqf.qua_mario.powerups.PowerUp;
 import fqf.qua_mario.powerups.forms.FireForm;
 import fqf.qua_mario.powerups.forms.SmallForm;
 import fqf.qua_mario.powerups.forms.SuperForm;
+import fqf.qua_mario.stomptypes.StompType;
+import fqf.qua_mario.stomptypes.stomptypes.StompBasic;
 import net.fabricmc.fabric.api.event.registry.FabricRegistryBuilder;
 import net.fabricmc.fabric.api.event.registry.RegistryAttribute;
 import net.minecraft.registry.Registry;
@@ -25,6 +27,12 @@ public class MarioRegistries {
 			.attribute(RegistryAttribute.SYNCED)
 			.buildAndRegister();
 
+	public static final RegistryKey<Registry<StompType>> STOMP_TYPES_KEY = RegistryKey.ofRegistry(
+			Identifier. of(ModMarioQuaMario.MOD_ID, "stomp_types"));
+	public static final Registry<StompType> STOMP_TYPES = FabricRegistryBuilder.createSimple(STOMP_TYPES_KEY)
+			.attribute(RegistryAttribute.SYNCED)
+			.buildAndRegister();
+
 	public static void register() {
 		registerCharacters();
 		registerPowerUps();
@@ -40,6 +48,6 @@ public class MarioRegistries {
 		FireForm.INSTANCE.register();
 	}
 	public static void registerStompTypes() {
-
+		StompBasic.INSTANCE.register();
 	}
 }

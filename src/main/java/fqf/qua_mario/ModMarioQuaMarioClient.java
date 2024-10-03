@@ -1,6 +1,8 @@
 package fqf.qua_mario;
 
+import fqf.qua_mario.stomptypes.StompHandler;
 import net.fabricmc.api.ClientModInitializer;
+import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientEntityEvents;
 import net.fabricmc.fabric.api.client.keybinding.v1.KeyBindingHelper;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 import net.minecraft.client.MinecraftClient;
@@ -9,24 +11,35 @@ import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.client.option.KeyBinding;
 import net.minecraft.client.util.InputUtil;
+import net.minecraft.entity.Entity;
 import net.minecraft.util.math.Vec3d;
+import org.apache.commons.compress.utils.Lists;
 import org.lwjgl.glfw.GLFW;
+
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 public class ModMarioQuaMarioClient implements ClientModInitializer {
 	public static final String CATEGORY = "fabric.mods." + ModMarioQuaMario.MOD_ID;
 	public static final KeyBinding spinBinding = new KeyBinding(CATEGORY + "." + "spin", InputUtil.Type.KEYSYM, GLFW.GLFW_KEY_LEFT_ALT, CATEGORY);
 
+	public static final List<Entity> SQUASHED_ENTITIES = Lists.newArrayList();
+
 	@Override
 	public void onInitializeClient() {
 		KeyBindingHelper.registerKeyBinding(spinBinding);
 
-//		PayloadTypeRegistry.playC2S().register(ModMarioQuaMario.PlayJumpSfxPayload.ID, ModMarioQuaMario.PlayJumpSfxPayload.CODEC);
-//		PayloadTypeRegistry.playC2S().register(StompAttack.requestStompPayload.ID, StompAttack.requestStompPayload.CODEC);
+		ClientEntityEvents.ENTITY_UNLOAD.register((entity, world) -> {
+			ModMarioQuaMario.LOGGER.info("Unloaded entity!");
+			SQUASHED_ENTITIES.remove(entity);
+		});
 
 		ClientPlayNetworking.registerGlobalReceiver(ModMarioQuaMario.SetMarioEnabledPayload.ID, (payload, context) -> {
-			ModMarioQuaMario.LOGGER.info("Received the packet client-side! " + payload.isMario());
 			MarioClient.isMario = payload.isMario();
 		});
+
+		ClientPlayNetworking.registerGlobalReceiver(StompHandler.affirmStompPayload.ID, StompHandler::parseAffirmStompPacket);
 	}
 
 	public static void drawSpeedometer(DrawContext context) {

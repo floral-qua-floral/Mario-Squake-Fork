@@ -35,6 +35,6 @@ public abstract class MarioCharacter {
 		return(this.name);
 	}
 	public void register() {
-		Registry.register(MarioRegistries.CHARACTERS, getID(), this);
+		Registry.register(MarioRegistries.CHARACTERS, this.getID(), this);
 	}
 }

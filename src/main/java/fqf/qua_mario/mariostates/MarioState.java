@@ -22,25 +22,44 @@ public abstract class MarioState {
 		MarioState evaluate();
 	}
 
-	protected static final Logger LOGGER = ModMarioQuaMario.LOGGER;
-
 	public String name;
-	public ArrayList<MarioStateTransition> preTickTransitions;
-	public ArrayList<MarioStateTransition> postTickTransitions;
-	public ArrayList<MarioStateTransition> postMoveTransitions = new ArrayList<>(Arrays.asList(
+	protected ArrayList<MarioStateTransition> preTickTransitions;
+	protected ArrayList<MarioStateTransition> postTickTransitions;
+	protected ArrayList<MarioStateTransition> postMoveTransitions = new ArrayList<>(Arrays.asList(
 			CommonTransitions.LAVA_BOOST,
 			CommonTransitions.ENTER_WATER
 	));
 
-	public void evaluateTransitions(ArrayList<MarioStateTransition> transitions) {
-		if(transitions != null) for (MarioStateTransition transition : transitions) {
-			MarioState nextState = transition.evaluate();
-			if (nextState != null) {
-				MarioClient.stateTimer = 0;
-				MarioClient.changeState(nextState);
-				return;
-			}
+	public enum TransitionPhases {
+		PRE_TICK,
+		POST_TICK,
+		POST_MOVE,
+		POST_STATE;
+
+		private ArrayList<MarioStateTransition> getTransitionList(MarioState state) {
+			return switch(this) {
+				case PRE_TICK -> state.preTickTransitions;
+				case POST_TICK -> state.postTickTransitions;
+				case POST_MOVE -> state.postMoveTransitions;
+				case POST_STATE -> null;
+			};
 		}
+	}
+
+	public void evaluateTransitions(TransitionPhases phase) {
+		MarioState powerTransitionResult = MarioClient.powerUp.customTransition(this, phase);
+		if(MarioClient.changeState(powerTransitionResult)) return;
+
+		ArrayList<MarioStateTransition> transitionList = phase.getTransitionList(this);
+		if(transitionList != null) for (MarioStateTransition transition : transitionList) {
+			if (MarioClient.changeState(transition.evaluate().getTransitionTarget(MarioClient.getState())))
+				return;
+		}
+	}
+
+	public MarioState getTransitionTarget(MarioState from) {
+		MarioState stateFromPowerUp = MarioClient.powerUp.interceptTransition(from, this);
+		return stateFromPowerUp != null ? stateFromPowerUp : this;
 	}
 
 	public abstract void tick();
@@ -51,11 +70,11 @@ public abstract class MarioState {
 			if(MarioClient.yVel < terminalVelocity) MarioClient.yVel = terminalVelocity;
 		}
 	}
-	protected void applyGravity(CharaStat gravity, CharaStat terminalVelocity) {
-		applyGravity(MarioClient.getStat(gravity), MarioClient.getStat(terminalVelocity));
+	protected void applyGravity(CharaStat gravity) {
+		applyGravity(MarioClient.getStat(gravity), MarioClient.getStat(CharaStat.TERMINAL_VELOCITY));
 	}
 	protected void applyGravity() {
-		applyGravity(CharaStat.GRAVITY, CharaStat.TERMINAL_VELOCITY);
+		applyGravity(CharaStat.GRAVITY);
 	}
 
 	protected static class CommonTransitions {

@@ -3,16 +3,18 @@
   "package": "fqf.qua_mario.mixin",
   "compatibilityLevel": "JAVA_8",
   "mixins": [
-    "PlayerEntityMixin",
+    "DamageSourceMixin",
     "EntityDataSaverMixin",
-    "DamageSourceMixin"
+    "PlayerEntityMixin"
   ],
   "injectors": {
-	"defaultRequire": 1
+    "defaultRequire": 1
   },
   "client": [
+    "CameraMixin",
+    "ClientPlayNetworkHandlerMixin",
     "EntitySwimPreventionMixin",
-	"InGameHudMixin",
-	"CameraMixin"
+    "InGameHudMixin",
+    "LivingEntityRendererMixin"
   ]
 }

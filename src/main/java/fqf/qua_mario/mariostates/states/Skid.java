@@ -8,6 +8,7 @@ import fqf.qua_mario.cameraanims.animations.CameraSideflipGentle;
 import fqf.qua_mario.cameraanims.animations.CameraSideflipNoFunAllowed;
 import fqf.qua_mario.characters.CharaStat;
 import fqf.qua_mario.mariostates.MarioState;
+import net.minecraft.util.math.MathHelper;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -22,8 +23,7 @@ public class Skid extends MarioState {
 				CommonTransitions.FALL,
 				() -> {
 					// Stop skidding
-					if (MarioClient.stateTimer > 60 || MarioClient.forwardInput >= 0 || MarioClient.forwardVel < -0.05) {
-						LOGGER.info("\n" + MarioClient.stateTimer + "\n" + MarioClient.forwardInput + "\n" + MarioClient.forwardVel);
+					if (MarioClient.stateTimer > 20 || MarioClient.forwardInput >= 0 || MarioClient.forwardVel < -0.05) {
 						return Grounded.INSTANCE;
 					}
 					return null;
@@ -32,7 +32,9 @@ public class Skid extends MarioState {
 
 		postTickTransitions = new ArrayList<>(Arrays.asList(
 				() -> {
-					return null;
+					// Regular jump
+					return(MarioClient.forwardVel > MarioClient.getStat(CharaStat.SIDEFLIP_THRESHOLD)
+							? CommonTransitions.JUMP.evaluate() : null);
 				},
 				() -> {
 					// Sideflip
@@ -74,10 +76,11 @@ public class Skid extends MarioState {
 
 
 		if(MarioClient.forwardInput < 0) {
-			if(MarioClient.forwardVel <= 0.1) {
+			if(MathHelper.approximatelyEquals(MarioClient.forwardVel, 0)) {
 				MarioClient.stateTimer++;
 			}
-			MarioClient.setMotion(MarioClient.forwardVel * 0.9, 0);
+//			MarioClient.setMotion(MarioClient.forwardVel * 0.9, 0);
+			MarioClient.assignForwardStrafeVelocities(MarioClient.forwardVel * MarioClient.getStat(CharaStat.SKID_FACTOR), MarioClient.rightwardVel * MarioClient.getStat(CharaStat.SKID_FACTOR));
 		}
 	}
 }

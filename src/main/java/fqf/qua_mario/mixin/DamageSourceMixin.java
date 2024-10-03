@@ -1,6 +1,6 @@
 package fqf.qua_mario.mixin;
 
-import fqf.qua_mario.ModMarioQuaMario;
+import fqf.qua_mario.stomptypes.StompHandler;
 import net.minecraft.component.DataComponentTypes;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EquipmentSlot;
@@ -18,8 +18,6 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
-import java.util.Objects;
-
 @Mixin(DamageSource.class)
 public abstract class DamageSourceMixin {
 
@@ -35,8 +33,8 @@ public abstract class DamageSourceMixin {
 
 	@Inject(at = @At("HEAD"), method = "getDeathMessage", cancellable = true)
 	protected void getDeathMessage(LivingEntity killed, CallbackInfoReturnable<Text> ci) {
-		boolean useFeetItem = isIn(ModMarioQuaMario.USES_FEET_ITEM_TAG);
-		boolean useLegsItem = isIn(ModMarioQuaMario.USES_LEGS_ITEM_TAG);
+		boolean useFeetItem = isIn(StompHandler.USES_FEET_ITEM_TAG);
+		boolean useLegsItem = isIn(StompHandler.USES_LEGS_ITEM_TAG);
 
 		if((useFeetItem || useLegsItem) && attacker instanceof LivingEntity livingEntity) {
 			String name = getType().msgId();

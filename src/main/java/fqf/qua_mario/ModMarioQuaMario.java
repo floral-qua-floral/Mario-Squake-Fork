@@ -2,29 +2,21 @@ package fqf.qua_mario;
 
 import fqf.qua_mario.characters.CharaStat;
 import fqf.qua_mario.characters.MarioCharacter;
-import fqf.qua_mario.characters.characters.CharaMario;
 import fqf.qua_mario.powerups.PowerUp;
-import fqf.qua_mario.powerups.forms.FireForm;
-import fqf.qua_mario.powerups.forms.SmallForm;
-import fqf.qua_mario.powerups.forms.SuperForm;
+import fqf.qua_mario.stomptypes.StompHandler;
 import fqf.qua_mario.util.MarioDataSaver;
 import me.shedaniel.autoconfig.AutoConfig;
 import me.shedaniel.autoconfig.serializer.GsonConfigSerializer;
 import net.fabricmc.api.ModInitializer;
-import net.fabricmc.fabric.api.event.registry.FabricRegistryBuilder;
-import net.fabricmc.fabric.api.event.registry.RegistryAttribute;
 import net.fabricmc.fabric.api.networking.v1.PayloadTypeRegistry;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayConnectionEvents;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
-import net.minecraft.entity.damage.DamageType;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.network.RegistryByteBuf;
 import net.minecraft.network.codec.PacketCodec;
 import net.minecraft.network.codec.PacketCodecs;
 import net.minecraft.network.packet.CustomPayload;
-import net.minecraft.registry.RegistryKeys;
-import net.minecraft.registry.tag.TagKey;
 import net.minecraft.server.network.ServerPlayerEntity;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -33,14 +25,6 @@ import net.minecraft.util.Identifier;
 public class ModMarioQuaMario implements ModInitializer {
 	public static final String MOD_ID = "qua_mario";
 	public static final Logger LOGGER = LoggerFactory.getLogger(MOD_ID);
-
-	public static final TagKey<DamageType> USES_FEET_ITEM_TAG = TagKey.of(RegistryKeys.DAMAGE_TYPE, Identifier.of(MOD_ID, "uses_feet_item"));
-	public static final TagKey<DamageType> USES_LEGS_ITEM_TAG = TagKey.of(RegistryKeys.DAMAGE_TYPE, Identifier.of(MOD_ID, "uses_legs_item"));
-
-
-
-
-//	Registry.register()
 
 	public static final ModConfig CONFIG;
 	static {
@@ -62,8 +46,6 @@ public class ModMarioQuaMario implements ModInitializer {
 				&& !player.isClimbing()
 		);
 	}
-
-//	FabricRegistryBuilder
 
 	public static void sendSetMarioPacket(ServerPlayerEntity player, boolean isMario) {
 		ServerPlayNetworking.send(player, new SetMarioEnabledPayload(isMario));
@@ -100,10 +82,10 @@ public class ModMarioQuaMario implements ModInitializer {
 	@Override
 	public void onInitialize() {
 		PayloadTypeRegistry.playS2C().register(SetMarioEnabledPayload.ID, SetMarioEnabledPayload.CODEC);
-		PayloadTypeRegistry.playS2C().register(StompAttack.affirmStompPayload.ID, StompAttack.affirmStompPayload.CODEC);
+		PayloadTypeRegistry.playS2C().register(StompHandler.affirmStompPayload.ID, StompHandler.affirmStompPayload.CODEC);
 
 		PayloadTypeRegistry.playC2S().register(PlayJumpSfxPayload.ID, PlayJumpSfxPayload.CODEC);
-		PayloadTypeRegistry.playC2S().register(StompAttack.requestStompPayload.ID, StompAttack.requestStompPayload.CODEC);
+		PayloadTypeRegistry.playC2S().register(StompHandler.requestStompPayload.ID, StompHandler.requestStompPayload.CODEC);
 
 //		Registry.register(POWER_UPS, SmallForm.INSTANCE.getID(), SmallForm.INSTANCE);
 //		Registry.register(POWER_UPS, SuperForm.INSTANCE.getID(), SuperForm.INSTANCE);
@@ -120,9 +102,9 @@ public class ModMarioQuaMario implements ModInitializer {
 			LOGGER.info("Received the packet asking to play a sound effect");
 		});
 
-		ServerPlayNetworking.registerGlobalReceiver(StompAttack.requestStompPayload.ID, (payload, context) -> {
+		ServerPlayNetworking.registerGlobalReceiver(StompHandler.requestStompPayload.ID, (payload, context) -> {
 			LOGGER.info("Received the packet asking to stomp something");
-			StompAttack.server_receive(payload, context);
+			StompHandler.parseRequestStompPacket(payload, context);
 		});
 
 		MarioCommand.registerMarioCommand();

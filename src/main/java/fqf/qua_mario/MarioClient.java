@@ -4,6 +4,8 @@ import fqf.qua_mario.characters.characters.CharaMario;
 import fqf.qua_mario.characters.CharaStat;
 import fqf.qua_mario.characters.MarioCharacter;
 import fqf.qua_mario.mariostates.states.Grounded;
+import fqf.qua_mario.powerups.PowerUp;
+import fqf.qua_mario.powerups.forms.SuperForm;
 import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.MovementType;
@@ -31,9 +33,11 @@ public class MarioClient {
 
 	private static MarioState marioState = Grounded.INSTANCE;
 	public static int stateTimer = 0;
-	public static void changeState(MarioState newState) {
+	public static boolean changeState(MarioState newState) {
+		if(newState == null || marioState == newState) return false;
 		stateTimer = 0;
 		marioState = newState;
+		return true;
 	}
 	public static MarioState getState() { return(marioState); }
 
@@ -56,6 +60,8 @@ public class MarioClient {
 	public static MarioCharacter character = CharaMario.INSTANCE;
 	public static boolean useCharacterStats = true;
 	public static CharaStat lastUsedAccelStat;
+
+	public static PowerUp powerUp = SuperForm.INSTANCE;
 
 	public static boolean attemptMarioTravel(PlayerEntity player, Vec3d movementInput) {
 		if(ModMarioQuaMario.useMarioPhysics(player, true) && player instanceof ClientPlayerEntity clientPlayer) {
@@ -98,9 +104,9 @@ public class MarioClient {
 		yVel = currentVel.y;
 
 		// Execute Mario's state behavior
-		marioState.evaluateTransitions(marioState.preTickTransitions);
+		marioState.evaluateTransitions(MarioState.TransitionPhases.PRE_TICK);
 		marioState.tick();
-		marioState.evaluateTransitions(marioState.postTickTransitions);
+		marioState.evaluateTransitions(MarioState.TransitionPhases.POST_TICK);
 
 		// Apply new y velocity
 		Vec3d newVel = player.getVelocity();
@@ -108,7 +114,7 @@ public class MarioClient {
 
 		// Use velocities
 		player.move(MovementType.SELF, player.getVelocity());
-		marioState.evaluateTransitions(marioState.postMoveTransitions);
+		marioState.evaluateTransitions(MarioState.TransitionPhases.POST_MOVE);
 
 		// Decrement timers
 		jumpLandingTime--;
@@ -119,16 +125,7 @@ public class MarioClient {
 		return true;
 	}
 
-	public static List<Entity> getStompTargets(boolean onlyFromAbove) {
-		List<Entity> stompTargets = MarioClient.player.getWorld().getOtherEntities(MarioClient.player, MarioClient.player.getBoundingBox());
 
-		if(onlyFromAbove)
-			stompTargets.removeIf(stompTarget -> MarioClient.player.prevY < stompTarget.getY() + stompTarget.getHeight());
-
-
-
-		return stompTargets;
-	}
 
 	public static void setMotion(double forward, double rightward) {
 		// Calculate forward and sideways vector components
@@ -360,8 +357,8 @@ public class MarioClient {
 		lastUsedAccelStat = accelStat;
 
 		approachAngleAndAccel(
-				getStat(accelStat) * slipFactor, getStat(speedStat) * forwardInput, forwardAngleContribution,
-				getStat(strafeAccelStat) * slipFactor, getStat(strafeSpeedStat) * rightwardInput, strafeAngleContribution,
+				getStat(accelStat) * slipFactor, getStat(speedStat) * forwardInput, forwardAngleContribution * forwardInput,
+				getStat(strafeAccelStat) * slipFactor, getStat(strafeSpeedStat) * rightwardInput, strafeAngleContribution * rightwardInput,
 				getStat(redirectStat) * slipFactor
 		);
 	}

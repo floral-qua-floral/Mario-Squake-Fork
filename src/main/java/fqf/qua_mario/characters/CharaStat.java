@@ -1,7 +1,5 @@
 package fqf.qua_mario.characters;
 
-import fqf.qua_mario.ModMarioQuaMario;
-
 public enum CharaStat {
 	WALK_ACCEL(0.045),
 	WALK_STANDSTILL_ACCEL(0.125),
@@ -32,6 +30,7 @@ public enum CharaStat {
 	STRAFE_SPEED(0.275),
 
 	GRAVITY(-0.115),
+	JUMP_GRAVITY(-0.08),
 	TERMINAL_VELOCITY(-3.25),
 
 	DRIFT_FORWARD_ACCEL,
@@ -42,13 +41,9 @@ public enum CharaStat {
 	DRIFT_BACKWARD_SPEED,
 	DRIFT_REDIRECTION,
 
-	JUMP_GRAVITY(-0.115),
-
-	JUMP_HEIGHT(1.1),
-	JUMP_HEIGHT_ADDEND(0.0),
-	JUMP_VELOCITY(getJumpVelocity(JUMP_HEIGHT)),
-	JUMP_VELOCITY_ADDEND(getJumpVelocity(JUMP_HEIGHT_ADDEND)),
-	JUMP_CAP,
+	JUMP_VELOCITY(0.792),
+	JUMP_VELOCITY_ADDEND(0.089),
+	JUMP_CAP(0.275),
 
 	SIDEFLIP_HEIGHT,
 	SIDEFLIP_VELOCITY,
