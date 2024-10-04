@@ -16,19 +16,16 @@ public class SoundFader {
 	public static final Map<PlayerEntity, Boolean> JUMP_IS_FADING = new HashMap<>();
 
 	public static class JumpSoundInstance extends PositionedSoundInstance implements TickableSoundInstance {
-		private static boolean isDone;
 		private final PlayerEntity owner;
 
 		public JumpSoundInstance(SoundEvent sound, SoundCategory category, float volume, float pitch, Random random, double x, double y, double z, PlayerEntity player) {
 			super(sound, category, volume, pitch, random, x, y, z);
-			isDone = false;
-
 			owner = player;
 		}
 
 		@Override
 		public boolean isDone() {
-			return isDone;
+			return volume <= 0.0F;
 		}
 
 		@Override

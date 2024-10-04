@@ -10,6 +10,8 @@ public class FireForm extends PowerUp {
 	private FireForm() {
 		this.ID = Identifier.of(ModMarioQuaMario.MOD_ID, "fire_form");
 		this.prefix = "Fire ";
+		this.widthFactor = 1.0F;
+		this.heightFactor = 1.0F;
 	}
 
 	@Override

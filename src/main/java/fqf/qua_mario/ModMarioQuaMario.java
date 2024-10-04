@@ -24,12 +24,22 @@ public class ModMarioQuaMario implements ModInitializer {
 		CONFIG = AutoConfig.getConfigHolder(ModConfig.class).getConfig();
 	}
 
+	public static boolean getIsMario(PlayerEntity player) {
+		return(player.getWorld().isClient ? MarioClient.isMario : ((MarioDataSaver) player).marioQuaMario$getPersistentData().getBoolean("isMario"));
+	}
+	public static MarioCharacter getCharacter(PlayerEntity player) {
+		return(player.getWorld().isClient ? MarioClient.getCharacter() : ((MarioDataSaver) player).marioQuaMario$getCharacter());
+	}
+	public static PowerUp getPowerUp(PlayerEntity player) {
+		return(player.getWorld().isClient ? MarioClient.getPowerUp() : ((MarioDataSaver) player).marioQuaMario$getPowerUp());
+	}
+
 	public static boolean useMarioPhysics(PlayerEntity player, boolean mustBeClient) {
 		return(
 				// Has to be client-side if required by parameter
 				(player.getWorld().isClient || !mustBeClient)
 				// Has to be Mario (duh)
-				&& (player.getWorld().isClient ? MarioClient.isMario : ((MarioDataSaver) player).marioQuaMario$getPersistentData().getBoolean("isMario"))
+				&& getIsMario(player)
 				// Can't be creative-flying or gliding with an Elytra
 				&& !player.getAbilities().flying && !player.isFallFlying()
 				// Can't be in a vehicle
@@ -48,7 +58,8 @@ public class ModMarioQuaMario implements ModInitializer {
 			return stat.getValue();
 		}
 		else {
-
+			if(player.getWorld().getGameRules().getBoolean(MarioRegistries.USE_CHARACTER_STATS))
+				return getCharacter(player).getStatValue(stat);
 			return stat.getDefaultValue();
 		}
 	}
@@ -57,22 +68,23 @@ public class ModMarioQuaMario implements ModInitializer {
 		ModMarioQuaMario.getMarioPersistentData(player).putBoolean("isMario", isMario);
 		ServerPlayNetworking.send(player, new MarioPackets.SetMarioEnabledPayload(isMario));
 
+		player.calculateDimensions();
 		return (isMario ? "Enabled" : "Disabled") + " Mario mode for " + player + ".";
 	}
 
 	public static String setCharacter(ServerPlayerEntity player, MarioCharacter character) {
 		((MarioDataSaver) player).marioQuaMario$setCharacter(character);
 		// Change the player's playermodel to the current character & power-up state
-		// Send a "change character" packet
 		ServerPlayNetworking.send(player, new MarioPackets.SetCharacterPayload(MarioRegistries.CHARACTERS.getRawId(character)));
+		player.calculateDimensions();
 		return player + " will now be " + character.getName();
 	}
 
 	public static String setPowerUp(ServerPlayerEntity player, PowerUp powerUp) {
 		((MarioDataSaver) player).marioQuaMario$setPowerUp(powerUp);
 		// Change the player's playermodel to the current power-up state
-		// Send a "change power-up" packet
 		ServerPlayNetworking.send(player, new MarioPackets.SetPowerUpPayload(MarioRegistries.POWER_UPS.getRawId(powerUp)));
+		player.calculateDimensions();
 		return player + " will now be " + powerUp.getFormName(((MarioDataSaver) player).marioQuaMario$getCharacter());
 	}
 

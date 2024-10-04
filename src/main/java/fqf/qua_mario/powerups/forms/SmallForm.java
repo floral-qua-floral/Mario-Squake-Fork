@@ -10,6 +10,8 @@ public class SmallForm extends PowerUp {
 	private SmallForm() {
 		this.ID = Identifier.of(ModMarioQuaMario.MOD_ID, "small_form");
 		this.prefix = "";
+		this.widthFactor = 1.0F;
+		this.heightFactor = 0.5F;
 	}
 
 	@Override

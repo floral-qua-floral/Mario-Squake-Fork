@@ -21,7 +21,7 @@ public enum CharaStat {
 	OVERBACKPEDAL_ACCEL(0.04),
 
 	SKID_THRESHOLD(0.285),
-	SKID_FACTOR(0.9),
+	SKID_DRAG(0.1),
 
 	RUN_ACCEL(0.0185),
 	RUN_SPEED(0.5),
@@ -46,13 +46,13 @@ public enum CharaStat {
 	DRIFT_BACKWARD_SPEED,
 	DRIFT_REDIRECTION,
 
-	JUMP_VELOCITY(0.86),
-	JUMP_VELOCITY_ADDEND(0.165),
+	JUMP_VELOCITY(0.858),
+	JUMP_VELOCITY_ADDEND(0.117),
 	JUMP_CAP(0.39),
 
 	SIDEFLIP_VELOCITY,
 	SIDEFLIP_CAP,
-	SIDEFLIP_THRESHOLD(0.125),
+	SIDEFLIP_THRESHOLD(0.2),
 	SIDEFLIP_BACKWARD_SPEED,
 
 	CROUCH_JUMP_HEIGHT,
@@ -76,6 +76,10 @@ public enum CharaStat {
 	LONG_JUMP_SPEED_ADDEND,
 	LONG_JUMP_SPEED_CAP,
 
+	STOMP_BASE_DAMAGE,
+	SPIN_JUMP_BASE_DAMAGE,
+	GROUND_POUND_BASE_DAMAGE,
+
 	ZERO(0);
 
 	private final double DEFAULT_VALUE;
@@ -95,7 +99,7 @@ public enum CharaStat {
 	public double getValue() {
 		// Only use client-side!!!!!!!!!!
 		if(MarioClient.useCharacterStats)
-			return MarioClient.character.getStatValue(this);
+			return MarioClient.getCharacter().getStatValue(this);
 		return getDefaultValue();
 	}
 

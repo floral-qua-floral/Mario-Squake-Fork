@@ -3,10 +3,8 @@ package fqf.qua_mario.mariostates;
 import fqf.qua_mario.*;
 import fqf.qua_mario.characters.CharaStat;
 import fqf.qua_mario.mariostates.states.Aerial;
-import fqf.qua_mario.mariostates.states.Grounded;
 import fqf.qua_mario.mariostates.states.Jump;
 import fqf.qua_mario.mariostates.states.Underwater;
-import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 import net.minecraft.entity.MovementType;
 import net.minecraft.registry.tag.FluidTags;
 import org.jetbrains.annotations.Nullable;
@@ -20,7 +18,7 @@ public abstract class MarioState {
 		@Nullable MarioState evaluate();
 	}
 
-	public String name;
+	protected String name;
 	protected ArrayList<MarioStateTransition> preTickTransitions;
 	protected ArrayList<MarioStateTransition> postTickTransitions;
 	protected ArrayList<MarioStateTransition> postMoveTransitions = new ArrayList<>(Arrays.asList(
@@ -44,8 +42,12 @@ public abstract class MarioState {
 		}
 	}
 
+	public String getName() {
+		return name;
+	}
+
 	public void evaluateTransitions(TransitionPhases phase) {
-		MarioState powerTransitionResult = MarioClient.powerUp.customTransition(this, phase);
+		MarioState powerTransitionResult = MarioClient.getPowerUp().customTransition(this, phase);
 		if(MarioClient.changeState(powerTransitionResult)) return;
 
 		ArrayList<MarioStateTransition> transitionList = phase.getTransitionList(this);
@@ -57,7 +59,7 @@ public abstract class MarioState {
 	}
 
 	public MarioState getTransitionTarget(MarioState from) {
-		MarioState stateFromPowerUp = MarioClient.powerUp.interceptTransition(from, this);
+		MarioState stateFromPowerUp = MarioClient.getPowerUp().interceptTransition(from, this);
 		return stateFromPowerUp != null ? stateFromPowerUp : this;
 	}
 
@@ -89,7 +91,7 @@ public abstract class MarioState {
 		}
 	}
 
-	protected static class CommonTransitions {
+	protected record CommonTransitions() {
 		public static final MarioStateTransition FALL = () -> {
 			if(!MarioClient.player.isOnGround()) {
 				MarioClient.yVel = Math.max(0.0, MarioClient.yVel);
@@ -123,16 +125,6 @@ public abstract class MarioState {
 			return null;
 		};
 
-		public static final MarioStateTransition LANDING = () -> {
-			if(MarioClient.player.isOnGround()) {
-				if(MarioClient.getState() == Jump.INSTANCE) {
-					MarioClient.jumpLandingTime = 4;
-				}
-				return Grounded.INSTANCE;
-			}
-			return null;
-		};
-
 		public static final MarioStateTransition ENTER_WATER = () -> {
 			if(MarioClient.player.getFluidHeight(FluidTags.WATER) > 0.5) {
 				return Underwater.INSTANCE;
@@ -146,23 +138,6 @@ public abstract class MarioState {
 			}
 			return null;
 		};
-
-		public static final ArrayList<MarioStateTransition> PRE_TICK_JUMP_TRANSITIONS = new ArrayList<>(Arrays.asList(
-				() -> {
-					MarioState landingResult = CommonTransitions.LANDING.evaluate();
-					if(landingResult != null) {
-						MarioClient.jumpLandingTime = 6;
-						return landingResult;
-					}
-					return null;
-				},
-				() -> {
-					if(Input.DUCK.isPressed()) {
-						ModMarioQuaMario.LOGGER.info("Ground pound!");
-					}
-					return null;
-				}
-		));
 	}
 }
 

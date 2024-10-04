@@ -1,6 +1,7 @@
 package fqf.qua_mario;
 
 public enum VoiceLine {
+	DOUBLE_JUMP("double_jump"),
 	SIDEFLIP("sideflip");
 
 	private final String EVENT_NAME;

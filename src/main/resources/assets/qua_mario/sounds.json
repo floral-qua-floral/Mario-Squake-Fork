@@ -4,5 +4,19 @@
     "sounds": [
       "qua_mario:jump"
     ]
+  },
+
+  "mario_sideflip": {
+    "subtitle": "subtitles.mario.mario_sideflip",
+    "sounds": [
+      "qua_mario/voices/mario/sideflip1"
+    ]
+  },
+
+  "luigi_sideflip": {
+    "subtitle": "subtitles.mario.luigi_sideflip",
+    "sounds": [
+      "qua_mario/voices/luigi/sideflip1"
+    ]
   }
 }

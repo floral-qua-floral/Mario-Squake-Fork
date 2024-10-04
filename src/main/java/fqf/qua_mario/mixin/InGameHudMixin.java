@@ -13,6 +13,6 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 public class InGameHudMixin {
     @Inject(method = "renderStatusEffectOverlay", at = @At("HEAD"))
     private void renderStatusEffectOverlay(DrawContext context, RenderTickCounter tickCounter, CallbackInfo ci) {
-        ModMarioQuaMarioClient.drawSpeedometer(context);
+        ModMarioQuaMarioClient.drawScreenInfo(context);
     }
 }

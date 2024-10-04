@@ -78,8 +78,9 @@ public class Skid extends MarioState {
 			if(MathHelper.approximatelyEquals(MarioClient.forwardVel, 0)) {
 				MarioClient.stateTimer++;
 			}
+			MarioClient.applyDrag(CharaStat.SKID_DRAG);
 //			MarioClient.setMotion(MarioClient.forwardVel * 0.9, 0);
-			MarioClient.assignForwardStrafeVelocities(MarioClient.forwardVel * CharaStat.SKID_FACTOR.getValue(), MarioClient.rightwardVel * CharaStat.SKID_FACTOR.getValue());
+//			MarioClient.assignForwardStrafeVelocities(MarioClient.forwardVel * CharaStat.SKID_DRAG.getValue(), MarioClient.rightwardVel * CharaStat.SKID_DRAG.getValue());
 		}
 	}
 }

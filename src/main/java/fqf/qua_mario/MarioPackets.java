@@ -56,8 +56,8 @@ public class MarioPackets {
 	public static void registerClient() {
 		ClientPlayNetworking.registerGlobalReceiver(MarioPackets.InitialSyncPayload.ID, (payload, context) -> {
 			MarioClient.isMario = payload.isMario();
-			MarioClient.character = MarioRegistries.CHARACTERS.get(payload.newCharacter());
-			MarioClient.powerUp = MarioRegistries.POWER_UPS.get(payload.newPowerUp());
+			MarioClient.setCharacter(MarioRegistries.CHARACTERS.get(payload.newCharacter()));
+			MarioClient.setPowerUp(MarioRegistries.POWER_UPS.get(payload.newPowerUp()));
 			MarioClient.useCharacterStats = payload.useCharacterStats();
 		});
 
@@ -65,10 +65,10 @@ public class MarioPackets {
 				MarioClient.isMario = payload.isMario());
 
 		ClientPlayNetworking.registerGlobalReceiver(MarioPackets.SetCharacterPayload.ID, (payload, context) ->
-				MarioClient.character = MarioRegistries.CHARACTERS.get(payload.newCharacter()));
+				MarioClient.setCharacter(MarioRegistries.CHARACTERS.get(payload.newCharacter())));
 
 		ClientPlayNetworking.registerGlobalReceiver(MarioPackets.SetPowerUpPayload.ID, (payload, context) ->
-				MarioClient.powerUp = MarioRegistries.POWER_UPS.get(payload.newPowerUp()));
+				MarioClient.setPowerUp(MarioRegistries.POWER_UPS.get(payload.newPowerUp())));
 
 		ClientPlayNetworking.registerGlobalReceiver(MarioPackets.SetUseCharacterStatsPayload.ID, (payload, context) ->
 				MarioClient.useCharacterStats = payload.useCharacterStats());

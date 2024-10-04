@@ -6,6 +6,7 @@ import fqf.qua_mario.characters.MarioCharacter;
 import fqf.qua_mario.mariostates.states.Grounded;
 import fqf.qua_mario.powerups.PowerUp;
 import fqf.qua_mario.powerups.forms.SuperForm;
+import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.entity.MovementType;
 import net.minecraft.entity.player.PlayerEntity;
@@ -55,11 +56,26 @@ public class MarioClient {
 	}
 	public static CameraAnim getCameraAnim() { return cameraAnim; }
 
-	public static MarioCharacter character = CharaMario.INSTANCE;
+	private static MarioCharacter character = CharaMario.INSTANCE;
+	public static MarioCharacter getCharacter() {
+		return character;
+	}
+	public static void setCharacter(MarioCharacter newCharacter) {
+		character = newCharacter;
+		player.calculateDimensions();
+	}
+
+	private static PowerUp powerUp = SuperForm.INSTANCE;
+	public static PowerUp getPowerUp() {
+		return powerUp;
+	}
+	public static void setPowerUp(PowerUp newPowerUp) {
+		powerUp = newPowerUp;
+		player.calculateDimensions();
+	}
+
 	public static boolean useCharacterStats = true;
 	public static CharaStat lastUsedAccelStat;
-
-	public static PowerUp powerUp = SuperForm.INSTANCE;
 
 	public static boolean attemptMarioTravel(PlayerEntity player, Vec3d movementInput) {
 		if(ModMarioQuaMario.useMarioPhysics(player, true) && player instanceof ClientPlayerEntity clientPlayer) {
@@ -324,22 +340,29 @@ public class MarioClient {
 			CharaStat redirectStat
 	) {
 		// Get slipperiness
-		float slipperiness;
-		if(player.isOnGround()) {
-			BlockPos blockPos = player.getVelocityAffectingPos();
-			slipperiness = player.getWorld().getBlockState(blockPos).getBlock().getSlipperiness();
-		}
-		else slipperiness = 0.6F;
-
-		double slipFactor = Math.pow(0.6 / slipperiness, 3);
-
-		lastUsedAccelStat = accelStat;
+		double slipFactor = getSlipFactor();
 
 		approachAngleAndAccel(
 				accelStat.getValue() * slipFactor, speedStat.getValue() * forwardInput, forwardAngleContribution * forwardInput,
 				strafeAccelStat.getValue() * slipFactor, strafeSpeedStat.getValue() * rightwardInput, strafeAngleContribution * rightwardInput,
 				redirectStat.getValue() * slipFactor
 		);
+	}
+
+	public static void applyDrag(CharaStat dragStat) {
+		double dragAsFactor = (1 / dragStat.getValue()) * getSlipFactor();
+		assignForwardStrafeVelocities(forwardVel * dragAsFactor, rightwardVel * dragAsFactor);
+	}
+
+	public static double getSlipFactor() {
+		return Math.pow(0.6 / getFloorSlipperiness(), 3);
+	}
+	private static float getFloorSlipperiness() {
+		if(player.isOnGround()) {
+			BlockPos blockPos = player.getVelocityAffectingPos();
+			return player.getWorld().getBlockState(blockPos).getBlock().getSlipperiness();
+		}
+		return 0.6F;
 	}
 
 	public static double getStatBuffer(CharaStat stat) {
