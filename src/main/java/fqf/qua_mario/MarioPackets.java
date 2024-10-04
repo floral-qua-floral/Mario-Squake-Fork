@@ -4,17 +4,15 @@ import fqf.qua_mario.stomptypes.StompHandler;
 import fqf.qua_mario.util.MarioDataSaver;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 import net.fabricmc.fabric.api.networking.v1.PayloadTypeRegistry;
+import net.fabricmc.fabric.api.networking.v1.PlayerLookup;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayConnectionEvents;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
-import net.minecraft.client.sound.SoundInstance;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.network.RegistryByteBuf;
 import net.minecraft.network.codec.PacketCodec;
 import net.minecraft.network.codec.PacketCodecs;
 import net.minecraft.network.packet.CustomPayload;
 import net.minecraft.server.network.ServerPlayerEntity;
-import net.minecraft.sound.SoundCategory;
-import net.minecraft.sound.SoundEvent;
-import net.minecraft.sound.SoundEvents;
 import net.minecraft.util.Identifier;
 
 public class MarioPackets {
@@ -26,8 +24,9 @@ public class MarioPackets {
 		PayloadTypeRegistry.playS2C().register(MarioPackets.SetUseCharacterStatsPayload.ID, MarioPackets.SetUseCharacterStatsPayload.CODEC);
 		PayloadTypeRegistry.playS2C().register(MarioPackets.SetCharacterPayload.ID, MarioPackets.SetCharacterPayload.CODEC);
 		PayloadTypeRegistry.playS2C().register(MarioPackets.SetPowerUpPayload.ID, MarioPackets.SetPowerUpPayload.CODEC);
+		PayloadTypeRegistry.playS2C().register(MarioPackets.PlayJumpSfxPayload.ID, MarioPackets.PlayJumpSfxPayload.CODEC);
 
-		PayloadTypeRegistry.playC2S().register(MarioPackets.PlayJumpSfxPayload.ID, MarioPackets.PlayJumpSfxPayload.CODEC);
+		PayloadTypeRegistry.playC2S().register(BroadcastJumpSfxPayload.ID, BroadcastJumpSfxPayload.CODEC);
 		PayloadTypeRegistry.playC2S().register(StompHandler.requestStompPayload.ID, StompHandler.requestStompPayload.CODEC);
 	}
 
@@ -43,16 +42,12 @@ public class MarioPackets {
 			));
 		});
 
-		ServerPlayNetworking.registerGlobalReceiver(MarioPackets.PlayJumpSfxPayload.ID, (payload, context) -> {
+		ServerPlayNetworking.registerGlobalReceiver(BroadcastJumpSfxPayload.ID, (payload, context) -> {
 			ModMarioQuaMario.LOGGER.info("Received the packet asking to play a sound effect");
-//			context.player().getWorld().playSound(
-//					null,
-//					context.player().getBlockPos(),
-//					SoundEvents.BLOCK_BEACON_POWER_SELECT,
-//					SoundCategory.PLAYERS,
-//					1f,
-//					1f
-//			);
+			for(ServerPlayerEntity player : PlayerLookup.tracking(context.player())) {
+				if(player != context.player())
+					ServerPlayNetworking.send(player, new PlayJumpSfxPayload(context.player().getId(), payload.isFading));
+			}
 		});
 
 		ServerPlayNetworking.registerGlobalReceiver(StompHandler.requestStompPayload.ID, StompHandler::parseRequestStompPacket);
@@ -79,19 +74,22 @@ public class MarioPackets {
 				MarioClient.useCharacterStats = payload.useCharacterStats());
 
 		ClientPlayNetworking.registerGlobalReceiver(StompHandler.affirmStompPayload.ID, StompHandler::parseAffirmStompPacket);
+
+		ClientPlayNetworking.registerGlobalReceiver(MarioPackets.PlayJumpSfxPayload.ID, (payload, context) -> {
+			if(payload.isFading)
+				SoundFader.fadeJumpSound((PlayerEntity) context.player().getWorld().getEntityById(payload.player));
+			else
+				SoundFader.playJumpSound((PlayerEntity) context.player().getWorld().getEntityById(payload.player));
+		});
 	}
 
 	public record InitialSyncPayload(boolean isMario, int newCharacter, int newPowerUp, boolean useCharacterStats) implements CustomPayload {
 		public static final Id<InitialSyncPayload> ID = new Id<>(Identifier.of(ModMarioQuaMario.MOD_ID, "initial_sync"));
 		public static final PacketCodec<RegistryByteBuf, InitialSyncPayload> CODEC = PacketCodec.tuple(
-				PacketCodecs.BOOL,
-				InitialSyncPayload::isMario,
-				PacketCodecs.INTEGER,
-				InitialSyncPayload::newCharacter,
-				PacketCodecs.INTEGER,
-				InitialSyncPayload::newPowerUp,
-				PacketCodecs.BOOL,
-				InitialSyncPayload::useCharacterStats,
+				PacketCodecs.BOOL, InitialSyncPayload::isMario,
+				PacketCodecs.INTEGER, InitialSyncPayload::newCharacter,
+				PacketCodecs.INTEGER, InitialSyncPayload::newPowerUp,
+				PacketCodecs.BOOL, InitialSyncPayload::useCharacterStats,
 				InitialSyncPayload::new
 		);
 
@@ -131,9 +129,20 @@ public class MarioPackets {
 		public Id<? extends CustomPayload> getId() { return ID; }
 	}
 
-	public record PlayJumpSfxPayload(boolean isSpin) implements CustomPayload {
+	public record BroadcastJumpSfxPayload(boolean isFading) implements CustomPayload {
+		public static final Id<BroadcastJumpSfxPayload> ID = new Id<>(Identifier.of(ModMarioQuaMario.MOD_ID, "broadcast_jump_sfx"));
+		public static final PacketCodec<RegistryByteBuf, BroadcastJumpSfxPayload> CODEC = PacketCodec.tuple(PacketCodecs.BOOL, BroadcastJumpSfxPayload::isFading, BroadcastJumpSfxPayload::new);
+
+		@Override
+		public Id<? extends CustomPayload> getId() { return ID; }
+	}
+
+	public record PlayJumpSfxPayload(int player, boolean isFading) implements CustomPayload {
 		public static final Id<PlayJumpSfxPayload> ID = new Id<>(Identifier.of(ModMarioQuaMario.MOD_ID, "play_jump_sfx"));
-		public static final PacketCodec<RegistryByteBuf, PlayJumpSfxPayload> CODEC = PacketCodec.tuple(PacketCodecs.BOOL, PlayJumpSfxPayload::isSpin, PlayJumpSfxPayload::new);
+		public static final PacketCodec<RegistryByteBuf, PlayJumpSfxPayload> CODEC = PacketCodec.tuple(
+				PacketCodecs.INTEGER, PlayJumpSfxPayload::player,
+				PacketCodecs.BOOL, PlayJumpSfxPayload::isFading,
+				PlayJumpSfxPayload::new);
 
 		@Override
 		public Id<? extends CustomPayload> getId() { return ID; }

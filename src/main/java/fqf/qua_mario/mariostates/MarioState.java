@@ -77,14 +77,13 @@ public abstract class MarioState {
 	}
 
 	protected void capJumpAndApplyGravity(CharaStat jumpCapStat) {
-		final double CAP_SPEED = jumpCapStat.getValue();
-		if(!MarioClient.jumpCapped && Input.JUMP.isHeld() && MarioClient.yVel > CAP_SPEED)
+		if(!MarioClient.jumpCapped && Input.JUMP.isHeld() && MarioClient.yVel > 0)
 			applyGravity(CharaStat.JUMP_GRAVITY);
 		else {
 			if(!MarioClient.jumpCapped) {
 				MarioClient.jumpCapped = true;
-				MarioClient.yVel = Math.min(MarioClient.yVel, CAP_SPEED);
-				SoundFader.fadeJumpSound(MarioClient.player);
+				MarioClient.yVel = Math.min(MarioClient.yVel, jumpCapStat.getValue());
+				SoundFader.broadcastAndFadeJumpSound();
 			}
 			applyGravity(CharaStat.GRAVITY);
 		}
@@ -102,7 +101,7 @@ public abstract class MarioState {
 		public static final MarioStateTransition JUMP = () -> {
 			if(Input.JUMP.isPressed()) {
 				MarioClient.jumpCapped = false;
-				SoundFader.playJumpSound(MarioClient.player);
+				SoundFader.broadcastAndPlayJumpSound();
 				if(MarioClient.doubleJumpLandingTime > 0) { // Triple Jump
 					ModMarioQuaMario.LOGGER.info("Triple jump! Wa-ha!");
 				}
@@ -117,9 +116,6 @@ public abstract class MarioState {
 
 					// Reduce horizontal velocities
 					MarioClient.assignForwardStrafeVelocities(MarioClient.forwardVel * 0.85, MarioClient.rightwardVel * 0.85);
-
-					// Send packet to play the jump sound
-					ClientPlayNetworking.send(new MarioPackets.PlayJumpSfxPayload(false));
 
 					return Jump.INSTANCE;
 				}

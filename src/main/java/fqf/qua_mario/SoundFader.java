@@ -1,5 +1,6 @@
 package fqf.qua_mario;
 
+import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.sound.*;
 import net.minecraft.entity.player.PlayerEntity;
@@ -37,6 +38,11 @@ public class SoundFader {
 		}
 	}
 
+	public static void broadcastAndPlayJumpSound() {
+		playJumpSound(MarioClient.player);
+		ClientPlayNetworking.send(new MarioPackets.BroadcastJumpSfxPayload(false));
+	}
+
 	public static void playJumpSound(PlayerEntity jumper) {
 		JUMP_IS_FADING.put(jumper, false);
 		JumpSoundInstance newSound = new JumpSoundInstance(
@@ -55,6 +61,11 @@ public class SoundFader {
 		soundManager.play(newSound);
 
 //		AmbientSoundLoops
+	}
+
+	public static void broadcastAndFadeJumpSound() {
+		fadeJumpSound(MarioClient.player);
+		ClientPlayNetworking.send(new MarioPackets.BroadcastJumpSfxPayload(true));
 	}
 
 	public static void fadeJumpSound(PlayerEntity jumper) {
