@@ -1,7 +1,7 @@
 package fqf.qua_mario.mariostates.states;
 
+import fqf.qua_mario.Input;
 import fqf.qua_mario.MarioClient;
-import fqf.qua_mario.MarioInputs;
 import fqf.qua_mario.ModMarioQuaMario;
 import fqf.qua_mario.cameraanims.animations.CameraSideflip;
 import fqf.qua_mario.cameraanims.animations.CameraSideflipGentle;
@@ -38,8 +38,7 @@ public class Skid extends MarioState {
 				},
 				() -> {
 					// Sideflip
-					if (MarioInputs.isPressed(MarioInputs.Key.JUMP)) {
-						MarioInputs.unbuffer(MarioInputs.Key.JUMP);
+					if (Input.JUMP.isPressed()) {
 						ModMarioQuaMario.LOGGER.info("yVel: " + CharaStat.JUMP_VELOCITY.getValue());
 						MarioClient.yVel = CharaStat.SIDEFLIP_VELOCITY.getValue();
 						MarioClient.assignForwardStrafeVelocities(CharaStat.SIDEFLIP_BACKWARD_SPEED.getValue(), 0.0);

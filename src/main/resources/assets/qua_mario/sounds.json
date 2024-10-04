@@ -1,0 +1,8 @@
+{
+  "jump": {
+    "subtitle": "subtitles.mario.jump",
+    "sounds": [
+      "qua_mario:jump"
+    ]
+  }
+}

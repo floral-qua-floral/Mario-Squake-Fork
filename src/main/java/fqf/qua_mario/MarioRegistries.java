@@ -15,9 +15,11 @@ import net.fabricmc.fabric.api.gamerule.v1.GameRuleFactory;
 import net.fabricmc.fabric.api.gamerule.v1.GameRuleRegistry;
 import net.fabricmc.fabric.api.networking.v1.PlayerLookup;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
+import net.minecraft.registry.Registries;
 import net.minecraft.registry.Registry;
 import net.minecraft.registry.RegistryKey;
 import net.minecraft.server.network.ServerPlayerEntity;
+import net.minecraft.sound.SoundEvent;
 import net.minecraft.util.Identifier;
 import net.minecraft.world.GameRules;
 
@@ -48,10 +50,15 @@ public class MarioRegistries {
 						}
 					}));
 
+	public static final Identifier JUMP_SOUND_ID = Identifier.of(ModMarioQuaMario.MOD_ID, "jump");
+	public static final SoundEvent JUMP_SOUND_EVENT = SoundEvent.of(JUMP_SOUND_ID);
+
 	public static void register() {
 		registerCharacters();
 		registerPowerUps();
 		registerStompTypes();
+
+		Registry.register(Registries.SOUND_EVENT, JUMP_SOUND_ID, JUMP_SOUND_EVENT);
 	}
 
 	public static void registerCharacters() {

@@ -75,7 +75,6 @@ public class MarioClient {
 		MarioClient.player = player;
 
 		// Update Mario's custom inputs class
-		MarioInputs.update(player);
 		Input.update(player.input);
 
 		// Undo vanilla vertical swimming

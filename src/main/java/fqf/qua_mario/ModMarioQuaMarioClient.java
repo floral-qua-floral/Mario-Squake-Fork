@@ -1,10 +1,8 @@
 package fqf.qua_mario;
 
-import fqf.qua_mario.stomptypes.StompHandler;
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientEntityEvents;
 import net.fabricmc.fabric.api.client.keybinding.v1.KeyBindingHelper;
-import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gui.DrawContext;
@@ -26,6 +24,8 @@ public class ModMarioQuaMarioClient implements ClientModInitializer {
 
 	@Override
 	public void onInitializeClient() {
+
+
 		KeyBindingHelper.registerKeyBinding(spinBinding);
 
 		ClientEntityEvents.ENTITY_UNLOAD.register((entity, world) -> {

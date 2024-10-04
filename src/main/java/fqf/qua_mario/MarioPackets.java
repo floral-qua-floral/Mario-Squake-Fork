@@ -19,6 +19,8 @@ import net.minecraft.util.Identifier;
 
 public class MarioPackets {
 	public static void registerCommon() {
+		PayloadTypeRegistry.playS2C().register(MarioPackets.InitialSyncPayload.ID, MarioPackets.InitialSyncPayload.CODEC);
+
 		PayloadTypeRegistry.playS2C().register(MarioPackets.SetMarioEnabledPayload.ID, MarioPackets.SetMarioEnabledPayload.CODEC);
 		PayloadTypeRegistry.playS2C().register(StompHandler.affirmStompPayload.ID, StompHandler.affirmStompPayload.CODEC);
 		PayloadTypeRegistry.playS2C().register(MarioPackets.SetUseCharacterStatsPayload.ID, MarioPackets.SetUseCharacterStatsPayload.CODEC);
@@ -78,8 +80,6 @@ public class MarioPackets {
 
 		ClientPlayNetworking.registerGlobalReceiver(StompHandler.affirmStompPayload.ID, StompHandler::parseAffirmStompPacket);
 	}
-
-
 
 	public record InitialSyncPayload(boolean isMario, int newCharacter, int newPowerUp, boolean useCharacterStats) implements CustomPayload {
 		public static final Id<InitialSyncPayload> ID = new Id<>(Identifier.of(ModMarioQuaMario.MOD_ID, "initial_sync"));

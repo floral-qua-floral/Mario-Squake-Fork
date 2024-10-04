@@ -1,7 +1,6 @@
 package fqf.qua_mario.mariostates.states;
 
 import fqf.qua_mario.MarioClient;
-import fqf.qua_mario.MarioInputs;
 import fqf.qua_mario.mariostates.MarioState;
 import net.minecraft.registry.tag.FluidTags;
 
@@ -33,10 +32,10 @@ public class Underwater extends MarioState {
 //		applyGravity(-0.045, -0.4);
 //		MarioClient.player.setVelocity(MarioClient.player.getVelocity().multiply(0.85));
 
-		if(MarioInputs.isPressed(MarioInputs.Key.JUMP) && ticksSincePaddle > 2) {
+//		if(MarioInputs.isPressed(MarioInputs.Key.JUMP) && ticksSincePaddle > 2) {
 //			MarioClient.yVel = Math.max(0.5, MarioClient.yVel + 0.4);
-			ticksSincePaddle = 0;
-		}
-		else ticksSincePaddle++;
+//			ticksSincePaddle = 0;
+//		}
+//		else ticksSincePaddle++;
 	}
 }

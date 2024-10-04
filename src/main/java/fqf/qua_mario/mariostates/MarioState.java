@@ -1,8 +1,6 @@
 package fqf.qua_mario.mariostates;
 
-import fqf.qua_mario.Input;
-import fqf.qua_mario.MarioPackets;
-import fqf.qua_mario.ModMarioQuaMario;
+import fqf.qua_mario.*;
 import fqf.qua_mario.characters.CharaStat;
 import fqf.qua_mario.mariostates.states.Aerial;
 import fqf.qua_mario.mariostates.states.Grounded;
@@ -11,7 +9,6 @@ import fqf.qua_mario.mariostates.states.Underwater;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 import net.minecraft.entity.MovementType;
 import net.minecraft.registry.tag.FluidTags;
-import fqf.qua_mario.MarioClient;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
@@ -81,12 +78,13 @@ public abstract class MarioState {
 
 	protected void capJumpAndApplyGravity(CharaStat jumpCapStat) {
 		final double CAP_SPEED = jumpCapStat.getValue();
-		if(!MarioClient.jumpCapped && MarioClient.yVel > (Input.JUMP.isHeld() ? 0 : CAP_SPEED))
+		if(!MarioClient.jumpCapped && Input.JUMP.isHeld() && MarioClient.yVel > CAP_SPEED)
 			applyGravity(CharaStat.JUMP_GRAVITY);
 		else {
 			if(!MarioClient.jumpCapped) {
 				MarioClient.jumpCapped = true;
 				MarioClient.yVel = Math.min(MarioClient.yVel, CAP_SPEED);
+				SoundFader.fadeJumpSound(MarioClient.player);
 			}
 			applyGravity(CharaStat.GRAVITY);
 		}
@@ -104,6 +102,7 @@ public abstract class MarioState {
 		public static final MarioStateTransition JUMP = () -> {
 			if(Input.JUMP.isPressed()) {
 				MarioClient.jumpCapped = false;
+				SoundFader.playJumpSound(MarioClient.player);
 				if(MarioClient.doubleJumpLandingTime > 0) { // Triple Jump
 					ModMarioQuaMario.LOGGER.info("Triple jump! Wa-ha!");
 				}

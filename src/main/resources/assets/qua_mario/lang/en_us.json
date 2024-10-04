@@ -22,5 +22,7 @@
 	"enchantment.qua_mario.depth_charge": "Depth Charge",
 	"enchantment.qua_mario.depth_charge.desc": "Ground Pounds retain their momentum for longer underwater",
 
-	"tag.item.qua_mario.enchantable.pulverizing": "Enchantable with Pulverizing"
+	"tag.item.qua_mario.enchantable.pulverizing": "Enchantable with Pulverizing",
+
+	"subtitles.mario.jump": "Jumping"
 }
