@@ -1,6 +1,8 @@
 package fqf.qua_mario.stomptypes.stomptypes;
 
+import fqf.qua_mario.MarioRegistries;
 import fqf.qua_mario.ModMarioQuaMario;
+import fqf.qua_mario.stomptypes.StompHandler;
 import fqf.qua_mario.stomptypes.StompType;
 import net.minecraft.entity.Entity;
 import net.minecraft.server.network.ServerPlayerEntity;
@@ -18,7 +20,7 @@ public class StompBasic extends StompType {
 
 	@Override
 	public boolean cannotStompSpecific(Entity target) {
-		return false;
+		return target.getType().isIn(StompHandler.IMMUNE_TO_BASIC_STOMP_TAG);
 	}
 
 	@Override

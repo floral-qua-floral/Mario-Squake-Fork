@@ -30,6 +30,7 @@ public class StompHandler {
 
 	public static final TagKey<EntityType<?>> UNSTOMPABLE_TAG = TagKey.of(RegistryKeys.ENTITY_TYPE, Identifier.of(ModMarioQuaMario.MOD_ID, "unstompable"));
 	public static final TagKey<EntityType<?>> HURTS_TO_STOMP_TAG = TagKey.of(RegistryKeys.ENTITY_TYPE, Identifier.of(ModMarioQuaMario.MOD_ID, "hurts_to_stomp"));
+	public static final TagKey<EntityType<?>> IMMUNE_TO_BASIC_STOMP_TAG = TagKey.of(RegistryKeys.ENTITY_TYPE, Identifier.of(ModMarioQuaMario.MOD_ID, "immune_to_basic_stomp"));
 
 	public static final RegistryKey<DamageType> STOMP_DAMAGE_TYPE = RegistryKey.of(RegistryKeys.DAMAGE_TYPE, Identifier.of(ModMarioQuaMario.MOD_ID, "stomp"));
 

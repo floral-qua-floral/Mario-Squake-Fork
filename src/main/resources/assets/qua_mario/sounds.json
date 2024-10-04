@@ -1,19 +1,19 @@
 {
-  "jump": {
+  "sfx.jump": {
     "subtitle": "subtitles.mario.jump",
     "sounds": [
       "qua_mario:jump"
     ]
   },
 
-  "mario_sideflip": {
+  "voice.mario.sideflip": {
     "subtitle": "subtitles.mario.mario_sideflip",
     "sounds": [
       "qua_mario/voices/mario/sideflip1"
     ]
   },
 
-  "luigi_sideflip": {
+  "voice.luigi.sideflip": {
     "subtitle": "subtitles.mario.luigi_sideflip",
     "sounds": [
       "qua_mario/voices/luigi/sideflip1"

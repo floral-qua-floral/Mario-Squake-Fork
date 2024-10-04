@@ -2,7 +2,9 @@ package fqf.qua_mario;
 
 import fqf.qua_mario.characters.CharaStat;
 import fqf.qua_mario.characters.MarioCharacter;
+import fqf.qua_mario.characters.characters.CharaMario;
 import fqf.qua_mario.powerups.PowerUp;
+import fqf.qua_mario.powerups.forms.SuperForm;
 import fqf.qua_mario.util.MarioDataSaver;
 import me.shedaniel.autoconfig.AutoConfig;
 import me.shedaniel.autoconfig.serializer.GsonConfigSerializer;
@@ -11,6 +13,8 @@ import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.server.network.ServerPlayerEntity;
+import net.minecraft.util.Pair;
+import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -25,13 +29,45 @@ public class ModMarioQuaMario implements ModInitializer {
 	}
 
 	public static boolean getIsMario(PlayerEntity player) {
-		return(player.getWorld().isClient ? MarioClient.isMario : ((MarioDataSaver) player).marioQuaMario$getPersistentData().getBoolean("isMario"));
+		if(player.getWorld().isClient) {
+			if(player == MarioClient.player)
+				return MarioClient.isMario;
+			else if(ModMarioQuaMarioClient.OTHER_PLAYER_DATA.containsKey(player))
+				return ModMarioQuaMarioClient.OTHER_PLAYER_DATA.get(player).isMario;
+			else {
+				LOGGER.error("Tried to check if someone is Mario but we don't know?!");
+				return false;
+			}
+		}
+		return ((MarioDataSaver) player).marioQuaMario$getPersistentData().getBoolean("isMario");
 	}
+
+	@NotNull
 	public static MarioCharacter getCharacter(PlayerEntity player) {
-		return(player.getWorld().isClient ? MarioClient.getCharacter() : ((MarioDataSaver) player).marioQuaMario$getCharacter());
+		if(player.getWorld().isClient) {
+			if(player == MarioClient.player)
+				return MarioClient.getCharacter();
+			else if(ModMarioQuaMarioClient.OTHER_PLAYER_DATA.containsKey(player))
+				return ModMarioQuaMarioClient.OTHER_PLAYER_DATA.get(player).character;
+			else {
+				LOGGER.error("Tried to get Character of someone else but we don't know?!");
+				return CharaMario.INSTANCE;
+			}
+		}
+		return ((MarioDataSaver) player).marioQuaMario$getCharacter();
 	}
 	public static PowerUp getPowerUp(PlayerEntity player) {
-		return(player.getWorld().isClient ? MarioClient.getPowerUp() : ((MarioDataSaver) player).marioQuaMario$getPowerUp());
+		if(player.getWorld().isClient) {
+			if(player == MarioClient.player)
+				return MarioClient.getPowerUp();
+			else if(ModMarioQuaMarioClient.OTHER_PLAYER_DATA.containsKey(player))
+				return ModMarioQuaMarioClient.OTHER_PLAYER_DATA.get(player).powerUp;
+			else {
+				LOGGER.error("Tried to get Power-up of someone else but we don't know?!");
+				return SuperForm.INSTANCE;
+			}
+		}
+		return ((MarioDataSaver) player).marioQuaMario$getPowerUp();
 	}
 
 	public static boolean useMarioPhysics(PlayerEntity player, boolean mustBeClient) {

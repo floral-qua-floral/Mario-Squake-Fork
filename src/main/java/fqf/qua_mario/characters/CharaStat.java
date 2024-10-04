@@ -1,6 +1,8 @@
 package fqf.qua_mario.characters;
 
 import fqf.qua_mario.MarioClient;
+import fqf.qua_mario.MarioRegistries;
+import fqf.qua_mario.ModMarioQuaMario;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.server.network.ServerPlayerEntity;
@@ -104,7 +106,13 @@ public enum CharaStat {
 	}
 
 	public double getValue(ServerPlayerEntity player) {
-
-		return getDefaultValue();
+		if(player.getWorld().isClient) {
+			return this.getValue();
+		}
+		else {
+			if(player.getWorld().getGameRules().getBoolean(MarioRegistries.USE_CHARACTER_STATS))
+				return ModMarioQuaMario.getCharacter(player).getStatValue(this);
+			return this.getDefaultValue();
+		}
 	}
 }
