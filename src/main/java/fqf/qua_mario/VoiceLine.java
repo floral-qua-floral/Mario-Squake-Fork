@@ -6,9 +6,7 @@ import net.fabricmc.fabric.api.networking.v1.PlayerLookup;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.sound.PositionedSoundInstance;
-import net.minecraft.client.sound.SoundInstance;
 import net.minecraft.client.sound.SoundManager;
-import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.network.RegistryByteBuf;
 import net.minecraft.network.codec.PacketCodec;
@@ -29,8 +27,8 @@ import java.util.HashMap;
 import java.util.Map;
 
 public enum VoiceLine {
-	DOUBLE_JUMP("double_jump"),
-	SIDEFLIP("sideflip");
+	DOUBLE_JUMP,
+	SIDEFLIP;
 
 //	private final Identifier SOUND_IDENTIFIER;
 //	private final SoundEvent SOUND_EVENT;
@@ -39,12 +37,11 @@ public enum VoiceLine {
 	private static final Map<PlayerEntity, PositionedSoundInstance> PLAYER_VOICE_LINES = new HashMap<>();
 	private final Map<MarioCharacter, Pair<Identifier, SoundEvent>> SOUND_EVENTS;
 
-	VoiceLine(String eventName) {
+	VoiceLine() {
 		SOUND_EVENTS = new HashMap<>();
 
 		for(MarioCharacter character : MarioRegistries.CHARACTERS) {
-			Identifier id = Identifier.of(ModMarioQuaMario.MOD_ID, "voice." + character.getID().getPath() + "." + eventName);
-			ModMarioQuaMario.LOGGER.info("Registering sound: {}", id);
+			Identifier id = Identifier.of(ModMarioQuaMario.MOD_ID, "voice." + character.getID().getPath() + "." + this.name().toLowerCase());
 			SoundEvent event = SoundEvent.of(id);
 			SOUND_EVENTS.put(character, new Pair<>(id, event));
 			Registry.register(Registries.SOUND_EVENT, id, event);
