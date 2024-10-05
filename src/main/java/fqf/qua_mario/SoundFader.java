@@ -16,6 +16,7 @@ import net.minecraft.sound.SoundEvent;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.random.Random;
 
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -78,9 +79,10 @@ public class SoundFader {
 
 	public static void parseBroadcastJumpSfxPayload(BroadcastJumpSfxPayload payload, ServerPlayNetworking.Context context) {
 		ModMarioQuaMario.LOGGER.info("Received the packet asking to play a sound effect");
-		for(ServerPlayerEntity player : PlayerLookup.tracking(context.player())) {
-			if(player != context.player())
-				ServerPlayNetworking.send(player, new SoundFader.PlayJumpSfxPayload(context.player().getId(), payload.isFading));
+		Collection<ServerPlayerEntity> sendToPlayers = PlayerLookup.tracking(context.player());
+		for(ServerPlayerEntity player : sendToPlayers) {
+			if(player.equals(context.player())) continue;
+			ServerPlayNetworking.send(player, new SoundFader.PlayJumpSfxPayload(context.player().getId(), payload.isFading));
 		}
 	}
 

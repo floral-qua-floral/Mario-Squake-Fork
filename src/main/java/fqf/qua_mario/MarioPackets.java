@@ -23,9 +23,11 @@ public class MarioPackets {
 		PayloadTypeRegistry.playS2C().register(MarioPackets.SetCharacterPayload.ID, MarioPackets.SetCharacterPayload.CODEC);
 		PayloadTypeRegistry.playS2C().register(MarioPackets.SetPowerUpPayload.ID, MarioPackets.SetPowerUpPayload.CODEC);
 		PayloadTypeRegistry.playS2C().register(SoundFader.PlayJumpSfxPayload.ID, SoundFader.PlayJumpSfxPayload.CODEC);
+		PayloadTypeRegistry.playS2C().register(VoiceLine.PlayVoiceLinePayload.ID, VoiceLine.PlayVoiceLinePayload.CODEC);
 
-		PayloadTypeRegistry.playC2S().register(SoundFader.BroadcastJumpSfxPayload.ID, SoundFader.BroadcastJumpSfxPayload.CODEC);
 		PayloadTypeRegistry.playC2S().register(StompHandler.requestStompPayload.ID, StompHandler.requestStompPayload.CODEC);
+		PayloadTypeRegistry.playC2S().register(SoundFader.BroadcastJumpSfxPayload.ID, SoundFader.BroadcastJumpSfxPayload.CODEC);
+		PayloadTypeRegistry.playC2S().register(VoiceLine.BroadcastVoiceLinePayload.ID, VoiceLine.BroadcastVoiceLinePayload.CODEC);
 	}
 
 	public static void registerServer() {
@@ -56,6 +58,7 @@ public class MarioPackets {
 		});
 
 		ServerPlayNetworking.registerGlobalReceiver(SoundFader.BroadcastJumpSfxPayload.ID, SoundFader::parseBroadcastJumpSfxPayload);
+		ServerPlayNetworking.registerGlobalReceiver(VoiceLine.BroadcastVoiceLinePayload.ID, VoiceLine::parseBroadcastVoiceLinePayload);
 		ServerPlayNetworking.registerGlobalReceiver(StompHandler.requestStompPayload.ID, StompHandler::parseRequestStompPacket);
 	}
 
@@ -93,6 +96,7 @@ public class MarioPackets {
 		ClientPlayNetworking.registerGlobalReceiver(StompHandler.affirmStompPayload.ID, StompHandler::parseAffirmStompPacket);
 
 		ClientPlayNetworking.registerGlobalReceiver(SoundFader.PlayJumpSfxPayload.ID, SoundFader::parsePlayJumpSfxPayload);
+		ClientPlayNetworking.registerGlobalReceiver(VoiceLine.PlayVoiceLinePayload.ID, VoiceLine::parsePlayVoiceLinePayload);
 	}
 
 	public static PlayerEntity getPlayerFromInt(ClientPlayNetworking.Context context, int playerID) {
@@ -100,7 +104,7 @@ public class MarioPackets {
 	}
 
 	public record FullSyncPayload(int player, boolean isMario, int newCharacter, int newPowerUp) implements CustomPayload {
-		public static final Id<FullSyncPayload> ID = new Id<>(Identifier.of(ModMarioQuaMario.MOD_ID, "initial_sync"));
+		public static final Id<FullSyncPayload> ID = new Id<>(Identifier.of(ModMarioQuaMario.MOD_ID, "full_sync"));
 		public static final PacketCodec<RegistryByteBuf, FullSyncPayload> CODEC = PacketCodec.tuple(
 				PacketCodecs.INTEGER, FullSyncPayload::player,
 				PacketCodecs.BOOL, FullSyncPayload::isMario,
