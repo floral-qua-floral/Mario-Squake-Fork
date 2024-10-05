@@ -6,7 +6,6 @@ import fqf.qua_mario.characters.MarioCharacter;
 import fqf.qua_mario.mariostates.states.Grounded;
 import fqf.qua_mario.powerups.PowerUp;
 import fqf.qua_mario.powerups.forms.SuperForm;
-import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.entity.MovementType;
 import net.minecraft.entity.player.PlayerEntity;
@@ -85,15 +84,13 @@ public class MarioClient {
 
 		// Calculate forward and sideways vector components
 		double yawRad = Math.toRadians(player.getYaw());
-		double forwardX = -Math.sin(yawRad);
-		double forwardZ = Math.cos(yawRad);
-		double rightwardX = forwardZ;
-		double rightwardZ = -forwardX;
+		double negativeSineYaw = -Math.sin(yawRad);
+		double cosineYaw = Math.cos(yawRad);
 
 		// Calculate current forwards and sideways velocity
 		Vec3d currentVel = player.getVelocity();
-		forwardVel = currentVel.x * forwardX + currentVel.z * forwardZ;
-		rightwardVel = currentVel.x * rightwardX + currentVel.z * rightwardZ;
+		forwardVel = currentVel.x * negativeSineYaw + currentVel.z * cosineYaw;
+		rightwardVel = currentVel.x * cosineYaw + currentVel.z * -negativeSineYaw;
 
 		// Evaluate the direction the player is inputting
 		forwardInput = (Math.abs(movementInput.z) < 0.1) ? 0.0 : movementInput.z * INPUT_FACTOR;
@@ -312,12 +309,18 @@ public class MarioClient {
 	public static void assignForwardStrafeVelocities(double forward, double strafe) {
 		// Calculate forward and sideways vector components
 		double yawRad = Math.toRadians(player.getYaw());
-		double forwardX = -Math.sin(yawRad);
-		double forwardZ = Math.cos(yawRad);
-		double rightwardX = forwardZ;
-		double rightwardZ = -forwardX;
+		double negativeSineYaw = -Math.sin(yawRad);
+		double cosineYaw = Math.cos(yawRad);
 
-		player.setVelocity(forward * forwardX + strafe * rightwardX, yVel, forward * forwardZ + strafe * rightwardZ);
+		/*
+		 Apply hard caps to ensure Mario can't accelerate WAY too fast
+		 The limit is set to be about the top speed of a boat on normal ice.
+		 Backwards speed has a much higher limit than forwards speed because I'm a sucker for SM64 TASes.
+		*/
+		forward = MathHelper.clamp(forward, -3.75, 2.1);
+		strafe = MathHelper.clamp(strafe, -1.9, 1.9);
+
+		player.setVelocity(forward * negativeSineYaw + strafe * cosineYaw, yVel, forward * cosineYaw + strafe * -negativeSineYaw);
 	}
 
 	public static void groundAccel(
@@ -336,7 +339,9 @@ public class MarioClient {
 	}
 
 	public static void applyDrag(CharaStat dragStat) {
-		double dragAsFactor = (1 - dragStat.getValue()) * getSlipFactor();
+		double dragAsFactor = (1 - dragStat.getValue());
+		if(dragAsFactor < 1) dragAsFactor *= getSlipFactor(); // If the drag is slowing you down, it's made less effective by slipperiness
+		else dragAsFactor /= getSlipFactor(); // If the drag is speeding you up, it's made more effective by slipperiness
 		assignForwardStrafeVelocities(forwardVel * dragAsFactor, rightwardVel * dragAsFactor);
 	}
 

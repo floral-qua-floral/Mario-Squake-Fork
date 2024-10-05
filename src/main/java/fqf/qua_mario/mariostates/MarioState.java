@@ -100,15 +100,19 @@ public abstract class MarioState {
 			return null;
 		};
 
+		public static void performJumpLike() {
+			MarioClient.jumpCapped = false;
+			SoundFader.broadcastAndPlayJumpSound();
+		}
+
 		public static final MarioStateTransition JUMP = () -> {
 			if(Input.JUMP.isPressed()) {
-				MarioClient.jumpCapped = false;
-				SoundFader.broadcastAndPlayJumpSound();
+				performJumpLike();
 				if(MarioClient.doubleJumpLandingTime > 0) { // Triple Jump
-					ModMarioQuaMario.LOGGER.info("Triple jump! Wa-ha!");
+					VoiceLine.TRIPLE_JUMP.broadcast();
 				}
 				else if(MarioClient.jumpLandingTime > 0) { // Double Jump
-					ModMarioQuaMario.LOGGER.info("Double jump! Yippee!");
+					VoiceLine.DOUBLE_JUMP.broadcast();
 				}
 				else { // Normal jump
 					// Apply upward velocity

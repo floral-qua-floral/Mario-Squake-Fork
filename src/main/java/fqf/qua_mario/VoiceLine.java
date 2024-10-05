@@ -79,7 +79,7 @@ public enum VoiceLine {
 
 		PositionedSoundInstance newSound = new PositionedSoundInstance(
 				getEvent(ModMarioQuaMario.getCharacter(player)),
-				SoundCategory.PLAYERS,
+				SoundCategory.VOICE,
 				1.0F,
 				1.0F,
 				Random.create(seed),

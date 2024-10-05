@@ -18,6 +18,25 @@ public class Grounded extends MarioState {
 		preTickTransitions = new ArrayList<>(List.of(
 				CommonTransitions.FALL,
 				() -> {
+					// Duckslide
+					if(Input.DUCK.isHeld() && MarioClient.forwardVel > CharaStat.DUCK_SLIDE_THRESHOLD.getValue()) {
+						VoiceLine.DUCK.broadcast();
+						MarioClient.yVel = 1;
+						return Aerial.INSTANCE;
+					}
+					return null;
+				},
+				() -> {
+					// Duck Waddle
+					if(Input.DUCK.isHeld()) {
+						VoiceLine.DUCK.broadcast();
+						MarioClient.assignForwardStrafeVelocities(-0.5, 0);
+						MarioClient.yVel = 1;
+						return Aerial.INSTANCE;
+					}
+					return null;
+				},
+				() -> {
 					// Skid
 					if(Input.BACKWARD.isHeld()
 							&& MarioClient.forwardVel > CharaStat.SKID_THRESHOLD.getValue()) {
