@@ -47,7 +47,7 @@ public abstract class MarioState {
 	}
 
 	public void evaluateTransitions(TransitionPhases phase) {
-		MarioState powerTransitionResult = MarioClient.getPowerUp().customTransition(this, phase);
+		MarioState powerTransitionResult = MarioClient.powerUp.customTransition(this, phase);
 		if(MarioClient.changeState(powerTransitionResult)) return;
 
 		ArrayList<MarioStateTransition> transitionList = phase.getTransitionList(this);
@@ -59,7 +59,7 @@ public abstract class MarioState {
 	}
 
 	public MarioState getTransitionTarget(MarioState from) {
-		MarioState stateFromPowerUp = MarioClient.getPowerUp().interceptTransition(from, this);
+		MarioState stateFromPowerUp = MarioClient.powerUp.interceptTransition(from, this);
 		return stateFromPowerUp != null ? stateFromPowerUp : this;
 	}
 

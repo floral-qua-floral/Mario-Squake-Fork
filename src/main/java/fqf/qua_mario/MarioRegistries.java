@@ -50,27 +50,30 @@ public class MarioRegistries {
 						}
 					}));
 
-	public static final Identifier JUMP_SOUND_ID = Identifier.of(ModMarioQuaMario.MOD_ID, "jump");
+	public static final Identifier JUMP_SOUND_ID = Identifier.of(ModMarioQuaMario.MOD_ID, "sfx.jump");
 	public static final SoundEvent JUMP_SOUND_EVENT = SoundEvent.of(JUMP_SOUND_ID);
 
 	public static void register() {
-		registerCharacters();
 		registerPowerUps();
+		registerCharacters(); // Characters have to be registered after power-ups so they know which power-ups they need models for!!
 		registerStompTypes();
 
 		Registry.register(Registries.SOUND_EVENT, JUMP_SOUND_ID, JUMP_SOUND_EVENT);
 	}
 
-	public static void registerCharacters() {
-		CharaMario.INSTANCE.register();
-		Luigi.INSTANCE.register();
-	}
 	public static void registerPowerUps() {
+		ModMarioQuaMario.LOGGER.info("Registering power-up states...");
 		SmallForm.INSTANCE.register();
 		SuperForm.INSTANCE.register();
 		FireForm.INSTANCE.register();
 	}
+	public static void registerCharacters() {
+		ModMarioQuaMario.LOGGER.info("Registering characters...");
+		CharaMario.INSTANCE.register();
+		Luigi.INSTANCE.register();
+	}
 	public static void registerStompTypes() {
+		ModMarioQuaMario.LOGGER.info("Registering stomp types...");
 		StompBasic.INSTANCE.register();
 	}
 }

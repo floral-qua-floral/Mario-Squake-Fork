@@ -1,12 +1,19 @@
 package fqf.qua_mario;
 
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
+import net.fabricmc.fabric.api.networking.v1.PlayerLookup;
+import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.sound.*;
 import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.network.RegistryByteBuf;
+import net.minecraft.network.codec.PacketCodec;
+import net.minecraft.network.codec.PacketCodecs;
+import net.minecraft.network.packet.CustomPayload;
+import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.sound.SoundCategory;
 import net.minecraft.sound.SoundEvent;
-import net.minecraft.sound.SoundEvents;
+import net.minecraft.util.Identifier;
 import net.minecraft.util.math.random.Random;
 
 import java.util.HashMap;
@@ -37,7 +44,7 @@ public class SoundFader {
 
 	public static void broadcastAndPlayJumpSound() {
 		playJumpSound(MarioClient.player);
-		ClientPlayNetworking.send(new MarioPackets.BroadcastJumpSfxPayload(false));
+		ClientPlayNetworking.send(new BroadcastJumpSfxPayload(false));
 	}
 
 	public static void playJumpSound(PlayerEntity jumper) {
@@ -62,11 +69,47 @@ public class SoundFader {
 
 	public static void broadcastAndFadeJumpSound() {
 		fadeJumpSound(MarioClient.player);
-		ClientPlayNetworking.send(new MarioPackets.BroadcastJumpSfxPayload(true));
+		ClientPlayNetworking.send(new BroadcastJumpSfxPayload(true));
 	}
 
 	public static void fadeJumpSound(PlayerEntity jumper) {
 		JUMP_IS_FADING.put(jumper, true);
+	}
+
+	public static void parseBroadcastJumpSfxPayload(BroadcastJumpSfxPayload payload, ServerPlayNetworking.Context context) {
+		ModMarioQuaMario.LOGGER.info("Received the packet asking to play a sound effect");
+		for(ServerPlayerEntity player : PlayerLookup.tracking(context.player())) {
+			if(player != context.player())
+				ServerPlayNetworking.send(player, new SoundFader.PlayJumpSfxPayload(context.player().getId(), payload.isFading));
+		}
+	}
+
+	public static void parsePlayJumpSfxPayload(PlayJumpSfxPayload payload, ClientPlayNetworking.Context context) {
+		if(payload.isFading)
+			fadeJumpSound((PlayerEntity) context.player().getWorld().getEntityById(payload.player));
+		else
+			playJumpSound((PlayerEntity) context.player().getWorld().getEntityById(payload.player));
+	}
+
+	public record BroadcastJumpSfxPayload(boolean isFading) implements CustomPayload {
+		public static final Id<BroadcastJumpSfxPayload> ID = new Id<>(Identifier.of(ModMarioQuaMario.MOD_ID, "broadcast_jump_sfx"));
+		public static final PacketCodec<RegistryByteBuf, BroadcastJumpSfxPayload> CODEC = PacketCodec.tuple(
+				PacketCodecs.BOOL, BroadcastJumpSfxPayload::isFading,
+				BroadcastJumpSfxPayload::new);
+
+		@Override
+		public Id<? extends CustomPayload> getId() { return ID; }
+	}
+
+	public record PlayJumpSfxPayload(int player, boolean isFading) implements CustomPayload {
+		public static final Id<PlayJumpSfxPayload> ID = new Id<>(Identifier.of(ModMarioQuaMario.MOD_ID, "play_jump_sfx"));
+		public static final PacketCodec<RegistryByteBuf, PlayJumpSfxPayload> CODEC = PacketCodec.tuple(
+				PacketCodecs.INTEGER, PlayJumpSfxPayload::player,
+				PacketCodecs.BOOL, PlayJumpSfxPayload::isFading,
+				PlayJumpSfxPayload::new);
+
+		@Override
+		public Id<? extends CustomPayload> getId() { return ID; }
 	}
 
 //	PositionedSoundInstance

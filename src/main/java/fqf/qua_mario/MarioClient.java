@@ -56,23 +56,9 @@ public class MarioClient {
 	}
 	public static CameraAnim getCameraAnim() { return cameraAnim; }
 
-	private static MarioCharacter character = CharaMario.INSTANCE;
-	public static MarioCharacter getCharacter() {
-		return character;
-	}
-	public static void setCharacter(MarioCharacter newCharacter) {
-		character = newCharacter;
-		player.calculateDimensions();
-	}
+	public static MarioCharacter character = CharaMario.INSTANCE;
 
-	private static PowerUp powerUp = SuperForm.INSTANCE;
-	public static PowerUp getPowerUp() {
-		return powerUp;
-	}
-	public static void setPowerUp(PowerUp newPowerUp) {
-		powerUp = newPowerUp;
-		player.calculateDimensions();
-	}
+	public static PowerUp powerUp = SuperForm.INSTANCE;
 
 	public static boolean useCharacterStats = true;
 	public static CharaStat lastUsedAccelStat;
@@ -350,7 +336,7 @@ public class MarioClient {
 	}
 
 	public static void applyDrag(CharaStat dragStat) {
-		double dragAsFactor = (1 / dragStat.getValue()) * getSlipFactor();
+		double dragAsFactor = (1 - dragStat.getValue()) * getSlipFactor();
 		assignForwardStrafeVelocities(forwardVel * dragAsFactor, rightwardVel * dragAsFactor);
 	}
 
@@ -371,9 +357,5 @@ public class MarioClient {
 
 	public static double getStatThreshold(CharaStat stat) {
 		return stat.getValue() * 0.99;
-	}
-
-	public static void voiceLine(VoiceLine line) {
-		// Send C2S packet with ordinal of the voice line so the server can handle playing the sound
 	}
 }

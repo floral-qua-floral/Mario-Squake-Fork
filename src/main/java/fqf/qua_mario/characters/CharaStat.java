@@ -3,9 +3,14 @@ package fqf.qua_mario.characters;
 import fqf.qua_mario.MarioClient;
 import fqf.qua_mario.MarioRegistries;
 import fqf.qua_mario.ModMarioQuaMario;
+import fqf.qua_mario.powerups.PowerUp;
+import fqf.qua_mario.powerups.StatChangingPowerUp;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.server.network.ServerPlayerEntity;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 public enum CharaStat {
 	WALK_ACCEL(0.045),
@@ -100,19 +105,19 @@ public enum CharaStat {
 	@Environment(EnvType.CLIENT)
 	public double getValue() {
 		// Only use client-side!!!!!!!!!!
-		if(MarioClient.useCharacterStats)
-			return MarioClient.getCharacter().getStatValue(this);
-		return getDefaultValue();
+		return this.getValue(MarioClient.useCharacterStats, MarioClient.character, MarioClient.powerUp);
 	}
 
-	public double getValue(ServerPlayerEntity player) {
-		if(player.getWorld().isClient) {
-			return this.getValue();
-		}
-		else {
-			if(player.getWorld().getGameRules().getBoolean(MarioRegistries.USE_CHARACTER_STATS))
-				return ModMarioQuaMario.getCharacter(player).getStatValue(this);
-			return this.getDefaultValue();
-		}
+	public double getValue(PlayerEntity player) {
+		if(ModMarioQuaMario.playerIsMarioClient(player)) return this.getValue();
+		return this.getValue(ModMarioQuaMario.getUseCharacterStats(player), ModMarioQuaMario.getCharacter(player), ModMarioQuaMario.getPowerUp(player));
+	}
+
+	public double getValue(boolean useCharacterStats, @NotNull MarioCharacter character, @NotNull PowerUp powerUp) {
+		return(
+				(useCharacterStats ? character.getStatFactor(this) : 1) *
+				(powerUp instanceof StatChangingPowerUp statChangingPowerUp ? statChangingPowerUp.getStatFactor(this) : 1.0) *
+				this.getDefaultValue()
+		);
 	}
 }

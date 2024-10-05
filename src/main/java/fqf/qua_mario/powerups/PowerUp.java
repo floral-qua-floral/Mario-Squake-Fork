@@ -1,10 +1,13 @@
 package fqf.qua_mario.powerups;
 
 import fqf.qua_mario.MarioRegistries;
+import fqf.qua_mario.characters.CharaStat;
 import fqf.qua_mario.characters.MarioCharacter;
 import fqf.qua_mario.mariostates.MarioState;
 import net.minecraft.registry.Registry;
 import net.minecraft.util.Identifier;
+
+import java.util.EnumMap;
 
 public abstract class PowerUp {
 	protected Identifier ID;

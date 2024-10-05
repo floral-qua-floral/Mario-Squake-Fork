@@ -12,6 +12,8 @@ import net.minecraft.sound.SoundCategory;
 import net.minecraft.sound.SoundEvent;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.Pair;
+import net.minecraft.util.math.random.Random;
+import net.minecraft.util.math.random.RandomSeed;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -30,7 +32,8 @@ public enum VoiceLine {
 		SOUND_EVENTS = new HashMap<>();
 
 		for(MarioCharacter character : MarioRegistries.CHARACTERS) {
-			Identifier id = Identifier.of(ModMarioQuaMario.MOD_ID, eventName);
+			Identifier id = Identifier.of(ModMarioQuaMario.MOD_ID, "voices/" + character.getID().getPath() + "/" + eventName);
+			ModMarioQuaMario.LOGGER.info("Registering sound: {}", id);
 			SoundEvent event = SoundEvent.of(id);
 			SOUND_EVENTS.put(character, new Pair<>(id, event));
 			Registry.register(Registries.SOUND_EVENT, id, event);
@@ -44,9 +47,10 @@ public enum VoiceLine {
 	}
 
 	public void broadcast() {
-
+		long seed = RandomSeed.getSeed();
+		play(MarioClient.player, seed);
 	}
-	public void play(PlayerEntity player) {
+	public void play(PlayerEntity player, long seed) {
 		PositionedSoundInstance previousVoiceLine = PLAYER_VOICE_LINES.get(player);
 		SoundManager soundManager = MinecraftClient.getInstance().getSoundManager();
 		soundManager.stop(previousVoiceLine);
@@ -56,7 +60,7 @@ public enum VoiceLine {
 				SoundCategory.PLAYERS,
 				1.0F,
 				1.0F,
-				SoundInstance.createRandom(),
+				Random.create(seed),
 				player.getX(),
 				player.getY(),
 				player.getZ()
@@ -64,4 +68,6 @@ public enum VoiceLine {
 		soundManager.play(newSound);
 		PLAYER_VOICE_LINES.put(player, newSound);
 	}
+
+	public static void register() {}
 }

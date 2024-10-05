@@ -17,58 +17,80 @@ import static net.minecraft.server.command.CommandManager.argument;
 import static net.minecraft.server.command.CommandManager.literal;
 
 public class MarioCommand {
+	private static ServerPlayerEntity getPlayerFromCmd(CommandContext<ServerCommandSource> context, boolean playerArgGiven) throws CommandSyntaxException {
+		return playerArgGiven ? EntityArgumentType.getPlayer(context, "whoThough") : context.getSource().getPlayerOrThrow();
+	}
+	private static int sendFeedback(CommandContext<ServerCommandSource> context, String feedback) {
+		context.getSource().sendFeedback(() -> Text.literal(feedback), true);
+		return 1;
+	}
+
+	private static int setEnabled(CommandContext<ServerCommandSource> context, boolean playerArgGiven) throws CommandSyntaxException {
+		return sendFeedback(context, ModMarioQuaMario.setIsMario(
+				getPlayerFromCmd(context, playerArgGiven),
+				BoolArgumentType.getBool(context, "value")
+		));
+	}
+
+	private static int setCharacter(CommandContext<ServerCommandSource> context, boolean playerArgGiven) throws CommandSyntaxException {
+		return sendFeedback(context, ModMarioQuaMario.setCharacter(
+				getPlayerFromCmd(context, playerArgGiven),
+				RegistryEntryReferenceArgumentType.getRegistryEntry(context, "newCharacter", MarioRegistries.CHARACTERS_KEY).value()
+		));
+	}
+
+	private static int setPowerUp(CommandContext<ServerCommandSource> context, boolean playerArgGiven) throws CommandSyntaxException {
+		return sendFeedback(context, ModMarioQuaMario.setPowerUp(
+				getPlayerFromCmd(context, playerArgGiven),
+				RegistryEntryReferenceArgumentType.getRegistryEntry(context, "newPowerUp", MarioRegistries.POWER_UPS_KEY).value()
+		));
+	}
+
+	private static int setFullData(CommandContext<ServerCommandSource> context, boolean playerArgGiven) throws CommandSyntaxException {
+		return sendFeedback(context, ModMarioQuaMario.setFullMarioData(
+				getPlayerFromCmd(context, playerArgGiven),
+				BoolArgumentType.getBool(context, "isEnabled"),
+				RegistryEntryReferenceArgumentType.getRegistryEntry(context, "character", MarioRegistries.CHARACTERS_KEY).value(),
+				RegistryEntryReferenceArgumentType.getRegistryEntry(context, "newPowerUp", MarioRegistries.POWER_UPS_KEY).value()
+		));
+	}
+
 	public static void registerMarioCommand() {
 		CommandRegistrationCallback.EVENT.register((dispatcher, registryAccess, environment) -> {
 			dispatcher.register(literal("mario")
 				.then(literal("setEnabled")
 					.then(argument("value", BoolArgumentType.bool())
-						.executes(context -> {
-							String feedback = ModMarioQuaMario.setIsMario(context.getSource().getPlayerOrThrow(), BoolArgumentType.getBool(context, "value"));
-							context.getSource().sendFeedback(() -> Text.literal(feedback), true);
-							return 1;
-						})
+						.executes(context -> setEnabled(context, false))
 						.then(argument("whoThough", EntityArgumentType.player())
-							.executes(context -> {
-								String feedback = ModMarioQuaMario.setIsMario(EntityArgumentType.getPlayer(context, "whoThough"), BoolArgumentType.getBool(context, "value"));
-								context.getSource().sendFeedback(() -> Text.literal(feedback), true);
-								return 1;
-							})
+							.executes(context -> setEnabled(context, true))
 						)
 					)
 				)
 				.then(literal("setCharacter")
 					.then(argument("newCharacter", RegistryEntryReferenceArgumentType.registryEntry(registryAccess, MarioRegistries.CHARACTERS_KEY))
-						.executes(context -> {
-							RegistryEntry.Reference<MarioCharacter> reference = RegistryEntryReferenceArgumentType.getRegistryEntry(context, "newCharacter", MarioRegistries.CHARACTERS_KEY);
-							String feedback = ModMarioQuaMario.setCharacter(context.getSource().getPlayerOrThrow(), reference.value());
-							context.getSource().sendFeedback(() -> Text.literal(feedback), true);
-							return 1;
-						})
+						.executes(context -> setCharacter(context, false))
 						.then(argument("whoThough", EntityArgumentType.player())
-								.executes(context -> {
-									RegistryEntry.Reference<MarioCharacter> reference = RegistryEntryReferenceArgumentType.getRegistryEntry(context, "newCharacter", MarioRegistries.CHARACTERS_KEY);
-									String feedback = ModMarioQuaMario.setCharacter(EntityArgumentType.getPlayer(context, "whoThough"), reference.value());
-									context.getSource().sendFeedback(() -> Text.literal(feedback), true);
-									return 1;
-								})
+							.executes(context -> setCharacter(context, true))
 						)
 					)
 				)
 				.then(literal("setPowerUp")
 					.then(argument("newPowerUp", RegistryEntryReferenceArgumentType.registryEntry(registryAccess, MarioRegistries.POWER_UPS_KEY))
-						.executes(context -> {
-							RegistryEntry.Reference<PowerUp> reference = RegistryEntryReferenceArgumentType.getRegistryEntry(context, "newPowerUp", MarioRegistries.POWER_UPS_KEY);
-							String feedback = ModMarioQuaMario.setPowerUp(context.getSource().getPlayerOrThrow(), reference.value());
-							context.getSource().sendFeedback(() -> Text.literal(feedback), true);
-							return 1;
-						})
+						.executes(context -> setPowerUp(context, false))
 						.then(argument("whoThough", EntityArgumentType.player())
-								.executes(context -> {
-									RegistryEntry.Reference<PowerUp> reference = RegistryEntryReferenceArgumentType.getRegistryEntry(context, "newPowerUp", MarioRegistries.POWER_UPS_KEY);
-									String feedback = ModMarioQuaMario.setPowerUp(EntityArgumentType.getPlayer(context, "whoThough"), reference.value());
-									context.getSource().sendFeedback(() -> Text.literal(feedback), true);
-									return 1;
-								})
+							.executes(context -> setPowerUp(context, true))
+						)
+					)
+				)
+				.then(literal("setFullData")
+					.then(argument("character", RegistryEntryReferenceArgumentType.registryEntry(registryAccess, MarioRegistries.CHARACTERS_KEY))
+						.then(argument("powerUp", RegistryEntryReferenceArgumentType.registryEntry(registryAccess, MarioRegistries.POWER_UPS_KEY))
+							.then(argument("isEnabled", BoolArgumentType.bool())
+								.executes(context -> setFullData(context, false))
+								.then(argument("whoThough", EntityArgumentType.player())
+									.executes(context -> setFullData(context, true))
+								)
+							)
 						)
 					)
 				)

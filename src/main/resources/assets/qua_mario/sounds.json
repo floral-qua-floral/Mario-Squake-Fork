@@ -9,14 +9,14 @@
   "voice.mario.sideflip": {
     "subtitle": "subtitles.mario.mario_sideflip",
     "sounds": [
-      "qua_mario/voices/mario/sideflip1"
+      "qua_mario:voices/mario/sideflip1"
     ]
   },
 
   "voice.luigi.sideflip": {
     "subtitle": "subtitles.mario.luigi_sideflip",
     "sounds": [
-      "qua_mario/voices/luigi/sideflip1"
+      "qua_mario:voices/luigi/sideflip1"
     ]
   }
 }
