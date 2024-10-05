@@ -18,7 +18,6 @@ import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.sound.SoundCategory;
 import net.minecraft.sound.SoundEvent;
 import net.minecraft.util.Identifier;
-import net.minecraft.util.Pair;
 import net.minecraft.util.math.random.Random;
 import net.minecraft.util.math.random.RandomSeed;
 
@@ -35,7 +34,7 @@ public enum VoiceLine {
 
 	private static final VoiceLine[] VOICE_LINE_VALUES = VoiceLine.values();
 	private static final Map<PlayerEntity, PositionedSoundInstance> PLAYER_VOICE_LINES = new HashMap<>();
-	private final Map<MarioCharacter, Pair<Identifier, SoundEvent>> SOUND_EVENTS;
+	private final Map<MarioCharacter, SoundEvent> SOUND_EVENTS;
 
 	VoiceLine() {
 		SOUND_EVENTS = new HashMap<>();
@@ -43,15 +42,12 @@ public enum VoiceLine {
 		for(MarioCharacter character : MarioRegistries.CHARACTERS) {
 			Identifier id = Identifier.of(ModMarioQuaMario.MOD_ID, "voice." + character.getID().getPath() + "." + this.name().toLowerCase());
 			SoundEvent event = SoundEvent.of(id);
-			SOUND_EVENTS.put(character, new Pair<>(id, event));
+			SOUND_EVENTS.put(character, event);
 			Registry.register(Registries.SOUND_EVENT, id, event);
 		}
 	}
-	public Identifier getIdentifier(MarioCharacter character) {
-		return SOUND_EVENTS.get(character).getLeft();
-	}
 	public SoundEvent getEvent(MarioCharacter character) {
-		return SOUND_EVENTS.get(character).getRight();
+		return SOUND_EVENTS.get(character);
 	}
 
 	public void broadcast() {
