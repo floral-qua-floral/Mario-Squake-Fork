@@ -26,9 +26,25 @@ import java.util.HashMap;
 import java.util.Map;
 
 public enum VoiceLine {
-	DOUBLE_JUMP,
-	SIDEFLIP;
+	SELECT,
+	DUCK,
 
+	DOUBLE_JUMP,
+	TRIPLE_JUMP,
+	TRIPLE_JUMP_SALUTE,
+
+	DUCK_JUMP,
+	LONG_JUMP,
+	BACKFLIP,
+	SIDEFLIP,
+	WALL_JUMP,
+
+	REVERT,
+	BURNT,
+
+	FIREBALL,
+	GET_STAR
+	;
 //	private final Identifier SOUND_IDENTIFIER;
 //	private final SoundEvent SOUND_EVENT;
 
