@@ -7,14 +7,17 @@ import fqf.qua_mario.powerups.forms.SuperForm;
 import me.shedaniel.autoconfig.AutoConfig;
 import me.shedaniel.autoconfig.serializer.GsonConfigSerializer;
 import net.fabricmc.api.ModInitializer;
+import net.fabricmc.fabric.api.networking.v1.PlayerLookup;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.network.packet.CustomPayload;
 import net.minecraft.server.network.ServerPlayerEntity;
 import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -37,6 +40,14 @@ public class ModMarioQuaMario implements ModInitializer {
 //				&& player instanceof ClientPlayerEntity clientPlayer
 //				&& clientPlayer.equals(MarioClient.player)
 //		);
+	}
+
+	private static void sendMarioUpdatePacket(PlayerEntity changingPlayer, CustomPayload packet) {
+		Collection<ServerPlayerEntity> sendToPlayers = PlayerLookup.tracking(changingPlayer);
+		sendToPlayers.add((ServerPlayerEntity) changingPlayer);
+		for(ServerPlayerEntity player : sendToPlayers) {
+			ServerPlayNetworking.send(player, packet);
+		}
 	}
 
 	public static boolean getIsMario(PlayerEntity player) {
@@ -100,7 +111,7 @@ public class ModMarioQuaMario implements ModInitializer {
 
 	public static String setIsMario(PlayerEntity player, boolean isMario) {
 		if(!player.getWorld().isClient)
-			ServerPlayNetworking.send((ServerPlayerEntity) player, new MarioPackets.SetMarioEnabledPayload(player.getId(), isMario));
+			sendMarioUpdatePacket(player, new MarioPackets.SetMarioEnabledPayload(player.getId(), isMario));
 		else if(playerIsMarioClient(player))
 			MarioClient.isMario = isMario;
 
@@ -117,8 +128,7 @@ public class ModMarioQuaMario implements ModInitializer {
 
 	public static String setCharacter(PlayerEntity player, MarioCharacter character) {
 		if(!player.getWorld().isClient)
-			ServerPlayNetworking.send((ServerPlayerEntity) player,
-					new MarioPackets.SetCharacterPayload(player.getId(), MarioRegistries.CHARACTERS.getRawId(character)));
+			sendMarioUpdatePacket(player, new MarioPackets.SetCharacterPayload(player.getId(), MarioRegistries.CHARACTERS.getRawId(character)));
 		else if(playerIsMarioClient(player))
 			MarioClient.character = character;
 
@@ -134,9 +144,9 @@ public class ModMarioQuaMario implements ModInitializer {
 	}
 
 	public static String setPowerUp(PlayerEntity player, PowerUp powerUp) {
-		if(!player.getWorld().isClient)
-			ServerPlayNetworking.send((ServerPlayerEntity) player,
-					new MarioPackets.SetPowerUpPayload(player.getId(), MarioRegistries.POWER_UPS.getRawId(powerUp)));
+		if(!player.getWorld().isClient) {
+			sendMarioUpdatePacket(player, new MarioPackets.SetPowerUpPayload(player.getId(), MarioRegistries.POWER_UPS.getRawId(powerUp)));
+		}
 		else if(playerIsMarioClient(player))
 			MarioClient.powerUp = powerUp;
 
@@ -154,7 +164,7 @@ public class ModMarioQuaMario implements ModInitializer {
 	public static String setFullMarioData(PlayerEntity player, boolean isMario, MarioCharacter character, PowerUp powerUp) {
 		if(!player.getWorld().isClient) {
 			if(((ServerPlayerEntity) player).networkHandler != null)
-				ServerPlayNetworking.send((ServerPlayerEntity) player, new MarioPackets.FullSyncPayload(
+				sendMarioUpdatePacket(player, new MarioPackets.FullSyncPayload(
 						player.getId(),
 						isMario,
 						MarioRegistries.CHARACTERS.getRawId(character),
