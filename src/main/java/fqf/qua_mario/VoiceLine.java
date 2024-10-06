@@ -43,8 +43,7 @@ public enum VoiceLine {
 	BURNT,
 
 	FIREBALL,
-	GET_STAR
-	;
+	GET_STAR;
 
 	private static final VoiceLine[] VOICE_LINE_VALUES = VoiceLine.values();
 	private static final Map<PlayerEntity, PositionedSoundInstance> PLAYER_VOICE_LINES = new HashMap<>();
