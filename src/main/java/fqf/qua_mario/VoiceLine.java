@@ -31,7 +31,7 @@ public enum VoiceLine {
 
 	DOUBLE_JUMP,
 	TRIPLE_JUMP,
-	TRIPLE_JUMP_SALUTE,
+	GYMNAST_SALUTE,
 
 	DUCK_JUMP,
 	LONG_JUMP,
@@ -45,8 +45,6 @@ public enum VoiceLine {
 	FIREBALL,
 	GET_STAR
 	;
-//	private final Identifier SOUND_IDENTIFIER;
-//	private final SoundEvent SOUND_EVENT;
 
 	private static final VoiceLine[] VOICE_LINE_VALUES = VoiceLine.values();
 	private static final Map<PlayerEntity, PositionedSoundInstance> PLAYER_VOICE_LINES = new HashMap<>();
@@ -69,7 +67,7 @@ public enum VoiceLine {
 	public void broadcast() {
 		long seed = RandomSeed.getSeed();
 		play(MarioClient.player, seed);
-		ModMarioQuaMario.LOGGER.info("broadcast() Seed: " + seed);
+		ModMarioQuaMario.LOGGER.info("broadcast() Seed: {}", seed);
 		ClientPlayNetworking.send(new BroadcastVoiceLinePayload(MarioClient.player.getId(), this.ordinal(), seed));
 	}
 	public void play(PlayerEntity player, long seed) {
@@ -92,7 +90,7 @@ public enum VoiceLine {
 	}
 
 	public static void parseBroadcastVoiceLinePayload(BroadcastVoiceLinePayload payload, ServerPlayNetworking.Context context) {
-		ModMarioQuaMario.LOGGER.info("parseBroadcastVoiceLinePayload() Seed: " + payload.randomSeed);
+		ModMarioQuaMario.LOGGER.info("parseBroadcastVoiceLinePayload() Seed: {}", payload.randomSeed);
 		Collection<ServerPlayerEntity> sendToPlayers = PlayerLookup.tracking(context.player());
 		for(ServerPlayerEntity player : sendToPlayers) {
 			if(player.equals(context.player())) continue;
@@ -101,7 +99,7 @@ public enum VoiceLine {
 	}
 
 	public static void parsePlayVoiceLinePayload(PlayVoiceLinePayload payload, ClientPlayNetworking.Context context) {
-		ModMarioQuaMario.LOGGER.info("parsePlayVoiceLinePayload() Seed: " + payload.randomSeed);
+		ModMarioQuaMario.LOGGER.info("parsePlayVoiceLinePayload() Seed: {}", payload.randomSeed);
 		VoiceLine playLine = VOICE_LINE_VALUES[payload.voiceLineOrdinal];
 		playLine.play((PlayerEntity) context.player().getWorld().getEntityById(payload.player), payload.randomSeed);
 	}

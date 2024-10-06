@@ -6,83 +6,8 @@
     ]
   },
 
-  "voice.mario.select": {
-    "subtitle": "subtitles.mario.mario_select",
-    "sounds": [
-      "qua_mario:voices/mario/select/select1",
-      "qua_mario:voices/mario/select/select2",
-      "qua_mario:voices/mario/select/select3",
-      "qua_mario:voices/mario/select/select4",
-      "qua_mario:voices/mario/select/select5",
-      "qua_mario:voices/mario/select/select6"
-    ]
-  },
-
-  "voice.mario.duck": {
-    "subtitle": "subtitles.mario.mario_duck",
-    "sounds": [
-      "qua_mario:voices/mario/duck/duck1",
-      "qua_mario:voices/mario/duck/duck2",
-      "qua_mario:voices/mario/duck/duck3"
-    ]
-  },
-
-  "voice.mario.double_jump": {
-    "subtitle": "subtitles.mario.mario_double_jump",
-    "sounds": [
-      "qua_mario:voices/mario/double_jump/doublejump1",
-      "qua_mario:voices/mario/double_jump/doublejump2",
-      "qua_mario:voices/mario/double_jump/doublejump3",
-      "qua_mario:voices/mario/double_jump/doublejump4",
-      "qua_mario:voices/mario/double_jump/doublejump5",
-      "qua_mario:voices/mario/double_jump/doublejump6"
-    ]
-  },
-
-  "voice.mario.triple_jump": {
-    "subtitle": "subtitles.mario.mario_triple_jump",
-    "sounds": [
-      "qua_mario:voices/mario/triple_jump/triplejump1",
-      "qua_mario:voices/mario/triple_jump/triplejump2",
-      "qua_mario:voices/mario/triple_jump/triplejump3",
-      "qua_mario:voices/mario/triple_jump/triplejump4",
-      "qua_mario:voices/mario/triple_jump/triplejump5",
-      "qua_mario:voices/mario/triple_jump/triplejump6"
-    ]
-  },
-
-  "voice.mario.triple_jump_salute": {
-    "subtitle": "subtitles.mario.mario_triple_jump_salute",
-    "sounds": [
-      "qua_mario:voices/mario/triple_jump_salute/tjumptaunt1",
-      "qua_mario:voices/mario/triple_jump_salute/tjumptaunt2",
-      "qua_mario:voices/mario/triple_jump_salute/tjumptaunt3"
-    ]
-  },
-
-  "voice.mario.duck_jump": {
-    "subtitle": "subtitles.mario.mario_duck_jump",
-    "sounds": [
-      "qua_mario:voices/mario/duck_jump/duckjump1",
-      "qua_mario:voices/mario/duck_jump/duckjump2",
-      "qua_mario:voices/mario/duck_jump/duckjump3"
-    ]
-  },
-
-  "voice.mario.long_jump": {
-    "subtitle": "subtitles.mario.mario_long_jump",
-    "sounds": [
-      "qua_mario:voices/mario/long_jump/longjump1",
-      "qua_mario:voices/mario/long_jump/longjump2",
-      "qua_mario:voices/mario/long_jump/longjump3",
-      "qua_mario:voices/mario/long_jump/longjump4",
-      "qua_mario:voices/mario/long_jump/longjump5",
-      "qua_mario:voices/mario/long_jump/longjump6"
-    ]
-  },
-
-  "voice.mario.backflip": {
-    "subtitle": "subtitles.mario.mario_backflip",
+  "voice.luigi.backflip": {
+    "subtitle": "subtitles.qua_mario.voice_luigi_backflip",
     "sounds": [
       {
         "type": "event",
@@ -90,66 +15,362 @@
       }
     ]
   },
-
-  "voice.mario.sideflip": {
-    "subtitle": "subtitles.mario.mario_sideflip",
+  "voice.luigi.burnt": {
+    "subtitle": "subtitles.qua_mario.voice_luigi_burnt",
     "sounds": [
-      "qua_mario:voices/mario/sideflip/sideflip1",
-      "qua_mario:voices/mario/sideflip/sideflip2",
-      "qua_mario:voices/mario/sideflip/sideflip3",
-      "qua_mario:voices/mario/sideflip/sideflip4"
+      "qua_mario:voices/luigi/burnt/burnt1.ogg"
+    ]
+  },
+  "voice.luigi.double_jump": {
+    "subtitle": "subtitles.qua_mario.voice_luigi_double_jump",
+    "sounds": [
+      "qua_mario:voices/luigi/double_jump/double_jump1.ogg",
+      "qua_mario:voices/luigi/double_jump/double_jump2.ogg",
+      "qua_mario:voices/luigi/double_jump/double_jump3.ogg",
+      "qua_mario:voices/luigi/double_jump/double_jump4.ogg",
+      "qua_mario:voices/luigi/double_jump/double_jump5.ogg",
+      "qua_mario:voices/luigi/double_jump/double_jump6.ogg"
+    ]
+  },
+  "voice.luigi.duck": {
+    "subtitle": "subtitles.qua_mario.voice_luigi_duck",
+    "sounds": [
+      "qua_mario:voices/luigi/duck/duck1.ogg",
+      "qua_mario:voices/luigi/duck/duck2.ogg"
+    ]
+  },
+  "voice.luigi.duck_jump": {
+    "subtitle": "subtitles.qua_mario.voice_luigi_duck_jump",
+    "sounds": [
+      "qua_mario:voices/luigi/duck_jump/duck_jump1.ogg",
+      "qua_mario:voices/luigi/duck_jump/duck_jump2.ogg",
+      "qua_mario:voices/luigi/duck_jump/duck_jump3.ogg"
+    ]
+  },
+  "voice.luigi.fireball": {
+    "subtitle": "subtitles.qua_mario.voice_luigi_fireball",
+    "sounds": [
+      "qua_mario:voices/luigi/fireball/fireball1.ogg",
+      "qua_mario:voices/luigi/fireball/fireball2.ogg",
+      "qua_mario:voices/luigi/fireball/fireball3.ogg"
+    ]
+  },
+  "voice.luigi.get_star": {
+    "subtitle": "subtitles.qua_mario.voice_luigi_get_star",
+    "sounds": [
+      "qua_mario:voices/luigi/get_star/get_star1.ogg",
+      "qua_mario:voices/luigi/get_star/get_star2.ogg"
+    ]
+  },
+  "voice.luigi.gymnast_salute": {
+    "subtitle": "subtitles.qua_mario.voice_luigi_gymnast_salute",
+    "sounds": [
+      "qua_mario:voices/luigi/gymnast_salute/gymnast_salute1.ogg",
+      "qua_mario:voices/luigi/gymnast_salute/gymnast_salute2.ogg",
+      "qua_mario:voices/luigi/gymnast_salute/gymnast_salute3.ogg"
+    ]
+  },
+  "voice.luigi.long_jump": {
+    "subtitle": "subtitles.qua_mario.voice_luigi_long_jump",
+    "sounds": [
+      "qua_mario:voices/luigi/long_jump/long_jump1.ogg",
+      "qua_mario:voices/luigi/long_jump/long_jump2.ogg",
+      "qua_mario:voices/luigi/long_jump/long_jump3.ogg",
+      "qua_mario:voices/luigi/long_jump/long_jump4.ogg",
+      "qua_mario:voices/luigi/long_jump/long_jump5.ogg"
+    ]
+  },
+  "voice.luigi.revert": {
+    "subtitle": "subtitles.qua_mario.voice_luigi_revert",
+    "sounds": [
+      "qua_mario:voices/luigi/revert/revert1.ogg",
+      "qua_mario:voices/luigi/revert/revert2.ogg",
+      "qua_mario:voices/luigi/revert/revert3.ogg",
+      "qua_mario:voices/luigi/revert/revert4.ogg",
+      "qua_mario:voices/luigi/revert/revert5.ogg"
+    ]
+  },
+  "voice.luigi.select": {
+    "subtitle": "subtitles.qua_mario.voice_luigi_select",
+    "sounds": [
+      "qua_mario:voices/luigi/select/select1.ogg",
+      "qua_mario:voices/luigi/select/select2.ogg",
+      "qua_mario:voices/luigi/select/select3.ogg",
+      "qua_mario:voices/luigi/select/select4.ogg",
+      "qua_mario:voices/luigi/select/select5.ogg"
+    ]
+  },
+  "voice.luigi.sideflip": {
+    "subtitle": "subtitles.qua_mario.voice_luigi_sideflip",
+    "sounds": [
+      "qua_mario:voices/luigi/sideflip/sideflip1.ogg",
+      "qua_mario:voices/luigi/sideflip/sideflip2.ogg",
+      "qua_mario:voices/luigi/sideflip/sideflip3.ogg"
+    ]
+  },
+  "voice.luigi.triple_jump": {
+    "subtitle": "subtitles.qua_mario.voice_luigi_triple_jump",
+    "sounds": [
+      "qua_mario:voices/luigi/triple_jump/triple_jump1.ogg",
+      "qua_mario:voices/luigi/triple_jump/triple_jump2.ogg",
+      "qua_mario:voices/luigi/triple_jump/triple_jump3.ogg",
+      "qua_mario:voices/luigi/triple_jump/triple_jump4.ogg",
+      "qua_mario:voices/luigi/triple_jump/triple_jump5.ogg",
+      "qua_mario:voices/luigi/triple_jump/triple_jump6.ogg"
+    ]
+  },
+  "voice.luigi.wall_jump": {
+    "subtitle": "subtitles.qua_mario.voice_luigi_wall_jump",
+    "sounds": [
+      "qua_mario:voices/luigi/wall_jump/wall_jump1.ogg",
+      "qua_mario:voices/luigi/wall_jump/wall_jump2.ogg"
     ]
   },
 
-  "voice.mario.wall_jump": {
-    "subtitle": "subtitles.mario.mario_wall_jump",
+  "voice.mario.backflip": {
+    "subtitle": "subtitles.qua_mario.voice_mario_backflip",
     "sounds": [
-      "qua_mario:voices/mario/wall_jump/wallkick1",
-      "qua_mario:voices/mario/wall_jump/wallkick2"
+      {
+        "type": "event",
+        "name": "voice.mario.sideflip"
+      }
     ]
   },
-
-  "voice.mario.revert": {
-    "subtitle": "subtitles.mario.mario_revert",
-    "sounds": [
-      "qua_mario:voices/mario/revert/revert1",
-      "qua_mario:voices/mario/revert/revert2",
-      "qua_mario:voices/mario/revert/revert3",
-      "qua_mario:voices/mario/revert/revert4",
-      "qua_mario:voices/mario/revert/revert5",
-      "qua_mario:voices/mario/revert/revert6"
-    ]
-  },
-
   "voice.mario.burnt": {
-    "subtitle": "subtitles.mario.mario_burnt",
+    "subtitle": "subtitles.qua_mario.voice_mario_burnt",
     "sounds": [
-      "qua_mario:voices/mario/burnt/burnt1",
-      "qua_mario:voices/mario/burnt/burnt2"
+      "qua_mario:voices/mario/burnt/burnt1.ogg",
+      "qua_mario:voices/mario/burnt/burnt2.ogg"
     ]
   },
-
+  "voice.mario.double_jump": {
+    "subtitle": "subtitles.qua_mario.voice_mario_double_jump",
+    "sounds": [
+      "qua_mario:voices/mario/double_jump/double_jump1.ogg",
+      "qua_mario:voices/mario/double_jump/double_jump2.ogg",
+      "qua_mario:voices/mario/double_jump/double_jump3.ogg",
+      "qua_mario:voices/mario/double_jump/double_jump4.ogg",
+      "qua_mario:voices/mario/double_jump/double_jump5.ogg",
+      "qua_mario:voices/mario/double_jump/double_jump6.ogg"
+    ]
+  },
+  "voice.mario.duck": {
+    "subtitle": "subtitles.qua_mario.voice_mario_duck",
+    "sounds": [
+      "qua_mario:voices/mario/duck/duck1.ogg",
+      "qua_mario:voices/mario/duck/duck2.ogg",
+      "qua_mario:voices/mario/duck/duck3.ogg"
+    ]
+  },
+  "voice.mario.duck_jump": {
+    "subtitle": "subtitles.qua_mario.voice_mario_duck_jump",
+    "sounds": [
+      "qua_mario:voices/mario/duck_jump/duck_jump1.ogg",
+      "qua_mario:voices/mario/duck_jump/duck_jump2.ogg",
+      "qua_mario:voices/mario/duck_jump/duck_jump3.ogg"
+    ]
+  },
   "voice.mario.fireball": {
-    "subtitle": "subtitles.mario.mario_fireball",
+    "subtitle": "subtitles.qua_mario.voice_mario_fireball",
     "sounds": [
-      "qua_mario:voices/mario/fireball/fireball1",
-      "qua_mario:voices/mario/fireball/fireball2"
+      "qua_mario:voices/mario/fireball/fireball1.ogg",
+      "qua_mario:voices/mario/fireball/fireball2.ogg"
     ]
   },
-
   "voice.mario.get_star": {
-    "subtitle": "subtitles.mario.mario_get_star",
+    "subtitle": "subtitles.qua_mario.voice_mario_get_star",
     "sounds": [
-      "qua_mario:voices/mario/get_star/getpower1",
-      "qua_mario:voices/mario/get_star/getpower2",
-      "qua_mario:voices/mario/get_star/getpower3"
+      "qua_mario:voices/mario/get_star/get_star1.ogg",
+      "qua_mario:voices/mario/get_star/get_star2.ogg",
+      "qua_mario:voices/mario/get_star/get_star3.ogg"
+    ]
+  },
+  "voice.mario.gymnast_salute": {
+    "subtitle": "subtitles.qua_mario.voice_mario_gymnast_salute",
+    "sounds": [
+      "qua_mario:voices/mario/gymnast_salute/gymnast_salute1.ogg",
+      "qua_mario:voices/mario/gymnast_salute/gymnast_salute2.ogg",
+      "qua_mario:voices/mario/gymnast_salute/gymnast_salute3.ogg"
+    ]
+  },
+  "voice.mario.long_jump": {
+    "subtitle": "subtitles.qua_mario.voice_mario_long_jump",
+    "sounds": [
+      "qua_mario:voices/mario/long_jump/long_jump1.ogg",
+      "qua_mario:voices/mario/long_jump/long_jump2.ogg",
+      "qua_mario:voices/mario/long_jump/long_jump3.ogg",
+      "qua_mario:voices/mario/long_jump/long_jump4.ogg",
+      "qua_mario:voices/mario/long_jump/long_jump5.ogg",
+      "qua_mario:voices/mario/long_jump/long_jump6.ogg"
+    ]
+  },
+  "voice.mario.revert": {
+    "subtitle": "subtitles.qua_mario.voice_mario_revert",
+    "sounds": [
+      "qua_mario:voices/mario/revert/revert1.ogg",
+      "qua_mario:voices/mario/revert/revert2.ogg",
+      "qua_mario:voices/mario/revert/revert3.ogg",
+      "qua_mario:voices/mario/revert/revert4.ogg",
+      "qua_mario:voices/mario/revert/revert5.ogg",
+      "qua_mario:voices/mario/revert/revert6.ogg"
+    ]
+  },
+  "voice.mario.select": {
+    "subtitle": "subtitles.qua_mario.voice_mario_select",
+    "sounds": [
+      "qua_mario:voices/mario/select/select1.ogg",
+      "qua_mario:voices/mario/select/select2.ogg",
+      "qua_mario:voices/mario/select/select3.ogg",
+      "qua_mario:voices/mario/select/select4.ogg",
+      "qua_mario:voices/mario/select/select5.ogg",
+      "qua_mario:voices/mario/select/select6.ogg"
+    ]
+  },
+  "voice.mario.sideflip": {
+    "subtitle": "subtitles.qua_mario.voice_mario_sideflip",
+    "sounds": [
+      "qua_mario:voices/mario/sideflip/sideflip1.ogg",
+      "qua_mario:voices/mario/sideflip/sideflip2.ogg",
+      "qua_mario:voices/mario/sideflip/sideflip3.ogg",
+      "qua_mario:voices/mario/sideflip/sideflip4.ogg"
+    ]
+  },
+  "voice.mario.triple_jump": {
+    "subtitle": "subtitles.qua_mario.voice_mario_triple_jump",
+    "sounds": [
+      "qua_mario:voices/mario/triple_jump/triple_jump1.ogg",
+      "qua_mario:voices/mario/triple_jump/triple_jump2.ogg",
+      "qua_mario:voices/mario/triple_jump/triple_jump3.ogg",
+      "qua_mario:voices/mario/triple_jump/triple_jump4.ogg",
+      "qua_mario:voices/mario/triple_jump/triple_jump5.ogg",
+      "qua_mario:voices/mario/triple_jump/triple_jump6.ogg"
+    ]
+  },
+  "voice.mario.wall_jump": {
+    "subtitle": "subtitles.qua_mario.voice_mario_wall_jump",
+    "sounds": [
+      "qua_mario:voices/mario/wall_jump/wall_jump1.ogg",
+      "qua_mario:voices/mario/wall_jump/wall_jump2.ogg"
     ]
   },
 
-  "voice.mario.": {
-    "subtitle": "subtitles.mario.mario_",
+  "voice.toadette.backflip": {
+    "subtitle": "subtitles.qua_mario.voice_toadette_backflip",
     "sounds": [
-      "qua_mario:voices/mario//1"
+      {
+        "type": "event",
+        "name": "voice.mario.sideflip"
+      }
+    ]
+  },
+  "voice.toadette.burnt": {
+    "subtitle": "subtitles.qua_mario.voice_toadette_burnt",
+    "sounds": [
+      "qua_mario:voices/toadette/burnt/burnt1.ogg",
+      "qua_mario:voices/toadette/burnt/burnt2.ogg"
+    ]
+  },
+  "voice.toadette.double_jump": {
+    "subtitle": "subtitles.qua_mario.voice_toadette_double_jump",
+    "sounds": [
+      "qua_mario:voices/toadette/double_jump/double_jump1.ogg",
+      "qua_mario:voices/toadette/double_jump/double_jump2.ogg",
+      "qua_mario:voices/toadette/double_jump/double_jump3.ogg",
+      "qua_mario:voices/toadette/double_jump/double_jump4.ogg",
+      "qua_mario:voices/toadette/double_jump/double_jump5.ogg"
+    ]
+  },
+  "voice.toadette.duck": {
+    "subtitle": "subtitles.qua_mario.voice_toadette_duck",
+    "sounds": [
+      "qua_mario:voices/toadette/duck/duck1.ogg",
+      "qua_mario:voices/toadette/duck/duck2.ogg",
+      "qua_mario:voices/toadette/duck/duck3.ogg"
+    ]
+  },
+  "voice.toadette.duck_jump": {
+    "subtitle": "subtitles.qua_mario.voice_toadette_duck_jump",
+    "sounds": [
+      "qua_mario:voices/toadette/duck_jump/duck_jump1.ogg",
+      "qua_mario:voices/toadette/duck_jump/duck_jump2.ogg",
+      "qua_mario:voices/toadette/duck_jump/duck_jump3.ogg"
+    ]
+  },
+  "voice.toadette.fireball": {
+    "subtitle": "subtitles.qua_mario.voice_toadette_fireball",
+    "sounds": [
+      "qua_mario:voices/toadette/fireball/fireball1.ogg",
+      "qua_mario:voices/toadette/fireball/fireball2.ogg",
+      "qua_mario:voices/toadette/fireball/fireball3.ogg"
+    ]
+  },
+  "voice.toadette.get_star": {
+    "subtitle": "subtitles.qua_mario.voice_toadette_get_star",
+    "sounds": [
+      "qua_mario:voices/toadette/get_star/get_star1.ogg",
+      "qua_mario:voices/toadette/get_star/get_star2.ogg"
+    ]
+  },
+  "voice.toadette.gymnast_salute": {
+    "subtitle": "subtitles.qua_mario.voice_toadette_gymnast_salute",
+    "sounds": [
+      "qua_mario:voices/toadette/gymnast_salute/gymnast_salute1.ogg",
+      "qua_mario:voices/toadette/gymnast_salute/gymnast_salute2.ogg",
+      "qua_mario:voices/toadette/gymnast_salute/gymnast_salute3.ogg",
+      "qua_mario:voices/toadette/gymnast_salute/gymnast_salute4.ogg"
+    ]
+  },
+  "voice.toadette.long_jump": {
+    "subtitle": "subtitles.qua_mario.voice_toadette_long_jump",
+    "sounds": [
+      "qua_mario:voices/toadette/long_jump/long_jump1.ogg",
+      "qua_mario:voices/toadette/long_jump/long_jump2.ogg",
+      "qua_mario:voices/toadette/long_jump/long_jump3.ogg"
+    ]
+  },
+  "voice.toadette.revert": {
+    "subtitle": "subtitles.qua_mario.voice_toadette_revert",
+    "sounds": [
+      "qua_mario:voices/toadette/revert/revert1.ogg",
+      "qua_mario:voices/toadette/revert/revert2.ogg",
+      "qua_mario:voices/toadette/revert/revert3.ogg",
+      "qua_mario:voices/toadette/revert/revert4.ogg",
+      "qua_mario:voices/toadette/revert/revert5.ogg",
+      "qua_mario:voices/toadette/revert/revert6.ogg",
+      "qua_mario:voices/toadette/revert/revert7.ogg"
+    ]
+  },
+  "voice.toadette.select": {
+    "subtitle": "subtitles.qua_mario.voice_toadette_select",
+    "sounds": [
+      "qua_mario:voices/toadette/select/select1.ogg",
+      "qua_mario:voices/toadette/select/select2.ogg",
+      "qua_mario:voices/toadette/select/select3.ogg"
+    ]
+  },
+  "voice.toadette.sideflip": {
+    "subtitle": "subtitles.qua_mario.voice_toadette_sideflip",
+    "sounds": [
+      "qua_mario:voices/toadette/sideflip/sideflip1.ogg",
+      "qua_mario:voices/toadette/sideflip/sideflip2.ogg",
+      "qua_mario:voices/toadette/sideflip/sideflip3.ogg"
+    ]
+  },
+  "voice.toadette.triple_jump": {
+    "subtitle": "subtitles.qua_mario.voice_toadette_triple_jump",
+    "sounds": [
+      "qua_mario:voices/toadette/triple_jump/triple_jump1.ogg",
+      "qua_mario:voices/toadette/triple_jump/triple_jump2.ogg",
+      "qua_mario:voices/toadette/triple_jump/triple_jump3.ogg",
+      "qua_mario:voices/toadette/triple_jump/triple_jump4.ogg",
+      "qua_mario:voices/toadette/triple_jump/triple_jump5.ogg"
+    ]
+  },
+  "voice.toadette.wall_jump": {
+    "subtitle": "subtitles.qua_mario.voice_toadette_wall_jump",
+    "sounds": [
+      "qua_mario:voices/toadette/wall_jump/wall_jump1.ogg",
+      "qua_mario:voices/toadette/wall_jump/wall_jump2.ogg"
     ]
   }
 }
