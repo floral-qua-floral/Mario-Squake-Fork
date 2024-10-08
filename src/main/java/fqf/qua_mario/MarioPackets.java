@@ -25,9 +25,10 @@ public class MarioPackets {
 		PayloadTypeRegistry.playS2C().register(SoundFader.PlayJumpSfxPayload.ID, SoundFader.PlayJumpSfxPayload.CODEC);
 		PayloadTypeRegistry.playS2C().register(VoiceLine.PlayVoiceLinePayload.ID, VoiceLine.PlayVoiceLinePayload.CODEC);
 
-		PayloadTypeRegistry.playC2S().register(StompHandler.requestStompPayload.ID, StompHandler.requestStompPayload.CODEC);
+		PayloadTypeRegistry.playC2S().register(StompHandler.RequestStompPayload.ID, StompHandler.RequestStompPayload.CODEC);
 		PayloadTypeRegistry.playC2S().register(SoundFader.BroadcastJumpSfxPayload.ID, SoundFader.BroadcastJumpSfxPayload.CODEC);
 		PayloadTypeRegistry.playC2S().register(VoiceLine.BroadcastVoiceLinePayload.ID, VoiceLine.BroadcastVoiceLinePayload.CODEC);
+		PayloadTypeRegistry.playC2S().register(SetSneakingLegality.ID, SetSneakingLegality.CODEC);
 	}
 
 	public static void registerServer() {
@@ -59,7 +60,10 @@ public class MarioPackets {
 
 		ServerPlayNetworking.registerGlobalReceiver(SoundFader.BroadcastJumpSfxPayload.ID, SoundFader::parseBroadcastJumpSfxPayload);
 		ServerPlayNetworking.registerGlobalReceiver(VoiceLine.BroadcastVoiceLinePayload.ID, VoiceLine::parseBroadcastVoiceLinePayload);
-		ServerPlayNetworking.registerGlobalReceiver(StompHandler.requestStompPayload.ID, StompHandler::parseRequestStompPacket);
+		ServerPlayNetworking.registerGlobalReceiver(StompHandler.RequestStompPayload.ID, StompHandler::parseRequestStompPacket);
+		ServerPlayNetworking.registerGlobalReceiver(SetSneakingLegality.ID, (payload, context) -> {
+			ModMarioQuaMario.ensureMarioData(context.player()).canSneak = payload.isLegal;
+		});
 	}
 
 	public static void registerClient() {
@@ -101,6 +105,16 @@ public class MarioPackets {
 
 	public static PlayerEntity getPlayerFromInt(ClientPlayNetworking.Context context, int playerID) {
 		return (PlayerEntity) context.player().getWorld().getEntityById(playerID);
+	}
+
+	public record SetSneakingLegality(boolean isLegal) implements CustomPayload {
+		public static final Id<SetSneakingLegality> ID = new Id<>(Identifier.of(ModMarioQuaMario.MOD_ID, "set_sneaking_legality"));
+		public static final PacketCodec<RegistryByteBuf, SetSneakingLegality> CODEC = PacketCodec.tuple(
+				PacketCodecs.BOOL, SetSneakingLegality::isLegal,
+				SetSneakingLegality::new);
+
+		@Override
+		public Id<? extends CustomPayload> getId() { return ID; }
 	}
 
 	public record FullSyncPayload(int player, boolean isMario, int newCharacter, int newPowerUp) implements CustomPayload {

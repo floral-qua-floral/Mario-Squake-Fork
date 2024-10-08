@@ -5,6 +5,7 @@ import fqf.qua_mario.ModMarioQuaMario;
 import fqf.qua_mario.characters.characters.CharaMario;
 import fqf.qua_mario.powerups.forms.SuperForm;
 import net.minecraft.entity.Entity;
+import net.minecraft.entity.EntityPose;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.nbt.NbtElement;

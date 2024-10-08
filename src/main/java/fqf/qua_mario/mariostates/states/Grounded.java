@@ -19,10 +19,10 @@ public class Grounded extends MarioState {
 				CommonTransitions.FALL,
 				() -> {
 					// Duckslide
-					if(Input.DUCK.isHeld() && MarioClient.forwardVel > CharaStat.DUCK_SLIDE_THRESHOLD.getValue()) {
+					if(Input.DUCK.isHeld() && DuckSlide.enterDuckSlide()) {
 						VoiceLine.DUCK.broadcast();
-						MarioClient.yVel = 1;
-						return Aerial.INSTANCE;
+						MarioClient.applyDrag(CharaStat.DUCK_SLIDE_BOOST, CharaStat.ZERO);
+						return DuckSlide.INSTANCE;
 					}
 					return null;
 				},
@@ -30,9 +30,7 @@ public class Grounded extends MarioState {
 					// Duck Waddle
 					if(Input.DUCK.isHeld()) {
 						VoiceLine.DUCK.broadcast();
-						MarioClient.assignForwardStrafeVelocities(-0.5, 0);
-						MarioClient.yVel = 1;
-						return Aerial.INSTANCE;
+						return DuckWaddle.INSTANCE;
 					}
 					return null;
 				},
@@ -53,9 +51,6 @@ public class Grounded extends MarioState {
 
 	@Override
 	public void tick() {
-		double strafeSpeed = MarioClient.rightwardInput * 0.275;
-		double strafeAccel = 0.065;
-
 		if(MarioClient.forwardInput > 0) {
 			boolean isRunning = MarioClient.player.isSprinting()
 					&& MarioClient.forwardVel > MarioClient.getStatThreshold(CharaStat.WALK_SPEED);

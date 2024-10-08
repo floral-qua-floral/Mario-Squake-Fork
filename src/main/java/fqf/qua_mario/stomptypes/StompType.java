@@ -3,7 +3,6 @@ package fqf.qua_mario.stomptypes;
 import fqf.qua_mario.MarioClient;
 import fqf.qua_mario.MarioRegistries;
 import fqf.qua_mario.ModMarioQuaMario;
-import fqf.qua_mario.ModMarioQuaMarioClient;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 import net.minecraft.entity.Entity;
@@ -51,7 +50,7 @@ public abstract class StompType {
 	}
 
 	public void sendAttemptPacket(Entity target) {
-		ClientPlayNetworking.send(new StompHandler.requestStompPayload(target.getId(), MarioRegistries.STOMP_TYPES.getRawIdOrThrow(this)));
+		ClientPlayNetworking.send(new StompHandler.RequestStompPayload(target.getId(), MarioRegistries.STOMP_TYPES.getRawIdOrThrow(this)));
 	}
 	public void sendAffirmPacket(ServerPlayerEntity player, Entity target, boolean harmless) {
 		ServerPlayNetworking.send(player, new StompHandler.affirmStompPayload(target.getId(), MarioRegistries.STOMP_TYPES.getRawId(this), harmless));

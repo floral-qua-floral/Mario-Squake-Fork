@@ -3,10 +3,12 @@ package fqf.qua_mario.mariostates;
 import fqf.qua_mario.*;
 import fqf.qua_mario.characters.CharaStat;
 import fqf.qua_mario.mariostates.states.Aerial;
+import fqf.qua_mario.mariostates.states.DoubleJump;
 import fqf.qua_mario.mariostates.states.Jump;
 import fqf.qua_mario.mariostates.states.Underwater;
 import net.minecraft.entity.MovementType;
 import net.minecraft.registry.tag.FluidTags;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
@@ -14,7 +16,7 @@ import java.util.Arrays;
 
 public abstract class MarioState {
 	@FunctionalInterface
-	protected interface MarioStateTransition {
+	public interface MarioStateTransition {
 		@Nullable MarioState evaluate();
 	}
 
@@ -45,6 +47,9 @@ public abstract class MarioState {
 	public String getName() {
 		return name;
 	}
+	public boolean getSneakLegality() {
+		return true;
+	}
 
 	public void evaluateTransitions(TransitionPhases phase) {
 		MarioState powerTransitionResult = MarioClient.powerUp.customTransition(this, phase);
@@ -65,31 +70,7 @@ public abstract class MarioState {
 
 	public abstract void tick();
 
-	protected void applyGravity(double accel, double terminalVelocity) {
-		if(MarioClient.yVel > terminalVelocity) {
-			MarioClient.yVel += accel;
-			if(MarioClient.yVel < terminalVelocity) MarioClient.yVel = terminalVelocity;
-		}
-	}
-	protected void applyGravity(CharaStat gravity) {
-		applyGravity(gravity.getValue(), CharaStat.TERMINAL_VELOCITY.getValue());
-	}
-	protected void applyGravity() {
-		applyGravity(CharaStat.GRAVITY);
-	}
 
-	protected void capJumpAndApplyGravity(CharaStat jumpCapStat) {
-		if(!MarioClient.jumpCapped && Input.JUMP.isHeld() && MarioClient.yVel > 0)
-			applyGravity(CharaStat.JUMP_GRAVITY);
-		else {
-			if(!MarioClient.jumpCapped) {
-				MarioClient.jumpCapped = true;
-				MarioClient.yVel = Math.min(MarioClient.yVel, jumpCapStat.getValue());
-				SoundFader.broadcastAndFadeJumpSound();
-			}
-			applyGravity(CharaStat.GRAVITY);
-		}
-	}
 
 	protected record CommonTransitions() {
 		public static final MarioStateTransition FALL = () -> {
@@ -100,25 +81,35 @@ public abstract class MarioState {
 			return null;
 		};
 
-		public static void performJumpLike() {
+		public static void performJump(@NotNull CharaStat velocityStat, @Nullable CharaStat addendStat) {
 			MarioClient.jumpCapped = false;
 			SoundFader.broadcastAndPlayJumpSound();
+
+			MarioClient.yVel = velocityStat.getValue();
+			if(addendStat != null) {
+				double momentum = Math.max(0, MarioClient.forwardVel / CharaStat.RUN_SPEED.getValue());
+				MarioClient.yVel += momentum * CharaStat.JUMP_VELOCITY_ADDEND.getValue();
+			}
 		}
 
 		public static final MarioStateTransition JUMP = () -> {
 			if(Input.JUMP.isPressed()) {
-				performJumpLike();
-				if(MarioClient.doubleJumpLandingTime > 0) { // Triple Jump
+				if(MarioClient.doubleJumpLandingTime > 0 && MarioClient.forwardVel > CharaStat.TRIPLE_JUMP_THRESHOLD.getValue()) { // Triple Jump
 					VoiceLine.TRIPLE_JUMP.broadcast();
 				}
 				else if(MarioClient.jumpLandingTime > 0) { // Double Jump
+					performJump(CharaStat.DOUBLE_JUMP_VELOCITY, CharaStat.DOUBLE_JUMP_VELOCITY_ADDEND);
 					VoiceLine.DOUBLE_JUMP.broadcast();
+
+					// Reduce horizontal velocities
+					MarioClient.assignForwardStrafeVelocities(MarioClient.forwardVel * 0.85, MarioClient.rightwardVel * 0.85);
+
+					return DoubleJump.INSTANCE;
+
+
 				}
 				else { // Normal jump
-					// Apply upward velocity
-					double momentum = Math.max(0, MarioClient.forwardVel / CharaStat.RUN_SPEED.getValue());
-					MarioClient.yVel = CharaStat.JUMP_VELOCITY.getValue()
-							+ (momentum * CharaStat.JUMP_VELOCITY_ADDEND.getValue());
+					performJump(CharaStat.JUMP_VELOCITY, CharaStat.JUMP_VELOCITY_ADDEND);
 
 					// Reduce horizontal velocities
 					MarioClient.assignForwardStrafeVelocities(MarioClient.forwardVel * 0.85, MarioClient.rightwardVel * 0.85);
@@ -130,7 +121,7 @@ public abstract class MarioState {
 		};
 
 		public static final MarioStateTransition ENTER_WATER = () -> {
-			if(MarioClient.player.getFluidHeight(FluidTags.WATER) > 0.5) {
+			if(MarioClient.player.getFluidHeight(FluidTags.WATER) > 30.5) {
 				return Underwater.INSTANCE;
 			}
 			return null;

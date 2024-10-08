@@ -5,6 +5,7 @@
   "mixins": [
     "DamageSourceMixin",
     "EntityDataSaverMixin",
+    "LivingEntityMixin",
     "PlayerEntityMixin"
   ],
   "injectors": {
@@ -12,6 +13,7 @@
   },
   "client": [
     "CameraMixin",
+    "ClientPlayerEntityMixin",
     "ClientPlayNetworkHandlerMixin",
     "EntitySwimPreventionMixin",
     "InGameHudMixin",

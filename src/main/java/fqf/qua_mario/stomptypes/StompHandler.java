@@ -1,7 +1,6 @@
 package fqf.qua_mario.stomptypes;
 
 import com.google.common.collect.Lists;
-import fqf.qua_mario.MarioClient;
 import fqf.qua_mario.MarioRegistries;
 import fqf.qua_mario.ModMarioQuaMario;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
@@ -18,10 +17,8 @@ import net.minecraft.registry.RegistryKeys;
 import net.minecraft.registry.tag.TagKey;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.util.Identifier;
-import net.minecraft.util.Uuids;
 
 import java.util.List;
-import java.util.UUID;
 
 public class StompHandler {
 	public static final TagKey<DamageType> USES_FEET_ITEM_TAG = TagKey.of(RegistryKeys.DAMAGE_TYPE, Identifier.of(ModMarioQuaMario.MOD_ID, "uses_feet_item"));
@@ -36,7 +33,7 @@ public class StompHandler {
 
 	public static List<Entity> forbiddenStompTargets = Lists.newArrayList();
 
-	public static void parseRequestStompPacket(requestStompPayload payload, ServerPlayNetworking.Context context) {
+	public static void parseRequestStompPacket(RequestStompPayload payload, ServerPlayNetworking.Context context) {
 		ServerWorld world = context.player().getServerWorld();
 		Entity target = world.getEntityById(payload.target);
 		StompType stompType = MarioRegistries.STOMP_TYPES.getOrThrow(payload.stompType);
@@ -66,14 +63,14 @@ public class StompHandler {
 		forbiddenStompTargets.clear();
 	}
 
-	public record requestStompPayload(int target, int stompType) implements CustomPayload {
-		public static final Id<requestStompPayload> ID = new Id<>(Identifier.of(ModMarioQuaMario.MOD_ID, "request_stomp"));
-		public static final PacketCodec<RegistryByteBuf, requestStompPayload> CODEC = PacketCodec.tuple(
+	public record RequestStompPayload(int target, int stompType) implements CustomPayload {
+		public static final Id<RequestStompPayload> ID = new Id<>(Identifier.of(ModMarioQuaMario.MOD_ID, "request_stomp"));
+		public static final PacketCodec<RegistryByteBuf, RequestStompPayload> CODEC = PacketCodec.tuple(
 				PacketCodecs.INTEGER,
-				requestStompPayload::target,
+				RequestStompPayload::target,
 				PacketCodecs.INTEGER,
-				requestStompPayload::stompType,
-				requestStompPayload::new
+				RequestStompPayload::stompType,
+				RequestStompPayload::new
 		);
 
 		@Override

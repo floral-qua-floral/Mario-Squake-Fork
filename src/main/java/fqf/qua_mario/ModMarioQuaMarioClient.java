@@ -51,11 +51,12 @@ public class ModMarioQuaMarioClient implements ClientModInitializer {
 	public static void drawScreenInfo(DrawContext context) {
 		PlayerEntity player = MinecraftClient.getInstance().player;
 
+		assert player != null;
 		Vec3d pos = player.getPos();
 		double dx = pos.x - player.lastRenderX;
 		double dz = pos.z - player.lastRenderZ;
 
-		DumbGarbage garbo = new DumbGarbage(context,context.getScaledWindowHeight() - (4 * DumbGarbage.textRenderer.fontHeight) - 2, context.getScaledWindowWidth() - 2);
+		DumbGarbage garbo = new DumbGarbage(context, context.getScaledWindowWidth() - 2, context.getScaledWindowHeight() - (4 * DumbGarbage.textRenderer.fontHeight) - 2);
 
 		drawString(garbo, 0, String.format("Speed: %.2f", Math.sqrt(dx * dx + dz * dz)));
 		drawString(garbo, 1, "State: " + MarioClient.getState().getName());

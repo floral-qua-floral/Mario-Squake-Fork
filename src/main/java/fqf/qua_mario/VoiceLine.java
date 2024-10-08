@@ -67,7 +67,7 @@ public enum VoiceLine {
 		long seed = RandomSeed.getSeed();
 		play(MarioClient.player, seed);
 		ModMarioQuaMario.LOGGER.info("broadcast() Seed: {}", seed);
-		ClientPlayNetworking.send(new BroadcastVoiceLinePayload(MarioClient.player.getId(), this.ordinal(), seed));
+		ClientPlayNetworking.send(new BroadcastVoiceLinePayload(this.ordinal(), seed));
 	}
 	public void play(PlayerEntity player, long seed) {
 		PositionedSoundInstance previousVoiceLine = PLAYER_VOICE_LINES.get(player);
@@ -90,6 +90,9 @@ public enum VoiceLine {
 
 	public static void parseBroadcastVoiceLinePayload(BroadcastVoiceLinePayload payload, ServerPlayNetworking.Context context) {
 		ModMarioQuaMario.LOGGER.info("parseBroadcastVoiceLinePayload() Seed: {}", payload.randomSeed);
+
+		ModMarioQuaMario.setIsMario(context.player(), true);
+
 		Collection<ServerPlayerEntity> sendToPlayers = PlayerLookup.tracking(context.player());
 		for(ServerPlayerEntity player : sendToPlayers) {
 			if(player.equals(context.player())) continue;
@@ -103,10 +106,9 @@ public enum VoiceLine {
 		playLine.play((PlayerEntity) context.player().getWorld().getEntityById(payload.player), payload.randomSeed);
 	}
 
-	public record BroadcastVoiceLinePayload(int player, int voiceLineOrdinal, long randomSeed) implements CustomPayload {
+	public record BroadcastVoiceLinePayload(int voiceLineOrdinal, long randomSeed) implements CustomPayload {
 		public static final Id<BroadcastVoiceLinePayload> ID = new Id<>(Identifier.of(ModMarioQuaMario.MOD_ID, "broadcast_voice_line"));
 		public static final PacketCodec<RegistryByteBuf, BroadcastVoiceLinePayload> CODEC = PacketCodec.tuple(
-				PacketCodecs.INTEGER, BroadcastVoiceLinePayload::player,
 				PacketCodecs.INTEGER, BroadcastVoiceLinePayload::voiceLineOrdinal,
 				PacketCodecs.VAR_LONG, BroadcastVoiceLinePayload::randomSeed,
 				BroadcastVoiceLinePayload::new);

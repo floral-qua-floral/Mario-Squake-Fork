@@ -38,6 +38,7 @@
     "fabricloader": ">=0.4.0",
     "cloth-config": "*",
     "fabric": "*",
-    "minecraft": ">=1.21"
+    "minecraft": ">=1.21",
+    "justenoughspeed": "*"
   }
 }

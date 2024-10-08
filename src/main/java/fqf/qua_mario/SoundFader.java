@@ -78,7 +78,6 @@ public class SoundFader {
 	}
 
 	public static void parseBroadcastJumpSfxPayload(BroadcastJumpSfxPayload payload, ServerPlayNetworking.Context context) {
-		ModMarioQuaMario.LOGGER.info("Received the packet asking to play a sound effect");
 		Collection<ServerPlayerEntity> sendToPlayers = PlayerLookup.tracking(context.player());
 		for(ServerPlayerEntity player : sendToPlayers) {
 			if(player.equals(context.player())) continue;

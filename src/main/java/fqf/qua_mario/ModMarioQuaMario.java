@@ -9,7 +9,6 @@ import me.shedaniel.autoconfig.serializer.GsonConfigSerializer;
 import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.networking.v1.PlayerLookup;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
-import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.network.packet.CustomPayload;
 import net.minecraft.server.network.ServerPlayerEntity;
@@ -44,10 +43,11 @@ public class ModMarioQuaMario implements ModInitializer {
 
 	private static void sendMarioUpdatePacket(PlayerEntity changingPlayer, CustomPayload packet) {
 		Collection<ServerPlayerEntity> sendToPlayers = PlayerLookup.tracking(changingPlayer);
-		sendToPlayers.add((ServerPlayerEntity) changingPlayer);
 		for(ServerPlayerEntity player : sendToPlayers) {
 			ServerPlayNetworking.send(player, packet);
 		}
+		if(!sendToPlayers.contains((ServerPlayerEntity) changingPlayer))
+			ServerPlayNetworking.send((ServerPlayerEntity) changingPlayer, packet);
 	}
 
 	public static boolean getIsMario(PlayerEntity player) {
@@ -86,6 +86,20 @@ public class ModMarioQuaMario implements ModInitializer {
 		else {
 			LOGGER.trace("Tried to get Power-up of someone else but we don't know?!");
 			return SuperForm.INSTANCE;
+		}
+	}
+
+	public static boolean getSneakProhibited(PlayerEntity player) {
+		if(!useMarioPhysics(player, false)) return false;
+		if(playerIsMarioClient(player))
+			return !MarioClient.getState().getSneakLegality();
+		else if(player.getWorld().isClient)
+			return false;
+		else if(PLAYER_DATA.containsKey(player))
+			return !PLAYER_DATA.get(player).canSneak;
+		else {
+			LOGGER.trace("Tried to check if someone is allowed to sneak but we don't know?!");
+			return true;
 		}
 	}
 
@@ -200,10 +214,14 @@ public class ModMarioQuaMario implements ModInitializer {
 		public boolean isMario;
 		public MarioCharacter character;
 		public PowerUp powerUp;
+		public boolean canSneak;
 		private MarioPlayerInfo(boolean isMario, MarioCharacter character, PowerUp powerUp) {
 			this.isMario = isMario;
 			this.character = character;
 			this.powerUp = powerUp;
+
+			// Non-persistent data
+			this.canSneak = true;
 		}
 	}
 }

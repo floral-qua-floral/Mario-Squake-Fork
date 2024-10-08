@@ -25,7 +25,13 @@ public enum Input {
 		LEFT.update(input.pressingLeft);
 
 		JUMP.update(input.jumping);
-		DUCK.update(input.sneaking);
+
+		/*
+		 If Mario is forced to stay in the sneaking pose by the environment, he'll count as holding down the duck
+		 button. However, he can only perform a duck _press_ using the actual key.
+		 This has the side effect of making it impossible to register duck presses while Mario is forced to sneak.
+		*/
+		DUCK.update(input.sneaking, input.sneaking || MarioClient.player.isInSneakingPose());
 
 		boolean spinKeybind = ModMarioQuaMario.CONFIG.getSpinputType() != ModConfig.SpinputType.LEFTRIGHT
 				&& exhaustSpinBindingWasPressed();

@@ -23,7 +23,7 @@ public class Skid extends MarioState {
 				CommonTransitions.FALL,
 				() -> {
 					// Stop skidding
-					if (MarioClient.stateTimer > 20 || MarioClient.forwardInput >= 0 || MarioClient.forwardVel < -0.05) {
+					if (MarioClient.stateTimer > 0 || MarioClient.forwardInput >= 0 || MarioClient.forwardVel < -0.05) {
 						return Grounded.INSTANCE;
 					}
 					return null;
@@ -78,9 +78,8 @@ public class Skid extends MarioState {
 			if(MathHelper.approximatelyEquals(MarioClient.forwardVel, 0)) {
 				MarioClient.stateTimer++;
 			}
-			MarioClient.applyDrag(CharaStat.SKID_DRAG);
-//			MarioClient.setMotion(MarioClient.forwardVel * 0.9, 0);
-//			MarioClient.assignForwardStrafeVelocities(MarioClient.forwardVel * CharaStat.SKID_DRAG.getValue(), MarioClient.rightwardVel * CharaStat.SKID_DRAG.getValue());
+			MarioClient.applyDrag(CharaStat.SKID_DRAG, CharaStat.SKID_DRAG_MIN,
+					CharaStat.SKID_REDIRECTION, -1, 0.5);
 		}
 	}
 }

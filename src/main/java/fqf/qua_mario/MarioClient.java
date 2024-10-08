@@ -6,6 +6,7 @@ import fqf.qua_mario.characters.MarioCharacter;
 import fqf.qua_mario.mariostates.states.Grounded;
 import fqf.qua_mario.powerups.PowerUp;
 import fqf.qua_mario.powerups.forms.SuperForm;
+import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.entity.MovementType;
 import net.minecraft.entity.player.PlayerEntity;
@@ -33,6 +34,10 @@ public class MarioClient {
 	public static boolean jumpCapped = false;
 	public static boolean changeState(MarioState newState) {
 		if(newState == null || marioState == newState) return false;
+
+		if(marioState.getSneakLegality() != newState.getSneakLegality())
+			ClientPlayNetworking.send(new MarioPackets.SetSneakingLegality(newState.getSneakLegality()));
+
 		stateTimer = 0;
 		marioState = newState;
 		return true;
@@ -79,7 +84,7 @@ public class MarioClient {
 		Input.update(player.input);
 
 		// Undo vanilla vertical swimming
-		if(player.isTouchingWater())
+		if(player.input.pressingLeft)
 			MarioClient.yVel += (player.input.sneaking ? 0.04 : 0.0) - (player.input.jumping ? 0.04 : 0.0);
 
 		// Calculate forward and sideways vector components
@@ -338,11 +343,42 @@ public class MarioClient {
 		);
 	}
 
-	public static void applyDrag(CharaStat dragStat) {
-		double dragAsFactor = (1 - dragStat.getValue());
-		if(dragAsFactor < 1) dragAsFactor *= getSlipFactor(); // If the drag is slowing you down, it's made less effective by slipperiness
-		else dragAsFactor /= getSlipFactor(); // If the drag is speeding you up, it's made more effective by slipperiness
-		assignForwardStrafeVelocities(forwardVel * dragAsFactor, rightwardVel * dragAsFactor);
+	public static void applyDrag(CharaStat dragStat, CharaStat dragMinStat, CharaStat redirectionStat, double forwardAngleContribution, double strafeAngleContribution) {
+		double dragStatValue = dragStat.getValue();
+		boolean dragInverted = dragStatValue < 0;
+		double dragAdjusted = dragStatValue * (dragInverted ? 1.0 : getSlipFactor());
+
+		Vector2d deltaVelocities = new Vector2d(
+				-dragAdjusted * forwardVel,
+				-dragAdjusted * rightwardVel
+		);
+
+		double minDrag = dragMinStat.getValue() * getSlipFactor();
+		double dragVelocity = deltaVelocities.lengthSquared();
+		if(dragVelocity != 0 && dragVelocity < minDrag * minDrag)
+			deltaVelocities.normalize(minDrag);
+
+		ModMarioQuaMario.LOGGER.info("applyDrag:"
+				+ "\ndragStat: " + dragStat
+				+ "\ndragStatValue: " + dragStatValue
+				+ "\ndragAdjusted: " + dragAdjusted
+				+ "\nminDrag: " + minDrag
+				+ "\ndeltaVelocities 2: " + deltaVelocities
+		);
+
+		approachAngleAndAccel(
+				deltaVelocities.x,
+				0,
+				forwardAngleContribution * forwardInput,
+				deltaVelocities.y,
+				0,
+				strafeAngleContribution * rightwardInput,
+				redirectionStat.getValue()
+		);
+	}
+
+	public static void applyDrag(CharaStat dragStat, CharaStat dragMinStat) {
+		applyDrag(dragStat, dragMinStat, CharaStat.ZERO, 0, 0);
 	}
 
 	public static double getSlipFactor() {

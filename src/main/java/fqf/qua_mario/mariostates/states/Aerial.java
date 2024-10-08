@@ -17,7 +17,7 @@ public class Aerial extends AirborneState {
 		this.stompType = StompBasic.INSTANCE;
 
 		preTickTransitions = new ArrayList<>(Arrays.asList(
-				AirborneTransitions.DOUBLE_JUMPABLE_LANDING,
+				AirborneTransitions.LANDING,
 				AirborneTransitions.GROUND_POUND
 		));
 	}

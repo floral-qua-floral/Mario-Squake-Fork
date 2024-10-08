@@ -1,6 +1,7 @@
 package fqf.qua_mario.mixin;
 
 import fqf.qua_mario.ModMarioQuaMario;
+import fqf.qua_mario.mariostates.states.DuckSlide;
 import fqf.qua_mario.powerups.PowerUp;
 import net.minecraft.entity.EntityDimensions;
 import net.minecraft.entity.EntityPose;
@@ -30,20 +31,16 @@ public abstract class PlayerEntityMixin extends LivingEntity {
 			ci.cancel();
 	}
 
-	@Inject(at = @At("TAIL"), method = "jump()V")
-	private void afterJump(CallbackInfo info) {
-		PlayerEntity player = (PlayerEntity) (Object) this;
-		if(ModMarioQuaMario.useMarioPhysics(player, false) && player.isSprinting()) {
-			float bunnyhopSpeedBonus = (float) Math.toRadians(player.getYaw());
-			Vec3d deltaVelocity = new Vec3d(MathHelper.sin(bunnyhopSpeedBonus) * 0.2F, 0, -(MathHelper.cos(bunnyhopSpeedBonus) * 0.2F));
-			player.setVelocity(player.getVelocity().add(deltaVelocity));
-		}
-	}
-
 	@Inject(at = @At("TAIL"), method = "getBaseDimensions(Lnet/minecraft/entity/EntityPose;)Lnet/minecraft/entity/EntityDimensions;", cancellable = true)
 	private void getBaseDimensions(EntityPose pose, CallbackInfoReturnable<EntityDimensions> cir) {
 		PlayerEntity player = (PlayerEntity) (Object) this;
 		if(ModMarioQuaMario.getIsMario(player)) {
+			// Returns the standing hitbox if being used by Mario on the client side while he can't sneak
+			if(ModMarioQuaMario.getSneakProhibited(player) && pose == EntityPose.CROUCHING) {
+				cir.setReturnValue(player.getBaseDimensions(EntityPose.STANDING));
+				return;
+			}
+
 			EntityDimensions resultDimensions = cir.getReturnValue();
 
 			final PowerUp POWER_UP = ModMarioQuaMario.getPowerUp(player);
@@ -59,4 +56,32 @@ public abstract class PlayerEntityMixin extends LivingEntity {
 			cir.setReturnValue(modifiedDimensions);
 		}
 	}
+
+	@Inject(at = @At("HEAD"), method = "clipAtLedge()Z", cancellable = true)
+	private void clipAtLedge(CallbackInfoReturnable<Boolean> cir) {
+		if(ModMarioQuaMario.useMarioPhysics((PlayerEntity) (Object) this, true) && MarioClient.getState().equals(DuckSlide.INSTANCE)) {
+			cir.setReturnValue(false);
+		}
+	}
+
+	@Inject(at = @At("HEAD"), method = "shouldSwimInFluids", cancellable = true)
+	private void shouldSwimInFluids(CallbackInfoReturnable<Boolean> cir) {
+//		if(ModMarioQuaMario.useMarioPhysics((PlayerEntity) (Object) this, true)) {
+//			cir.setReturnValue(false);
+//		}
+		if(((PlayerEntity) (Object) this).isTouchingWater())
+			cir.setReturnValue(false);
+	}
+
+//	@Inject(at = @At("HEAD"), method = "getPoses")
+
+//	@Inject(at = @At("TAIL"), method = "jump()V")
+//	private void afterJump(CallbackInfo info) {
+//		PlayerEntity player = (PlayerEntity) (Object) this;
+//		if(ModMarioQuaMario.useMarioPhysics(player, false) && player.isSprinting()) {
+//			float bunnyhopSpeedBonus = (float) Math.toRadians(player.getYaw());
+//			Vec3d deltaVelocity = new Vec3d(MathHelper.sin(bunnyhopSpeedBonus) * 0.2F, 0, -(MathHelper.cos(bunnyhopSpeedBonus) * 0.2F));
+//			player.setVelocity(player.getVelocity().add(deltaVelocity));
+//		}
+//	}
 }

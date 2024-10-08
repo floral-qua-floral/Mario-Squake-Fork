@@ -32,19 +32,4 @@ public abstract class LivingEntityRendererMixin<T extends LivingEntity, M extend
 			ci.cancel();
 		}
 	}
-
-//	@Inject(at = @At("TAIL"), method = "setupTransforms")
-//	private void setupTransforms(T entity, MatrixStack matrices, float animationProgress, float bodyYaw, float tickDelta, float scale, CallbackInfo ci) {
-//		if (entity.deathTime > 0 && ModMarioQuaMarioClient.SQUASHED_ENTITIES.containsKey(entity)) {
-//			float f = ((float)entity.deathTime + tickDelta - 1.0F) / 20.0F * 1.6F;
-//			f = MathHelper.sqrt(f);
-//			if (f > 1.0F) {
-//				f = 1.0F;
-//			}
-//
-//
-//			matrices.multiply(RotationAxis.POSITIVE_Z.rotationDegrees(-1 * f * this.getLyingAngle(entity)));
-//			matrices.scale(1.25F, 0.25F, 1.25F);
-//		}
-//	}
 }
