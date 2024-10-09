@@ -5,6 +5,48 @@
       "qua_mario:sfx/jump"
     ]
   },
+  "sfx.stomp": {
+    "subtitle": "subtitles.qua_mario.stomp",
+    "sounds": [
+      "qua_mario:sfx/stomp"
+    ]
+  },
+  "sfx.stomp_spike": {
+    "subtitle": "subtitles.qua_mario.stomp_spike",
+    "sounds": [
+      "qua_mario:sfx/stomp_spike"
+    ]
+  },
+  "sfx.stomp_spin": {
+    "subtitle": "subtitles.qua_mario.stomp_spin",
+    "sounds": [
+      "qua_mario:sfx/stomp_spin"
+    ]
+  },
+  "sfx.stomp_yoshi": {
+    "subtitle": "subtitles.qua_mario.stomp_yoshi",
+    "sounds": [
+      "qua_mario:sfx/stomp_yoshi"
+    ]
+  },
+  "sfx.ground_pound_flip": {
+    "subtitle": "subtitles.qua_mario.ground_pound_flip",
+    "sounds": [
+      "qua_mario:sfx/ground_pound_flip"
+    ]
+  },
+  "sfx.ground_pound_land": {
+    "subtitle": "subtitles.qua_mario.ground_pound_land",
+    "sounds": [
+      "qua_mario:sfx/ground_pound_land"
+    ]
+  },
+  "sfx.flip": {
+    "subtitle": "subtitles.qua_mario.flip",
+    "sounds": [
+      "qua_mario:sfx/flip"
+    ]
+  },
 
   "voice.luigi.backflip": {
     "subtitle": "subtitles.qua_mario.voice_luigi_backflip",
@@ -259,7 +301,7 @@
     "sounds": [
       {
         "type": "event",
-        "name": "voice.mario.sideflip"
+        "name": "voice.toadette.sideflip"
       }
     ]
   },

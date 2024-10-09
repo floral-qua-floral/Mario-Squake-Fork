@@ -91,8 +91,6 @@ public enum VoiceLine {
 	public static void parseBroadcastVoiceLinePayload(BroadcastVoiceLinePayload payload, ServerPlayNetworking.Context context) {
 		ModMarioQuaMario.LOGGER.info("parseBroadcastVoiceLinePayload() Seed: {}", payload.randomSeed);
 
-		ModMarioQuaMario.setIsMario(context.player(), true);
-
 		Collection<ServerPlayerEntity> sendToPlayers = PlayerLookup.tracking(context.player());
 		for(ServerPlayerEntity player : sendToPlayers) {
 			if(player.equals(context.player())) continue;

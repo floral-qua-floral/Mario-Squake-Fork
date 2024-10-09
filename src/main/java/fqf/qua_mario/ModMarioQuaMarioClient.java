@@ -1,6 +1,7 @@
 package fqf.qua_mario;
 
 import fqf.qua_mario.characters.characters.CharaMario;
+import fqf.qua_mario.mariostates.states.Grounded;
 import fqf.qua_mario.powerups.forms.SuperForm;
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientEntityEvents;
@@ -13,6 +14,7 @@ import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.option.KeyBinding;
 import net.minecraft.client.util.InputUtil;
 import net.minecraft.entity.Entity;
+import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.util.math.Vec3d;
 import org.apache.commons.compress.utils.Lists;
@@ -29,13 +31,17 @@ public class ModMarioQuaMarioClient implements ClientModInitializer {
 	@Override
 	public void onInitializeClient() {
 		KeyBindingHelper.registerKeyBinding(spinBinding);
+		MarioClient.changeState(Grounded.INSTANCE);
 
 		ClientEntityEvents.ENTITY_UNLOAD.register((entity, world) -> {
 			ModMarioQuaMario.LOGGER.info("Unloaded entity!");
 			SQUASHED_ENTITIES.remove(entity);
 		});
 
-
+		ClientTickEvents.END_WORLD_TICK.register((world) -> {
+			SQUASHED_ENTITIES.removeIf(squashedEntity ->
+					squashedEntity instanceof LivingEntity squashedLivingEntity && !squashedLivingEntity.isDead());
+		});
 
 
 

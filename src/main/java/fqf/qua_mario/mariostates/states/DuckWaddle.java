@@ -2,7 +2,6 @@ package fqf.qua_mario.mariostates.states;
 
 import fqf.qua_mario.Input;
 import fqf.qua_mario.MarioClient;
-import fqf.qua_mario.ModMarioQuaMario;
 import fqf.qua_mario.VoiceLine;
 import fqf.qua_mario.characters.CharaStat;
 import fqf.qua_mario.mariostates.MarioState;
@@ -13,14 +12,14 @@ import java.util.List;
 public class DuckWaddle extends MarioState {
 	public static final DuckWaddle INSTANCE = new DuckWaddle();
 
-	public static final MarioStateTransition BACKFLIP = () -> {
-		if(MarioClient.forwardVel <= 0 && MarioClient.forwardInput < 0 && Input.JUMP.isPressed()) {
-			CommonTransitions.performJump(CharaStat.SIDEFLIP_VELOCITY, null);
-			VoiceLine.BACKFLIP.broadcast();
-//						return DuckJump.INSTANCE;
-		}
-		return null;
-	};
+//	public static final MarioStateTransition BACKFLIP = () -> {
+//		if(MarioClient.forwardVel <= 0 && MarioClient.forwardInput < 0 && Input.JUMP.isPressed()) {
+//			CommonTransitions.performJump(CharaStat.SIDEFLIP_VELOCITY, null);
+//			VoiceLine.BACKFLIP.broadcast();
+////						return DuckJump.INSTANCE;
+//		}
+//		return null;
+//	};
 
 	private DuckWaddle() {
 		this.name = "Duck Waddle";
@@ -37,7 +36,7 @@ public class DuckWaddle extends MarioState {
 		));
 
 		postTickTransitions = new ArrayList<>(List.of(
-				BACKFLIP,
+//				BACKFLIP,
 				() -> {
 					if(Input.JUMP.isPressed()) {
 						CommonTransitions.performJump(CharaStat.DUCK_JUMP_VELOCITY, null);
@@ -61,6 +60,6 @@ public class DuckWaddle extends MarioState {
 				CharaStat.WADDLE_REDIRECTION
 		);
 
-		MarioClient.yVel += -0.1;
+		MarioClient.yVel -= 0.1;
 	}
 }

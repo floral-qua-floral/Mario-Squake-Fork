@@ -25,6 +25,8 @@ public abstract class ClientPlayerEntityMixin {
 		if(ModMarioQuaMario.getSneakProhibited((PlayerEntity) (Object) this)) cir.setReturnValue(false);
 	}
 
+//	@Inject(at = @At("HEAD"), method = "jump")
+
 //	@WrapOperation(at = @At(value = "INVOKE", target = "Lnet/minecraft/client/network/ClientPlayerEntity;shouldSwimInFluids()Z"), method = "tickMovement")
 //	private boolean boogle(ClientPlayerEntity instance, Operation<Boolean> original) {
 //

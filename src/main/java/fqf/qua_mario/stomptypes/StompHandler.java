@@ -1,6 +1,7 @@
 package fqf.qua_mario.stomptypes;
 
 import com.google.common.collect.Lists;
+import fqf.qua_mario.MarioClient;
 import fqf.qua_mario.MarioRegistries;
 import fqf.qua_mario.ModMarioQuaMario;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
@@ -29,8 +30,6 @@ public class StompHandler {
 	public static final TagKey<EntityType<?>> HURTS_TO_STOMP_TAG = TagKey.of(RegistryKeys.ENTITY_TYPE, Identifier.of(ModMarioQuaMario.MOD_ID, "hurts_to_stomp"));
 	public static final TagKey<EntityType<?>> IMMUNE_TO_BASIC_STOMP_TAG = TagKey.of(RegistryKeys.ENTITY_TYPE, Identifier.of(ModMarioQuaMario.MOD_ID, "immune_to_basic_stomp"));
 
-	public static final RegistryKey<DamageType> STOMP_DAMAGE_TYPE = RegistryKey.of(RegistryKeys.DAMAGE_TYPE, Identifier.of(ModMarioQuaMario.MOD_ID, "stomp"));
-
 	public static List<Entity> forbiddenStompTargets = Lists.newArrayList();
 
 	public static void parseRequestStompPacket(RequestStompPayload payload, ServerPlayNetworking.Context context) {
@@ -51,6 +50,7 @@ public class StompHandler {
 
 		if(stompType.cannotStompOverall(target)) return;
 
+		stompType.executeStompCommon(world, context.player(), target, harmless);
 		stompType.executeStompServer(world, context.player(), target, harmless);
 		stompType.sendAffirmPacket(context.player(), target, harmless);
 	}
@@ -59,6 +59,7 @@ public class StompHandler {
 		Entity target = context.player().getWorld().getEntityById(payload.target); // = context.player().getServerWorld().getEntity(payload.target);
 		StompType stompType = MarioRegistries.STOMP_TYPES.getOrThrow(payload.stompType);
 
+		stompType.executeStompCommon(context.player().clientWorld, MarioClient.player, target, payload.harmless);
 		stompType.executeStompClient(target, payload.harmless);
 		forbiddenStompTargets.clear();
 	}

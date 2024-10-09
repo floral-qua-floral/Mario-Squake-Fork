@@ -28,6 +28,7 @@ public class Underwater extends MarioState {
 
 	@Override
 	public void tick() {
+
 //		MarioClient.aerialAccel(MarioClient.forwardInput * 0.04, MarioClient.rightwardInput * 0.04, 0.25, -0.25, 0.195);
 //		applyGravity(-0.045, -0.4);
 //		MarioClient.player.setVelocity(MarioClient.player.getVelocity().multiply(0.85));

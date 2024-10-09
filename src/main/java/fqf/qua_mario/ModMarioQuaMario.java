@@ -142,7 +142,7 @@ public class ModMarioQuaMario implements ModInitializer {
 
 	public static String setCharacter(PlayerEntity player, MarioCharacter character) {
 		if(!player.getWorld().isClient)
-			sendMarioUpdatePacket(player, new MarioPackets.SetCharacterPayload(player.getId(), MarioRegistries.CHARACTERS.getRawId(character)));
+			sendMarioUpdatePacket(player, new MarioPackets.SetCharacterPayload(player.getId(), MarioRegistries.CHARACTERS.getRawIdOrThrow(character)));
 		else if(playerIsMarioClient(player))
 			MarioClient.character = character;
 
@@ -159,7 +159,7 @@ public class ModMarioQuaMario implements ModInitializer {
 
 	public static String setPowerUp(PlayerEntity player, PowerUp powerUp) {
 		if(!player.getWorld().isClient) {
-			sendMarioUpdatePacket(player, new MarioPackets.SetPowerUpPayload(player.getId(), MarioRegistries.POWER_UPS.getRawId(powerUp)));
+			sendMarioUpdatePacket(player, new MarioPackets.SetPowerUpPayload(player.getId(), MarioRegistries.POWER_UPS.getRawIdOrThrow(powerUp)));
 		}
 		else if(playerIsMarioClient(player))
 			MarioClient.powerUp = powerUp;
@@ -181,8 +181,8 @@ public class ModMarioQuaMario implements ModInitializer {
 				sendMarioUpdatePacket(player, new MarioPackets.FullSyncPayload(
 						player.getId(),
 						isMario,
-						MarioRegistries.CHARACTERS.getRawId(character),
-						MarioRegistries.POWER_UPS.getRawId(powerUp)
+						MarioRegistries.CHARACTERS.getRawIdOrThrow(character),
+						MarioRegistries.POWER_UPS.getRawIdOrThrow(powerUp)
 				));
 		}
 		else {

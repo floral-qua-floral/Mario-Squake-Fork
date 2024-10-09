@@ -23,8 +23,6 @@ public abstract class LivingEntityRendererMixin<T extends LivingEntity, M extend
 //		cir.setReturnValue(15.0F);
 //	}
 
-	@Shadow protected abstract float getLyingAngle(T entity);
-
 	@Inject(at = @At(value = "INVOKE", target = "Lnet/minecraft/client/render/entity/LivingEntityRenderer;getLyingAngle(Lnet/minecraft/entity/LivingEntity;)F"), method = "setupTransforms", cancellable = true)
 	private void squashedDeathAnimation(T entity, MatrixStack matrices, float animationProgress, float bodyYaw, float tickDelta, float scale, CallbackInfo ci) {
 		if(ModMarioQuaMarioClient.SQUASHED_ENTITIES.contains(entity)) {

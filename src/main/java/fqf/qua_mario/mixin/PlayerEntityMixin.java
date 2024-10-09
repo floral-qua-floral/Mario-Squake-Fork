@@ -1,5 +1,7 @@
 package fqf.qua_mario.mixin;
 
+import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
+import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
 import fqf.qua_mario.ModMarioQuaMario;
 import fqf.qua_mario.mariostates.states.DuckSlide;
 import fqf.qua_mario.powerups.PowerUp;
@@ -8,7 +10,6 @@ import net.minecraft.entity.EntityPose;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
 
@@ -66,11 +67,15 @@ public abstract class PlayerEntityMixin extends LivingEntity {
 
 	@Inject(at = @At("HEAD"), method = "shouldSwimInFluids", cancellable = true)
 	private void shouldSwimInFluids(CallbackInfoReturnable<Boolean> cir) {
-//		if(ModMarioQuaMario.useMarioPhysics((PlayerEntity) (Object) this, true)) {
-//			cir.setReturnValue(false);
-//		}
-		if(((PlayerEntity) (Object) this).isTouchingWater())
+		PlayerEntity player = (PlayerEntity) (Object) this;
+		if(ModMarioQuaMario.useMarioPhysics(player, false) && player.isTouchingWater())
 			cir.setReturnValue(false);
+	}
+
+	@WrapOperation(method = "jump", at = @At(value = "INVOKE", target = "Lnet/minecraft/entity/LivingEntity;jump()V"))
+	public void jump(PlayerEntity instance, Operation<Void> original) {
+		if(ModMarioQuaMario.useMarioPhysics(instance, false)) return;
+		original.call(instance);
 	}
 
 //	@Inject(at = @At("HEAD"), method = "getPoses")

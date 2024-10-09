@@ -1,11 +1,9 @@
 package fqf.qua_mario.mariostates;
 
 import fqf.qua_mario.*;
+import fqf.qua_mario.cameraanims.animations.CameraTripleJump;
 import fqf.qua_mario.characters.CharaStat;
-import fqf.qua_mario.mariostates.states.Aerial;
-import fqf.qua_mario.mariostates.states.DoubleJump;
-import fqf.qua_mario.mariostates.states.Jump;
-import fqf.qua_mario.mariostates.states.Underwater;
+import fqf.qua_mario.mariostates.states.*;
 import net.minecraft.entity.MovementType;
 import net.minecraft.registry.tag.FluidTags;
 import org.jetbrains.annotations.NotNull;
@@ -72,7 +70,7 @@ public abstract class MarioState {
 
 
 
-	protected record CommonTransitions() {
+	public record CommonTransitions() {
 		public static final MarioStateTransition FALL = () -> {
 			if(!MarioClient.player.isOnGround()) {
 				MarioClient.yVel = Math.max(0.0, MarioClient.yVel);
@@ -82,46 +80,54 @@ public abstract class MarioState {
 		};
 
 		public static void performJump(@NotNull CharaStat velocityStat, @Nullable CharaStat addendStat) {
+			performJump(velocityStat, addendStat, true);
+		}
+
+		public static void performJump(@NotNull CharaStat velocityStat, @Nullable CharaStat addendStat, boolean soundEffect) {
 			MarioClient.jumpCapped = false;
-			SoundFader.broadcastAndPlayJumpSound();
+			if(soundEffect) SoundFader.broadcastAndPlayJumpSound();
 
 			MarioClient.yVel = velocityStat.getValue();
 			if(addendStat != null) {
-				double momentum = Math.max(0, MarioClient.forwardVel / CharaStat.RUN_SPEED.getValue());
+				double momentum = Math.max(0, MarioClient.forwardVel / CharaStat.P_SPEED.getValue());
 				MarioClient.yVel += momentum * CharaStat.JUMP_VELOCITY_ADDEND.getValue();
+			}
+		}
+
+		public static MarioState getJumpState() {
+			if(MarioClient.doubleJumpLandingTime > 0 && MarioClient.forwardVel > CharaStat.ADVANCED_JUMP_THRESHOLD.getValue()) { // Triple Jump
+				performJump(CharaStat.TRIPLE_JUMP_VELOCITY, null);
+				MarioClient.setCameraAnim(CameraTripleJump.INSTANCE);
+				VoiceLine.TRIPLE_JUMP.broadcast();
+
+				MarioClient.assignForwardStrafeVelocities(CharaStat.P_SPEED.getValue(), 0);
+
+				return TripleJump.INSTANCE;
+			}
+			else if(MarioClient.jumpLandingTime > 0 && MarioClient.forwardVel > CharaStat.ADVANCED_JUMP_THRESHOLD.getValue()) { // Double Jump
+				performJump(CharaStat.DOUBLE_JUMP_VELOCITY, CharaStat.DOUBLE_JUMP_VELOCITY_ADDEND);
+				VoiceLine.DOUBLE_JUMP.broadcast();
+				MarioClient.applyDrag(CharaStat.JUMP_SPEED_LOSS, CharaStat.ZERO);
+
+				return DoubleJump.INSTANCE;
+			}
+			else { // Normal jump
+				performJump(CharaStat.JUMP_VELOCITY, CharaStat.JUMP_VELOCITY_ADDEND);
+				MarioClient.applyDrag(CharaStat.JUMP_SPEED_LOSS, CharaStat.ZERO);
+
+				return Jump.INSTANCE;
 			}
 		}
 
 		public static final MarioStateTransition JUMP = () -> {
 			if(Input.JUMP.isPressed()) {
-				if(MarioClient.doubleJumpLandingTime > 0 && MarioClient.forwardVel > CharaStat.TRIPLE_JUMP_THRESHOLD.getValue()) { // Triple Jump
-					VoiceLine.TRIPLE_JUMP.broadcast();
-				}
-				else if(MarioClient.jumpLandingTime > 0) { // Double Jump
-					performJump(CharaStat.DOUBLE_JUMP_VELOCITY, CharaStat.DOUBLE_JUMP_VELOCITY_ADDEND);
-					VoiceLine.DOUBLE_JUMP.broadcast();
-
-					// Reduce horizontal velocities
-					MarioClient.assignForwardStrafeVelocities(MarioClient.forwardVel * 0.85, MarioClient.rightwardVel * 0.85);
-
-					return DoubleJump.INSTANCE;
-
-
-				}
-				else { // Normal jump
-					performJump(CharaStat.JUMP_VELOCITY, CharaStat.JUMP_VELOCITY_ADDEND);
-
-					// Reduce horizontal velocities
-					MarioClient.assignForwardStrafeVelocities(MarioClient.forwardVel * 0.85, MarioClient.rightwardVel * 0.85);
-
-					return Jump.INSTANCE;
-				}
+				return getJumpState();
 			}
 			return null;
 		};
 
 		public static final MarioStateTransition ENTER_WATER = () -> {
-			if(MarioClient.player.getFluidHeight(FluidTags.WATER) > 30.5) {
+			if(MarioClient.player.getFluidHeight(FluidTags.WATER) > 0.5) {
 				return Underwater.INSTANCE;
 			}
 			return null;
@@ -130,6 +136,9 @@ public abstract class MarioState {
 		public static final MarioStateTransition LAVA_BOOST = () -> {
 			if(MarioClient.player.isInLava()) {
 				MarioClient.player.move(MovementType.SELF, MarioClient.player.getVelocity().multiply(-1));
+				MarioClient.yVel = CharaStat.LAVA_BOOST_VEL.getValue();
+				VoiceLine.BURNT.broadcast();
+				return LavaBoost.INSTANCE;
 			}
 			return null;
 		};

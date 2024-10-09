@@ -366,15 +366,28 @@ public class MarioClient {
 				+ "\ndeltaVelocities 2: " + deltaVelocities
 		);
 
-		approachAngleAndAccel(
-				deltaVelocities.x,
-				0,
-				forwardAngleContribution * forwardInput,
-				deltaVelocities.y,
-				0,
-				strafeAngleContribution * rightwardInput,
-				redirectionStat.getValue()
-		);
+		if(dragInverted) {
+			assignForwardStrafeVelocities(forwardVel + deltaVelocities.x, rightwardVel + deltaVelocities.y);
+			approachAngleAndAccel(
+					0,
+					0,
+					forwardAngleContribution * forwardInput,
+					0,
+					0,
+					strafeAngleContribution * rightwardInput,
+					redirectionStat.getValue()
+			);
+		}
+		else
+			approachAngleAndAccel(
+					deltaVelocities.x,
+					0,
+					forwardAngleContribution * forwardInput,
+					deltaVelocities.y,
+					0,
+					strafeAngleContribution * rightwardInput,
+					redirectionStat.getValue()
+			);
 	}
 
 	public static void applyDrag(CharaStat dragStat, CharaStat dragMinStat) {

@@ -1,5 +1,6 @@
 package fqf.qua_mario.mariostates.states;
 
+import fqf.qua_mario.Input;
 import fqf.qua_mario.MarioClient;
 import fqf.qua_mario.mariostates.MarioState;
 
@@ -21,6 +22,8 @@ public class Debug extends MarioState {
 				0.01, MarioClient.rightwardInput * 0.5, MarioClient.rightwardInput,
 				-1
 		);
+
+		if(Input.SPIN.isPressed()) MarioClient.changeState(Grounded.INSTANCE);
 
 //		MarioClient.accelInfluence(
 //				0.01, MarioClient.forwardInput * 0.55,

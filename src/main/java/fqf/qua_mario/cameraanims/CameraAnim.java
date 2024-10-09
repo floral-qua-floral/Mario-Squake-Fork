@@ -16,7 +16,5 @@ public abstract class CameraAnim {
 	protected double cappedLerp(double delta, double start, double end) {
 		return MathHelper.clampedLerp(start, end, delta);
 	}
-
-//	public static void tick;
 }
 

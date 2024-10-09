@@ -41,7 +41,7 @@ public class DuckSlide extends MarioState {
 		));
 
 		postTickTransitions = new ArrayList<>(List.of(
-				DuckWaddle.BACKFLIP,
+//				DuckWaddle.BACKFLIP,
 				() -> {
 					if(Input.JUMP.isPressed()) {
 						CommonTransitions.performJump(CharaStat.DUCK_JUMP_VELOCITY, null);

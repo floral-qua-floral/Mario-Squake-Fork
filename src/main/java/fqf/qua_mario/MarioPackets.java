@@ -39,8 +39,8 @@ public class MarioPackets {
 			ServerPlayNetworking.send(handler.player, new FullSyncPayload(
 					handler.player.getId(),
 					marioInfo.isMario,
-					MarioRegistries.CHARACTERS.getRawId(marioInfo.character),
-					MarioRegistries.POWER_UPS.getRawId(marioInfo.powerUp)
+					MarioRegistries.CHARACTERS.getRawIdOrThrow(marioInfo.character),
+					MarioRegistries.POWER_UPS.getRawIdOrThrow(marioInfo.powerUp)
 			));
 			ServerPlayNetworking.send(handler.player,
 					new SetUseCharacterStatsPayload(handler.player.getWorld().getGameRules().getBoolean(MarioRegistries.USE_CHARACTER_STATS)));
@@ -52,8 +52,8 @@ public class MarioPackets {
 				ServerPlayNetworking.send(player, new FullSyncPayload(
 						trackedPlayer.getId(),
 						marioInfo.isMario,
-						MarioRegistries.CHARACTERS.getRawId(marioInfo.character),
-						MarioRegistries.POWER_UPS.getRawId(marioInfo.powerUp)
+						MarioRegistries.CHARACTERS.getRawIdOrThrow(marioInfo.character),
+						MarioRegistries.POWER_UPS.getRawIdOrThrow(marioInfo.powerUp)
 				));
 			}
 		});

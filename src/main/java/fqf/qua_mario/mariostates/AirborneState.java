@@ -7,6 +7,7 @@ import fqf.qua_mario.SoundFader;
 import fqf.qua_mario.characters.CharaStat;
 import fqf.qua_mario.mariostates.states.Grounded;
 import fqf.qua_mario.mariostates.states.Jump;
+import fqf.qua_mario.stomptypes.StompHandler;
 import fqf.qua_mario.stomptypes.StompType;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -31,7 +32,7 @@ public abstract class AirborneState extends MarioState {
 		airTick();
 		applyGravity();
 
-		if(stompType != null) {
+		if(stompType != null && MarioClient.yVel < 0) {
 			stompType.attemptStomp();
 		}
 	}
@@ -69,9 +70,7 @@ public abstract class AirborneState extends MarioState {
 	protected record AirborneTransitions() {
 		public static final MarioStateTransition LANDING = () -> {
 			if(MarioClient.player.isOnGround()) {
-				if(MarioClient.getState() == Jump.INSTANCE) {
-					MarioClient.jumpLandingTime = 4;
-				}
+				StompHandler.forbiddenStompTargets.clear();
 				return Grounded.INSTANCE;
 			}
 			return null;
