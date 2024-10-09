@@ -6,14 +6,9 @@ import fqf.qua_mario.ModMarioQuaMario;
 import fqf.qua_mario.SoundFader;
 import fqf.qua_mario.characters.CharaStat;
 import fqf.qua_mario.mariostates.states.Grounded;
-import fqf.qua_mario.mariostates.states.Jump;
 import fqf.qua_mario.stomptypes.StompHandler;
 import fqf.qua_mario.stomptypes.StompType;
-import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-
-import java.util.ArrayList;
-import java.util.Arrays;
 
 public abstract class AirborneState extends MarioState {
 	protected boolean isJump;

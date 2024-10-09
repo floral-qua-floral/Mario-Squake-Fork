@@ -9,6 +9,7 @@ import fqf.qua_mario.cameraanims.animations.CameraSideflipGentle;
 import fqf.qua_mario.cameraanims.animations.CameraSideflipNoFunAllowed;
 import fqf.qua_mario.characters.CharaStat;
 import fqf.qua_mario.mariostates.MarioState;
+import fqf.qua_mario.mariostates.states.airborne.Sideflip;
 import net.minecraft.util.math.MathHelper;
 
 import java.util.ArrayList;

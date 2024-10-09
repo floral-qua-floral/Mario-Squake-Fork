@@ -5,6 +5,7 @@ import fqf.qua_mario.MarioClient;
 import fqf.qua_mario.VoiceLine;
 import fqf.qua_mario.characters.CharaStat;
 import fqf.qua_mario.mariostates.MarioState;
+import fqf.qua_mario.mariostates.states.airborne.DuckJump;
 
 import java.util.ArrayList;
 import java.util.List;

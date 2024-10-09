@@ -1,8 +1,7 @@
-package fqf.qua_mario.mariostates.states;
+package fqf.qua_mario.mariostates.states.airborne;
 
 import fqf.qua_mario.MarioClient;
 import fqf.qua_mario.mariostates.AirborneState;
-import fqf.qua_mario.stomptypes.stomptypes.StompBasic;
 
 import java.util.ArrayList;
 import java.util.Arrays;

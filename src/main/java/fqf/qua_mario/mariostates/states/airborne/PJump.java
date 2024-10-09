@@ -1,4 +1,4 @@
-package fqf.qua_mario.mariostates.states;
+package fqf.qua_mario.mariostates.states.airborne;
 
 import fqf.qua_mario.MarioClient;
 import fqf.qua_mario.characters.CharaStat;
@@ -8,11 +8,11 @@ import fqf.qua_mario.stomptypes.stomptypes.StompBasic;
 import java.util.ArrayList;
 import java.util.Arrays;
 
-public class Jump extends AirborneState {
-	public static final Jump INSTANCE = new Jump();
+public class PJump extends AirborneState {
+	public static final PJump INSTANCE = new PJump();
 
-	private Jump() {
-		this.name = "Jump";
+	private PJump() {
+		this.name = "P-Speed Jump";
 		this.isJump = true;
 		this.jumpCapStat = CharaStat.JUMP_CAP;
 		this.stompType = StompBasic.INSTANCE;
