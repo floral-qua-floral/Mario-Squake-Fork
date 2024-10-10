@@ -4,18 +4,23 @@ import fqf.qua_mario.ModMarioQuaMario;
 import fqf.qua_mario.characters.CharaStat;
 import fqf.qua_mario.mariostates.MarioState;
 import fqf.qua_mario.powerups.PowerUp;
+import fqf.qua_mario.powerups.StatChangingPowerUp;
 import net.minecraft.util.Identifier;
 
 import java.util.EnumMap;
 
-public class SmallForm extends PowerUp {
-	public static final SmallForm INSTANCE = new SmallForm();
-	private SmallForm() {
-		this.ID = Identifier.of(ModMarioQuaMario.MOD_ID, "small_form");
+public class MiniForm extends StatChangingPowerUp {
+	public static final MiniForm INSTANCE = new MiniForm();
+	private MiniForm() {
+		this.ID = Identifier.of(ModMarioQuaMario.MOD_ID, "mini_form");
 		this.prefix = "";
-		this.widthFactor = 1.0F;
-		this.heightFactor = 0.5F;
-		this.voicePitch = 1.075F;
+		this.widthFactor = 0.25F;
+		this.heightFactor = 0.125F;
+		this.voicePitch = 1.5F;
+
+		this.statFactors = new EnumMap<>(CharaStat.class);
+		this.statFactors.put(CharaStat.ALL_JUMP_VELOCITIES, 0.75);
+		this.statFactors.put(CharaStat.ALL_GRAVITIES, 0.375);
 	}
 
 	@Override

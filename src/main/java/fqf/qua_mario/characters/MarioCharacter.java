@@ -16,13 +16,6 @@ public abstract class MarioCharacter {
 	private final Map<PowerUp, String> MODELS = new HashMap<>();
 	protected EnumMap<CharaStat, Double> statFactors;
 
-	@Nullable
-	public abstract String getSoundPrefix();
-
-	public double getStatValue(CharaStat stat) {
-		return stat.getDefaultValue() * statFactors.getOrDefault(stat, 1.0);
-	}
-
 	public double getStatFactor(CharaStat stat) {
 		return this.statFactors.getOrDefault(stat, 1.0);
 	}

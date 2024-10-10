@@ -4,7 +4,9 @@ import fqf.qua_mario.MarioClient;
 import fqf.qua_mario.MarioRegistries;
 import fqf.qua_mario.ModMarioQuaMario;
 import fqf.qua_mario.characters.CharaStat;
+import fqf.qua_mario.mariostates.GroundedState;
 import fqf.qua_mario.mariostates.MarioState;
+import fqf.qua_mario.mariostates.states.airborne.Stomp;
 import fqf.qua_mario.stomptypes.StompHandler;
 import fqf.qua_mario.stomptypes.StompType;
 import net.minecraft.entity.Entity;
@@ -50,12 +52,7 @@ public class StompBasic extends StompType {
 	@Override
 	public void executeStompClient(Entity target, boolean harmless) {
 		ModMarioQuaMario.LOGGER.info("Executing basic stomp on the client side, against " + target);
-		MarioState jumpState = MarioState.CommonTransitions.getJumpState();
-		if(jumpState != null) {
-//			if(jumpState == Jump.INSTANCE) jumpState = Stomp.INSTANCE;
-
-			MarioClient.changeState(jumpState);
-		}
+		MarioClient.changeState(Stomp.INSTANCE);
 
 	}
 

@@ -10,8 +10,6 @@ public class SuperForm extends PowerUp {
 	private SuperForm() {
 		this.ID = Identifier.of(ModMarioQuaMario.MOD_ID, "super_form");
 		this.prefix = "Super ";
-		this.widthFactor = 1.0F;
-		this.heightFactor = 1.0F;
 	}
 
 	@Override

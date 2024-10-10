@@ -14,12 +14,10 @@ public class Luigi extends MarioCharacter {
 		this.name = "Luigi";
 
 		this.statFactors = new EnumMap<>(CharaStat.class);
-		this.statFactors.put(CharaStat.WALK_SPEED, 2.0);
-		this.statFactors.put(CharaStat.JUMP_VELOCITY, 1.25);
-	}
-
-	@Override
-	public String getSoundPrefix() {
-		return "luigi_";
+		this.statFactors.put(CharaStat.ALL_FRICTIONS, 0.7);
+		this.statFactors.put(CharaStat.WALK_SPEED, 1.4);
+		this.statFactors.put(CharaStat.RUN_SPEED, 1.2);
+		this.statFactors.put(CharaStat.P_SPEED, 1.22);
+		this.statFactors.put(CharaStat.ALL_JUMP_VELOCITIES, 1.15);
 	}
 }

@@ -24,7 +24,12 @@ public class PJump extends AirborneState {
 	}
 
 	@Override
-	protected void airTick() {
-		MarioClient.aerialAccel(MarioClient.forwardInput * 0.04, MarioClient.rightwardInput * 0.04, 0.25, -0.25, 0.195);
+	public void airTick() {
+		aerialDrift(
+				CharaStat.DRIFT_FORWARD_ACCEL, CharaStat.DRIFT_FORWARD_SPEED,
+				CharaStat.DRIFT_BACKWARD_ACCEL, CharaStat.DRIFT_BACKWARD_SPEED,
+				CharaStat.DRIFT_SIDE_ACCEL, CharaStat.DRIFT_SIDE_SPEED,
+				CharaStat.P_SPEED_REDIRECTION
+		);
 	}
 }

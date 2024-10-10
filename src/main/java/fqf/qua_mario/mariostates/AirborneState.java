@@ -15,7 +15,9 @@ public abstract class AirborneState extends MarioState {
 	@Nullable protected CharaStat jumpCapStat;
 	@Nullable protected StompType stompType;
 
-	protected abstract void airTick();
+	protected void airTick() {
+		aerialDrift();
+	}
 
 	@Override
 	public boolean getSneakLegality() {
@@ -62,7 +64,33 @@ public abstract class AirborneState extends MarioState {
 			MarioClient.yVel = Math.max(terminalVelocity, MarioClient.yVel + accel);
 	}
 
-	protected record AirborneTransitions() {
+	protected void aerialDrift() {
+		aerialDrift(
+				CharaStat.DRIFT_FORWARD_ACCEL, CharaStat.DRIFT_FORWARD_SPEED,
+				CharaStat.DRIFT_BACKWARD_ACCEL, CharaStat.DRIFT_BACKWARD_SPEED,
+				CharaStat.DRIFT_SIDE_ACCEL, CharaStat.DRIFT_SIDE_SPEED,
+				CharaStat.DRIFT_REDIRECTION
+		);
+	}
+
+	protected void aerialDrift(
+			CharaStat forwardAccelStat, CharaStat forwardSpeedStat,
+			CharaStat backwardAccelStat, CharaStat backwardSpeedStat,
+			CharaStat sideAccelStat, CharaStat sideSpeedStat,
+			CharaStat redirectionStat
+	) {
+		MarioClient.airborneAccel(
+				MarioClient.forwardInput >= 0 ? forwardAccelStat : backwardAccelStat,
+				MarioClient.forwardInput >= 0 ? forwardSpeedStat : backwardSpeedStat,
+				1.0,
+				sideAccelStat,
+				sideSpeedStat,
+				1.0,
+				redirectionStat
+		);
+	}
+
+	public record AirborneTransitions() {
 		public static final MarioStateTransition LANDING = () -> {
 			if(MarioClient.player.isOnGround()) {
 				StompHandler.forbiddenStompTargets.clear();

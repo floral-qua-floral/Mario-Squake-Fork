@@ -7,6 +7,7 @@ import fqf.qua_mario.characters.CharaStat;
 import fqf.qua_mario.mariostates.AirborneState;
 import fqf.qua_mario.mariostates.GroundedState;
 import fqf.qua_mario.mariostates.MarioState;
+import fqf.qua_mario.mariostates.states.airborne.DuckFall;
 import fqf.qua_mario.mariostates.states.airborne.DuckJump;
 import net.minecraft.util.math.MathHelper;
 import org.joml.Vector2d;
@@ -26,7 +27,11 @@ public class DuckSlide extends GroundedState {
 		this.name = "Duck Slide";
 
 		preTickTransitions = new ArrayList<>(List.of(
-				GroundedTransitions.FALL,
+				() -> {
+					if(GroundedTransitions.FALL.evaluate() != null)
+						return DuckFall.INSTANCE;
+					return null;
+				},
 				() -> {
 					// Release duck
 					if(!Input.DUCK.isHeld()) {
@@ -44,7 +49,7 @@ public class DuckSlide extends GroundedState {
 		));
 
 		postTickTransitions = new ArrayList<>(List.of(
-//				DuckWaddle.BACKFLIP,
+				DuckWaddle.BACKFLIP,
 				() -> {
 					if(Input.JUMP.isPressed()) {
 						GroundedTransitions.performJump(CharaStat.DUCK_JUMP_VELOCITY, null);

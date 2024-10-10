@@ -35,7 +35,7 @@ public abstract class AquaticState extends MarioState {
 			MarioClient.yVel = Math.max(terminalVelocity, MarioClient.yVel + accel);
 	}
 
-	protected record AquaticTransitions() {
+	public record AquaticTransitions() {
 		public static final MarioStateTransition EXIT_WATER = () -> {
 			if(MarioClient.player.getFluidHeight(FluidTags.WATER) < 0.4) {
 				MarioClient.yVel = Math.max(MarioClient.yVel, 0.65);

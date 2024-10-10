@@ -12,8 +12,9 @@ import java.util.EnumMap;
 public abstract class PowerUp {
 	protected Identifier ID;
 	protected String prefix;
-	protected float widthFactor;
-	protected float heightFactor;
+	protected float widthFactor = 1.0F;
+	protected float heightFactor = 1.0F;
+	protected float voicePitch = 1.0F;
 
 	public abstract MarioState customTransition(MarioState state, MarioState.TransitionPhases phase);
 	public abstract MarioState interceptTransition(MarioState from, MarioState to);
@@ -29,6 +30,9 @@ public abstract class PowerUp {
 	}
 	public float getHeightFactor() {
 		return(this.heightFactor);
+	}
+	public float getVoicePitch() {
+		return this.voicePitch;
 	}
 	public String getFormName(MarioCharacter character) {
 		return this.getPrefix() + character.getName();

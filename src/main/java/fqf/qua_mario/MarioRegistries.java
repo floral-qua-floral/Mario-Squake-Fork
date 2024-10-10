@@ -5,6 +5,7 @@ import fqf.qua_mario.characters.characters.CharaMario;
 import fqf.qua_mario.characters.characters.Luigi;
 import fqf.qua_mario.powerups.PowerUp;
 import fqf.qua_mario.powerups.forms.FireForm;
+import fqf.qua_mario.powerups.forms.MiniForm;
 import fqf.qua_mario.powerups.forms.SmallForm;
 import fqf.qua_mario.powerups.forms.SuperForm;
 import fqf.qua_mario.stomptypes.StompType;
@@ -76,6 +77,7 @@ public class MarioRegistries {
 		SmallForm.INSTANCE.register();
 		SuperForm.INSTANCE.register();
 		FireForm.INSTANCE.register();
+		MiniForm.INSTANCE.register();
 	}
 	public static void registerCharacters() {
 		ModMarioQuaMario.LOGGER.info("Registering characters...");

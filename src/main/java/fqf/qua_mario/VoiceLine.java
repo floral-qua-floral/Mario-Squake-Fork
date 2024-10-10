@@ -78,7 +78,7 @@ public enum VoiceLine {
 				getEvent(ModMarioQuaMario.getCharacter(player)),
 				SoundCategory.VOICE,
 				1.0F,
-				1.0F,
+				ModMarioQuaMario.getPowerUp(player).getVoicePitch(),
 				Random.create(seed),
 				player.getX(),
 				player.getY(),

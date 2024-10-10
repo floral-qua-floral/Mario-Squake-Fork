@@ -8,18 +8,25 @@ import fqf.qua_mario.stomptypes.stomptypes.StompBasic;
 import java.util.ArrayList;
 import java.util.Arrays;
 
-public class Stomp extends AirborneState {
-	public static final Stomp INSTANCE = new Stomp();
+public class Backflip extends AirborneState {
+	public static final Backflip INSTANCE = new Backflip();
 
-	private Stomp() {
-		this.name = "Stomp";
+	private Backflip() {
+		this.name = "Backflip";
 		this.isJump = true;
-		this.jumpCapStat = CharaStat.STOMP_CAP;
+		this.jumpCapStat = CharaStat.BACKFLIP_CAP;
 		this.stompType = StompBasic.INSTANCE;
 
 		preTickTransitions = new ArrayList<>(Arrays.asList(
-			AirborneTransitions.DOUBLE_JUMPABLE_LANDING,
-			AirborneTransitions.GROUND_POUND
+				AirborneTransitions.DOUBLE_JUMPABLE_LANDING,
+				AirborneTransitions.GROUND_POUND
 		));
+	}
+
+	@Override
+	public void airTick() {
+		MarioClient.stateTimer++;
+		if(MarioClient.stateTimer > 8)
+			super.airTick();
 	}
 }

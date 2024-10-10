@@ -6,28 +6,36 @@ import fqf.qua_mario.VoiceLine;
 import fqf.qua_mario.characters.CharaStat;
 import fqf.qua_mario.mariostates.GroundedState;
 import fqf.qua_mario.mariostates.MarioState;
+import fqf.qua_mario.mariostates.states.airborne.Backflip;
+import fqf.qua_mario.mariostates.states.airborne.DuckFall;
 import fqf.qua_mario.mariostates.states.airborne.DuckJump;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 public class DuckWaddle extends GroundedState {
-	public static final DuckWaddle INSTANCE = new DuckWaddle();
+	public static final MarioStateTransition BACKFLIP = () -> {
+		if(MarioClient.forwardVel <= 0 && MarioClient.forwardInput < 0 && Input.JUMP.isPressed()) {
+			GroundedTransitions.performJump(CharaStat.BACKFLIP_VELOCITY, null);
+			MarioClient.assignForwardStrafeVelocities(CharaStat.BACKFLIP_BACKWARD_SPEED.getValue(), 0);
+			VoiceLine.BACKFLIP.broadcast();
+			return Backflip.INSTANCE;
+		}
+		return null;
+	};
 
-//	public static final MarioStateTransition BACKFLIP = () -> {
-//		if(MarioClient.forwardVel <= 0 && MarioClient.forwardInput < 0 && Input.JUMP.isPressed()) {
-//			CommonTransitions.performJump(CharaStat.SIDEFLIP_VELOCITY, null);
-//			VoiceLine.BACKFLIP.broadcast();
-////						return DuckJump.INSTANCE;
-//		}
-//		return null;
-//	};
+	public static final DuckWaddle INSTANCE = new DuckWaddle();
 
 	private DuckWaddle() {
 		this.name = "Duck Waddle";
 
 		preTickTransitions = new ArrayList<>(List.of(
-				GroundedTransitions.FALL,
+				() -> {
+					if(GroundedTransitions.FALL.evaluate() != null)
+						return DuckFall.INSTANCE;
+					return null;
+				},
 				() -> {
 					// Release duck
 					if(!Input.DUCK.isHeld()) {
@@ -37,8 +45,8 @@ public class DuckWaddle extends GroundedState {
 				}
 		));
 
-		postTickTransitions = new ArrayList<>(List.of(
-//				BACKFLIP,
+		postTickTransitions = new ArrayList<>(Arrays.asList(
+				DuckWaddle.BACKFLIP,
 				() -> {
 					if(Input.JUMP.isPressed()) {
 						GroundedTransitions.performJump(CharaStat.DUCK_JUMP_VELOCITY, null);

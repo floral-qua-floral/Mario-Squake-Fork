@@ -127,77 +127,22 @@ public class MarioClient {
 		return true;
 	}
 
-	public static void aerialAccel(double forward, double rightward, double forwardCap, double backwardCap, double sideCap) {
-		// Calculate forward and sideways vector components
-		double yawRad = Math.toRadians(player.getYaw());
-		double forwardX = -Math.sin(yawRad);
-		double forwardZ = Math.cos(yawRad);
-		double rightwardX = forwardZ;
-		double rightwardZ = -forwardX;
-
-		// Apply speed caps
-		if (forward > 0) {
-			if(forwardVel > forwardCap) forward = 0; // don't accelerate if we're already past the speed cap!
-			else if(forwardVel + forward > forwardCap) {
-				forward = forwardCap - forwardVel; // accelerate just enough to reach the cap
-			}
-		} else if (forward < 0) {
-			if(forwardVel < backwardCap) forward = 0; // don't accelerate backwards if we're moving backwards too fast!
-			else if(forwardVel + forward < backwardCap) {
-				forward = backwardCap - forwardVel; // accelerate just enough to reach the cap
-			}
-		}
-
-		// Sideways speed cap only applies if we're already moving in the direction we're trying to accelerate
-		if(Math.signum(rightwardVel) == Math.signum(rightward)) {
-			if (Math.abs(rightwardVel) > sideCap) {
-				rightward = 0;
-			} else if (Math.abs(rightwardVel + forward) > sideCap) {
-				rightward = (sideCap * Math.signum(rightward)) - rightwardVel;
-			}
-		}
-
-		// Calculate new speed
-		Vec3d currentVel = player.getVelocity();
-		double deltaXVel = forwardX * forward + rightwardX * rightward;
-		double deltaZVel = forwardZ * forward + rightwardZ * rightward;
-		Vec3d newVel = capAcceleration(currentVel, currentVel.add(deltaXVel, 0, deltaZVel),
-				Math.max(Math.max(forwardCap, Math.abs(backwardCap)), sideCap));
-
-		// Apply new speed
-		player.setVelocity(newVel.x, currentVel.y, newVel.z);
-	}
-
-	public static Vec3d capAcceleration(Vec3d currentVel, Vec3d newVel, double cap) {
-		// I have to do it like this with a hundred thousand variables or the math gets wonky!
-		double newVelHorizontalLenSquared = newVel.horizontalLengthSquared();
-		double currentVelHorizontalLenSquared = currentVel.horizontalLengthSquared();
-
-		double epsilon = 0.01;
-
-		double deltaSpeed = newVelHorizontalLenSquared - currentVelHorizontalLenSquared;
-		if(deltaSpeed > epsilon) {
-			double capSquared = cap * cap;
-
-			double speedUnderCapDifference = currentVelHorizontalLenSquared - capSquared;
-			if(speedUnderCapDifference > epsilon) {
-				// We're already moving too fast, so just use the new angle and don't increase magnitude
-				return newVel.normalize().multiply(currentVel.horizontalLength());
-			} else if((newVelHorizontalLenSquared - capSquared) > -epsilon) {
-				// We're just about to pass our speed cap, so limit our speed to match it
-				return newVel.normalize().multiply(cap);
-			}
-		}
-
-		return newVel;
-	}
-
 	public static void approachAngleAndAccel(
 			double forwardAccel, double forwardTarget, double forwardAngleContribution,
 			double strafeAccel, double strafeTarget, double strafeAngleContribution,
 			double redirectDelta
 	) {
 		Vector2d redirectedVel;
+
+//		ModMarioQuaMario.LOGGER.info("approachAngleAndAccel:"
+//				+ "\n forwardAccel: " + forwardAccel
+//				+ "\n forwardTarget: " + forwardTarget
+//				+ "\n forwardAngleContribution: " + forwardAngleContribution
+//				+ "\n strafeAccel: " + strafeAccel
+//				+ "\n strafeTarget: " + strafeTarget
+//				+ "\n strafeAngleContribution: " + strafeAngleContribution
+//				+ "\n redirectDelta: " + redirectDelta
+//		);
 
 		if(redirectDelta == 0 || (forwardAngleContribution == 0 && strafeAngleContribution == 0) ||
 				(MathHelper.approximatelyEquals(forwardVel, 0) && MathHelper.approximatelyEquals(rightwardVel, 0) )) {
@@ -211,59 +156,65 @@ public class MarioClient {
 			else redirectedVel = intendedAngle.normalize(currentVel.length()); // redirectAngle < 0 for instant redirection
 		}
 
-
-		// Ensure forwardAccel and strafeAccel are positive
-		forwardAccel = Math.abs(forwardAccel);
-		strafeAccel = Math.abs(strafeAccel);
-
-		// Calculate which way to accelerate
-		double forwardAccelDir, strafeAccelDir;
-		double forwardDifference = forwardTarget - redirectedVel.x;
-		if(MathHelper.approximatelyEquals(forwardDifference, 0))
-			forwardAccelDir = 0;
-		else if(forwardAccel < Math.abs(forwardDifference))
-			forwardAccelDir = Math.signum(forwardDifference);
+		Vector2d newVel;
+		if(forwardAccel == 0 && strafeAccel == 0) {
+			// If we're only redirecting then we're done here, no need to calculate acceleration & apply speed cap
+			newVel = redirectedVel;
+		}
 		else {
-			forwardAccelDir = 0;
-			redirectedVel.x = forwardTarget;
-		}
-		double strafeDifference = strafeTarget - redirectedVel.y;
-		if(MathHelper.approximatelyEquals(strafeDifference, 0))
-			strafeAccelDir = 0;
-		else if(strafeAccel < Math.abs(strafeDifference))
-			strafeAccelDir = Math.signum(strafeDifference);
-		else {
-			strafeAccelDir = 0;
-			redirectedVel.y = strafeTarget;
-		}
+			// Ensure forwardAccel and strafeAccel are positive
+			forwardAccel = Math.abs(forwardAccel);
+			strafeAccel = Math.abs(strafeAccel);
 
-		// Calculate the acceleration vector and normalize it, so the player won't get extra acceleration by strafing
-		Vector2d accelVector = new Vector2d(
-				forwardAccel * forwardAccelDir,
-				strafeAccel * strafeAccelDir
-		);
-		if(accelVector.x != 0 || accelVector.y != 0) {
-			double accelVectorMaxLength = Math.max(forwardAccel, strafeAccel);
-			if(accelVector.lengthSquared() > accelVectorMaxLength * accelVectorMaxLength)
-				accelVector.normalize(accelVectorMaxLength);
-		}
+			// Calculate which way to accelerate
+			double forwardAccelDir, strafeAccelDir;
+			double forwardDifference = forwardTarget - redirectedVel.x;
+			if(MathHelper.approximatelyEquals(forwardDifference, 0))
+				forwardAccelDir = 0;
+			else if(forwardAccel < Math.abs(forwardDifference))
+				forwardAccelDir = Math.signum(forwardDifference);
+			else {
+				forwardAccelDir = 0;
+				redirectedVel.x = forwardTarget;
+			}
+			double strafeDifference = strafeTarget - redirectedVel.y;
+			if(MathHelper.approximatelyEquals(strafeDifference, 0))
+				strafeAccelDir = 0;
+			else if(strafeAccel < Math.abs(strafeDifference))
+				strafeAccelDir = Math.signum(strafeDifference);
+			else {
+				strafeAccelDir = 0;
+				redirectedVel.y = strafeTarget;
+			}
 
-		// Calculate the new velocity
-		Vector2d newVel = new Vector2d(
-				redirectedVel.x + accelVector.x,
-				redirectedVel.y + accelVector.y
-		);
+			// Calculate the acceleration vector and normalize it, so the player won't get extra acceleration by strafing
+			Vector2d accelVector = new Vector2d(
+					forwardAccel * forwardAccelDir,
+					strafeAccel * strafeAccelDir
+			);
+			if(accelVector.x != 0 || accelVector.y != 0) {
+				double accelVectorMaxLength = Math.max(forwardAccel, strafeAccel);
+				if(accelVector.lengthSquared() > accelVectorMaxLength * accelVectorMaxLength)
+					accelVector.normalize(accelVectorMaxLength);
+			}
 
-		// Calculate & apply soft speed cap
-		double speedCap = Math.max(Math.abs(forwardTarget), Math.abs(strafeTarget));
-		double speedCapSquared = speedCap * speedCap;
-		double oldVelLengthSquared = Vector2d.lengthSquared(forwardVel, rightwardVel);
+			// Calculate the new velocity
+			newVel = new Vector2d(
+					redirectedVel.x + accelVector.x,
+					redirectedVel.y + accelVector.y
+			);
 
-		if(newVel.lengthSquared() > oldVelLengthSquared) {
-			if(oldVelLengthSquared > speedCapSquared)
-				newVel.normalize(Vector2d.length(forwardVel, rightwardVel));
-			else if(newVel.lengthSquared() > speedCapSquared)
-				newVel.normalize(speedCap);
+			// Calculate & apply soft speed cap
+			double speedCap = Math.max(Math.abs(forwardTarget), Math.abs(strafeTarget));
+			double speedCapSquared = speedCap * speedCap;
+			double oldVelLengthSquared = Vector2d.lengthSquared(forwardVel, rightwardVel);
+
+			if(newVel.lengthSquared() > oldVelLengthSquared) {
+				if(oldVelLengthSquared > speedCapSquared)
+					newVel.normalize(Vector2d.length(forwardVel, rightwardVel));
+				else if(newVel.lengthSquared() > speedCapSquared)
+					newVel.normalize(speedCap);
+			}
 		}
 
 		// Assign velocities
@@ -343,6 +294,30 @@ public class MarioClient {
 		);
 	}
 
+	public static void airborneAccel(
+			CharaStat accelStat, CharaStat speedStat, double forwardAngleContribution,
+			CharaStat strafeAccelStat, CharaStat strafeSpeedStat, double strafeAngleContribution,
+			CharaStat redirectStat
+	) {
+		// Unlike when on the ground, when Mario is in midair, neutral inputs don't cause him to accelerate towards 0.
+		// He only accelerates when actively making an input, and will always try to accelerate in that direction, never backwards.
+		double accelValue, strafeAccelValue;
+		if(forwardInput != 0 && (Math.signum(forwardVel) != Math.signum(forwardInput) || Math.abs(forwardVel) < Math.abs(speedStat.getValue())))
+			accelValue = accelStat.getValue() * forwardInput;
+		else accelValue = 0;
+
+		if(rightwardInput != 0 && (Math.signum(rightwardVel) != Math.signum(rightwardInput) || Math.abs(rightwardVel) < Math.abs(strafeSpeedStat.getValue())))
+			strafeAccelValue = strafeAccelStat.getValue() * rightwardInput;
+		else strafeAccelValue = 0;
+
+		approachAngleAndAccel(
+				accelValue, speedStat.getValue() * Math.signum(forwardInput), forwardAngleContribution * forwardInput,
+				strafeAccelValue, strafeSpeedStat.getValue() * Math.signum(rightwardInput), strafeAngleContribution * rightwardInput,
+				redirectStat.getValue()
+		);
+
+	}
+
 	public static void applyDrag(CharaStat dragStat, CharaStat dragMinStat, CharaStat redirectionStat, double forwardAngleContribution, double strafeAngleContribution) {
 		double dragStatValue = dragStat.getValue();
 		boolean dragInverted = dragStatValue < 0;
@@ -358,13 +333,13 @@ public class MarioClient {
 		if(dragVelocity != 0 && dragVelocity < minDrag * minDrag)
 			deltaVelocities.normalize(minDrag);
 
-		ModMarioQuaMario.LOGGER.info("applyDrag:"
-				+ "\ndragStat: " + dragStat
-				+ "\ndragStatValue: " + dragStatValue
-				+ "\ndragAdjusted: " + dragAdjusted
-				+ "\nminDrag: " + minDrag
-				+ "\ndeltaVelocities 2: " + deltaVelocities
-		);
+//		ModMarioQuaMario.LOGGER.info("applyDrag:"
+//				+ "\n dragStat: " + dragStat
+//				+ "\n dragStatValue: " + dragStatValue
+//				+ "\n dragAdjusted: " + dragAdjusted
+//				+ "\n minDrag: " + minDrag
+//				+ "\n deltaVelocities 2: " + deltaVelocities
+//		);
 
 		if(dragInverted) {
 			assignForwardStrafeVelocities(forwardVel + deltaVelocities.x, rightwardVel + deltaVelocities.y);

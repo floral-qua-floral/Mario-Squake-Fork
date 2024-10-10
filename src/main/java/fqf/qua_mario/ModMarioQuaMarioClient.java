@@ -28,7 +28,6 @@ public class ModMarioQuaMarioClient implements ClientModInitializer {
 	@Override
 	public void onInitializeClient() {
 		KeyBindingHelper.registerKeyBinding(spinBinding);
-		MarioClient.changeState(Grounded.INSTANCE);
 
 		ClientEntityEvents.ENTITY_UNLOAD.register((entity, world) -> {
 			ModMarioQuaMario.LOGGER.info("Unloaded entity!");

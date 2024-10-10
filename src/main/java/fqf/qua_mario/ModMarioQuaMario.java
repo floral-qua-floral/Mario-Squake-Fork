@@ -1,5 +1,6 @@
 package fqf.qua_mario;
 
+import com.tom.cpm.api.ICommonAPI;
 import fqf.qua_mario.characters.MarioCharacter;
 import fqf.qua_mario.characters.characters.CharaMario;
 import fqf.qua_mario.powerups.PowerUp;
@@ -128,6 +129,7 @@ public class ModMarioQuaMario implements ModInitializer {
 		player.calculateDimensions();
 
 		// Change the player's playermodel to the current character & power-up state
+
 		String newModel = getCharacter(player).getModel(getPowerUp(player));
 		LOGGER.info("setIsMario: Switched to playermodel {}", newModel);
 
@@ -194,6 +196,13 @@ public class ModMarioQuaMario implements ModInitializer {
 		marioData.powerUp = powerUp;
 
 		return player + " is now set to " + powerUp.getFormName(character) + (isMario ? "." : ". (Disabled)");
+	}
+
+	private void setPlayerModel(PlayerEntity player) {
+		if(getIsMario(player)) {
+
+		}
+//		else ICommonAPI.
 	}
 
 	@Override

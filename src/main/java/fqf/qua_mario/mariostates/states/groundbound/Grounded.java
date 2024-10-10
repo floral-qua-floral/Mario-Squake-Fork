@@ -6,8 +6,10 @@ import fqf.qua_mario.VoiceLine;
 import fqf.qua_mario.characters.CharaStat;
 import fqf.qua_mario.mariostates.GroundedState;
 import fqf.qua_mario.mariostates.MarioState;
+import org.joml.Vector2d;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 public class Grounded extends GroundedState {
@@ -45,8 +47,18 @@ public class Grounded extends GroundedState {
 				}
 		));
 
-		postTickTransitions = new ArrayList<>(List.of(
-				GroundedTransitions.JUMP
+		postTickTransitions = new ArrayList<>(Arrays.asList(
+				GroundedTransitions.JUMP,
+				() -> {
+					double speedThreshold = MarioClient.getStatThreshold(CharaStat.RUN_SPEED);
+					if(MarioClient.player.isSprinting() && MarioClient.forwardInput >= 0.7 && Vector2d.lengthSquared(MarioClient.forwardVel, MarioClient.rightwardVel) >= speedThreshold * speedThreshold) {
+						Vector2d currentMotion = new Vector2d(MarioClient.forwardVel, MarioClient.rightwardVel);
+						currentMotion.normalize(CharaStat.P_SPEED.getValue());
+						MarioClient.assignForwardStrafeVelocities(currentMotion.x, currentMotion.y);
+						return PSpeedRun.INSTANCE;
+					}
+					return null;
+				}
 		));
 	}
 
@@ -102,7 +114,15 @@ public class Grounded extends GroundedState {
 			}
 		}
 		else if(MarioClient.forwardInput < 0) {
-			if(MarioClient.forwardVel < MarioClient.getStatBuffer(CharaStat.BACKPEDAL_SPEED)) {
+			if(MarioClient.forwardVel > 0) {
+				// Under-backpedal
+				MarioClient.groundAccel(
+						CharaStat.UNDERBACKPEDAL_ACCEL, CharaStat.BACKPEDAL_SPEED, 1.0,
+						CharaStat.STRAFE_ACCEL, CharaStat.STRAFE_SPEED, 1.0,
+						CharaStat.BACKPEDAL_REDIRECTION
+				);
+			}
+			else if(MarioClient.forwardVel < MarioClient.getStatBuffer(CharaStat.BACKPEDAL_SPEED)) {
 				// Over-backpedal
 				MarioClient.groundAccel(
 						CharaStat.OVERBACKPEDAL_ACCEL, CharaStat.BACKPEDAL_SPEED, 1.0,

@@ -15,9 +15,4 @@ public class CharaMario extends MarioCharacter {
 
 		this.statFactors = new EnumMap<>(CharaStat.class);
 	}
-
-	@Override
-	public String getSoundPrefix() {
-		return "mario_";
-	}
 }

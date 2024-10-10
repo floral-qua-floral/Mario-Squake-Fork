@@ -24,9 +24,9 @@ public class Sideflip extends AirborneState {
 	}
 
 	@Override
-	protected void airTick() {
+	public void airTick() {
 		MarioClient.stateTimer++;
 		if(MarioClient.stateTimer > 5)
-			MarioClient.aerialAccel(MarioClient.forwardInput * 0.04, MarioClient.rightwardInput * 0.04, 0.25, -0.25, 0.195);
+			super.airTick();
 	}
 }

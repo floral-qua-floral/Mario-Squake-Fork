@@ -1,13 +1,11 @@
 package fqf.qua_mario.mariostates;
 
 import fqf.qua_mario.*;
-import fqf.qua_mario.cameraanims.animations.CameraTripleJump;
 import fqf.qua_mario.characters.CharaStat;
 import fqf.qua_mario.mariostates.states.airborne.*;
 import fqf.qua_mario.mariostates.states.aquatic.WaterTread;
 import net.minecraft.entity.MovementType;
 import net.minecraft.registry.tag.FluidTags;
-import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
@@ -81,8 +79,8 @@ public abstract class MarioState {
 
 		public static final MarioStateTransition LAVA_BOOST = () -> {
 			if(MarioClient.player.isInLava()) {
-				if(MarioClient.yVel < 0)
-					MarioClient.player.move(MovementType.SELF, MarioClient.player.getVelocity().multiply(-1));
+				if(MarioClient.getState() != LavaBoost.INSTANCE)
+					MarioClient.player.move(MovementType.SELF, MarioClient.player.getVelocity().multiply(-5));
 				MarioClient.player.setVelocity(0.0, CharaStat.LAVA_BOOST_VEL.getValue(), 0.0);
 				VoiceLine.BURNT.broadcast();
 				return LavaBoost.INSTANCE;

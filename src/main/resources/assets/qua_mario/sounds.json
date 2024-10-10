@@ -53,7 +53,7 @@
     "sounds": [
       {
         "type": "event",
-        "name": "voice.luigi.sideflip"
+        "name": "qua_mario:voice.luigi.sideflip"
       }
     ]
   },
@@ -174,7 +174,7 @@
     "sounds": [
       {
         "type": "event",
-        "name": "voice.mario.sideflip"
+        "name": "qua_mario:voice.mario.sideflip"
       }
     ]
   },
@@ -301,7 +301,7 @@
     "sounds": [
       {
         "type": "event",
-        "name": "voice.toadette.sideflip"
+        "name": "qua_mario:voice.toadette.sideflip"
       }
     ]
   },
