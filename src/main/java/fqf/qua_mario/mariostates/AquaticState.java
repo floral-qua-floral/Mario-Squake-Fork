@@ -1,13 +1,8 @@
 package fqf.qua_mario.mariostates;
 
-import fqf.qua_mario.Input;
 import fqf.qua_mario.MarioClient;
-import fqf.qua_mario.ModMarioQuaMario;
-import fqf.qua_mario.SoundFader;
 import fqf.qua_mario.characters.CharaStat;
-import fqf.qua_mario.mariostates.states.Grounded;
 import fqf.qua_mario.mariostates.states.airborne.Aerial;
-import fqf.qua_mario.stomptypes.StompHandler;
 import fqf.qua_mario.stomptypes.StompType;
 import net.minecraft.registry.tag.FluidTags;
 import org.jetbrains.annotations.Nullable;

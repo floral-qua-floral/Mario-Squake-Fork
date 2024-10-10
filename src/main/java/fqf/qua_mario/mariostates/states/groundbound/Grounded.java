@@ -1,22 +1,23 @@
-package fqf.qua_mario.mariostates.states;
+package fqf.qua_mario.mariostates.states.groundbound;
 
 import fqf.qua_mario.Input;
 import fqf.qua_mario.MarioClient;
 import fqf.qua_mario.VoiceLine;
 import fqf.qua_mario.characters.CharaStat;
+import fqf.qua_mario.mariostates.GroundedState;
 import fqf.qua_mario.mariostates.MarioState;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class Grounded extends MarioState {
+public class Grounded extends GroundedState {
 	public static final Grounded INSTANCE = new Grounded();
 
 	private Grounded() {
 		this.name = "Grounded";
 
 		preTickTransitions = new ArrayList<>(List.of(
-				CommonTransitions.FALL,
+				GroundedTransitions.FALL,
 				() -> {
 					// Duckslide
 					if(Input.DUCK.isHeld() && DuckSlide.enterDuckSlide()) {
@@ -45,12 +46,12 @@ public class Grounded extends MarioState {
 		));
 
 		postTickTransitions = new ArrayList<>(List.of(
-				CommonTransitions.JUMP
+				GroundedTransitions.JUMP
 		));
 	}
 
 	@Override
-	public void tick() {
+	public void groundedTick() {
 		if(MarioClient.forwardInput > 0) {
 			boolean isRunning = MarioClient.player.isSprinting()
 					&& MarioClient.forwardVel > MarioClient.getStatThreshold(CharaStat.WALK_SPEED);
@@ -126,7 +127,5 @@ public class Grounded extends MarioState {
 					CharaStat.ZERO
 			);
 		}
-
-		MarioClient.yVel = -0.1;
 	}
 }

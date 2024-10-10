@@ -1,4 +1,4 @@
-package fqf.qua_mario.mariostates.states;
+package fqf.qua_mario.mariostates.states.groundbound;
 
 import fqf.qua_mario.Input;
 import fqf.qua_mario.MarioClient;
@@ -8,6 +8,7 @@ import fqf.qua_mario.cameraanims.animations.CameraSideflip;
 import fqf.qua_mario.cameraanims.animations.CameraSideflipGentle;
 import fqf.qua_mario.cameraanims.animations.CameraSideflipNoFunAllowed;
 import fqf.qua_mario.characters.CharaStat;
+import fqf.qua_mario.mariostates.GroundedState;
 import fqf.qua_mario.mariostates.MarioState;
 import fqf.qua_mario.mariostates.states.airborne.Sideflip;
 import net.minecraft.util.math.MathHelper;
@@ -15,14 +16,14 @@ import net.minecraft.util.math.MathHelper;
 import java.util.ArrayList;
 import java.util.Arrays;
 
-public class Skid extends MarioState {
+public class Skid extends GroundedState {
 	public static final Skid INSTANCE = new Skid();
 
 	private Skid() {
 		this.name = "Skid";
 
 		preTickTransitions = new ArrayList<>(Arrays.asList(
-				CommonTransitions.FALL,
+				GroundedTransitions.FALL,
 				() -> {
 					// Stop skidding
 					if (MarioClient.stateTimer > 0 || MarioClient.forwardInput >= 0 || MarioClient.forwardVel < -0.05) {
@@ -36,13 +37,13 @@ public class Skid extends MarioState {
 				() -> {
 					// Regular jump
 					return(MarioClient.forwardVel > CharaStat.SIDEFLIP_THRESHOLD.getValue()
-							? CommonTransitions.JUMP.evaluate() : null);
+							? GroundedTransitions.JUMP.evaluate() : null);
 				},
 				() -> {
 					// Sideflip
 					if (Input.JUMP.isPressed()) {
 						ModMarioQuaMario.LOGGER.info("yVel: " + CharaStat.JUMP_VELOCITY.getValue());
-						CommonTransitions.performJump(CharaStat.SIDEFLIP_VELOCITY, CharaStat.ZERO);
+						GroundedTransitions.performJump(CharaStat.SIDEFLIP_VELOCITY, CharaStat.ZERO);
 						VoiceLine.SIDEFLIP.broadcast();
 						MarioClient.assignForwardStrafeVelocities(CharaStat.SIDEFLIP_BACKWARD_SPEED.getValue(), 0.0);
 						MarioClient.player.setYaw(MarioClient.player.getYaw() + 180);
@@ -73,10 +74,7 @@ public class Skid extends MarioState {
 	}
 
 	@Override
-	public void tick() {
-		MarioClient.yVel = -0.1;
-
-
+	public void groundedTick() {
 		if(MarioClient.forwardInput < 0) {
 			if(MathHelper.approximatelyEquals(MarioClient.forwardVel, 0)) {
 				MarioClient.stateTimer++;

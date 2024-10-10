@@ -34,11 +34,6 @@ public class ModMarioQuaMario implements ModInitializer {
 
 	public static boolean playerIsMarioClient(PlayerEntity player) {
 		return player.isMainPlayer();
-//		return(
-//				player.getWorld().isClient
-//				&& player instanceof ClientPlayerEntity clientPlayer
-//				&& clientPlayer.equals(MarioClient.player)
-//		);
 	}
 
 	private static void sendMarioUpdatePacket(PlayerEntity changingPlayer, CustomPayload packet) {

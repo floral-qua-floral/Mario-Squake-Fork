@@ -5,8 +5,8 @@ import fqf.qua_mario.VoiceLine;
 import fqf.qua_mario.characters.CharaStat;
 import fqf.qua_mario.mariostates.AirborneState;
 import fqf.qua_mario.mariostates.MarioState;
-import fqf.qua_mario.mariostates.states.Grounded;
-import fqf.qua_mario.mariostates.states.Salute;
+import fqf.qua_mario.mariostates.states.groundbound.Grounded;
+import fqf.qua_mario.mariostates.states.groundbound.Salute;
 import fqf.qua_mario.stomptypes.stomptypes.StompBasic;
 
 import java.util.ArrayList;

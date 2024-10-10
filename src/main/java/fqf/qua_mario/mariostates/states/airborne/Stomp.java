@@ -1,4 +1,4 @@
-package fqf.qua_mario.mariostates.states;
+package fqf.qua_mario.mariostates.states.airborne;
 
 import fqf.qua_mario.MarioClient;
 import fqf.qua_mario.characters.CharaStat;

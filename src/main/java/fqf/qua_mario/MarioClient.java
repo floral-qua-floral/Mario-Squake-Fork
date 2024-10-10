@@ -3,7 +3,7 @@ package fqf.qua_mario;
 import fqf.qua_mario.characters.characters.CharaMario;
 import fqf.qua_mario.characters.CharaStat;
 import fqf.qua_mario.characters.MarioCharacter;
-import fqf.qua_mario.mariostates.states.Grounded;
+import fqf.qua_mario.mariostates.states.groundbound.Grounded;
 import fqf.qua_mario.powerups.PowerUp;
 import fqf.qua_mario.powerups.forms.SuperForm;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;

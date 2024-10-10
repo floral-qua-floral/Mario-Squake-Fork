@@ -5,7 +5,7 @@ import fqf.qua_mario.MarioClient;
 import fqf.qua_mario.ModMarioQuaMario;
 import fqf.qua_mario.SoundFader;
 import fqf.qua_mario.characters.CharaStat;
-import fqf.qua_mario.mariostates.states.Grounded;
+import fqf.qua_mario.mariostates.states.groundbound.Grounded;
 import fqf.qua_mario.stomptypes.StompHandler;
 import fqf.qua_mario.stomptypes.StompType;
 import org.jetbrains.annotations.Nullable;

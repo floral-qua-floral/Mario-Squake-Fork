@@ -3,6 +3,7 @@ package fqf.qua_mario.mariostates.states;
 import fqf.qua_mario.Input;
 import fqf.qua_mario.MarioClient;
 import fqf.qua_mario.mariostates.MarioState;
+import fqf.qua_mario.mariostates.states.groundbound.Grounded;
 
 public class Debug extends MarioState {
 	public static final Debug INSTANCE = new Debug();

@@ -1,13 +1,10 @@
 package fqf.qua_mario;
 
-import fqf.qua_mario.characters.characters.CharaMario;
-import fqf.qua_mario.mariostates.states.Grounded;
-import fqf.qua_mario.powerups.forms.SuperForm;
+import fqf.qua_mario.mariostates.states.groundbound.Grounded;
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientEntityEvents;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
 import net.fabricmc.fabric.api.client.keybinding.v1.KeyBindingHelper;
-import net.fabricmc.fabric.api.client.networking.v1.ClientPlayConnectionEvents;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gui.DrawContext;

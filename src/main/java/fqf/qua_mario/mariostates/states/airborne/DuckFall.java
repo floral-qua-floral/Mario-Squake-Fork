@@ -4,8 +4,8 @@ import fqf.qua_mario.Input;
 import fqf.qua_mario.MarioClient;
 import fqf.qua_mario.mariostates.AirborneState;
 import fqf.qua_mario.mariostates.MarioState;
-import fqf.qua_mario.mariostates.states.DuckSlide;
-import fqf.qua_mario.mariostates.states.DuckWaddle;
+import fqf.qua_mario.mariostates.states.groundbound.DuckSlide;
+import fqf.qua_mario.mariostates.states.groundbound.DuckWaddle;
 import fqf.qua_mario.stomptypes.stomptypes.StompBasic;
 
 import java.util.ArrayList;

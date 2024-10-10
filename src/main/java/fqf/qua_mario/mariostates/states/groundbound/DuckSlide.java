@@ -1,9 +1,11 @@
-package fqf.qua_mario.mariostates.states;
+package fqf.qua_mario.mariostates.states.groundbound;
 
 import fqf.qua_mario.Input;
 import fqf.qua_mario.MarioClient;
 import fqf.qua_mario.VoiceLine;
 import fqf.qua_mario.characters.CharaStat;
+import fqf.qua_mario.mariostates.AirborneState;
+import fqf.qua_mario.mariostates.GroundedState;
 import fqf.qua_mario.mariostates.MarioState;
 import fqf.qua_mario.mariostates.states.airborne.DuckJump;
 import net.minecraft.util.math.MathHelper;
@@ -12,7 +14,7 @@ import org.joml.Vector2d;
 import java.util.ArrayList;
 import java.util.List;
 
-public class DuckSlide extends MarioState {
+public class DuckSlide extends GroundedState {
 	public static final DuckSlide INSTANCE = new DuckSlide();
 
 	public static boolean enterDuckSlide() {
@@ -24,7 +26,7 @@ public class DuckSlide extends MarioState {
 		this.name = "Duck Slide";
 
 		preTickTransitions = new ArrayList<>(List.of(
-				CommonTransitions.FALL,
+				GroundedTransitions.FALL,
 				() -> {
 					// Release duck
 					if(!Input.DUCK.isHeld()) {
@@ -45,7 +47,7 @@ public class DuckSlide extends MarioState {
 //				DuckWaddle.BACKFLIP,
 				() -> {
 					if(Input.JUMP.isPressed()) {
-						CommonTransitions.performJump(CharaStat.DUCK_JUMP_VELOCITY, null);
+						GroundedTransitions.performJump(CharaStat.DUCK_JUMP_VELOCITY, null);
 						VoiceLine.DUCK_JUMP.broadcast();
 						return DuckJump.INSTANCE;
 					}
@@ -55,10 +57,8 @@ public class DuckSlide extends MarioState {
 	}
 
 	@Override
-	public void tick() {
+	public void groundedTick() {
 		MarioClient.applyDrag(CharaStat.DUCK_SLIDE_DRAG, CharaStat.DUCK_SLIDE_DRAG,
 				CharaStat.DUCK_SLIDE_REDIRECTION, 1, 1);
-
-		MarioClient.yVel = -0.1;
 	}
 }
