@@ -38,6 +38,7 @@ public class ModMarioQuaMario implements ModInitializer {
 	}
 
 	private static void sendMarioUpdatePacket(PlayerEntity changingPlayer, CustomPayload packet) {
+//		setPlayerModel(changingPlayer);
 		Collection<ServerPlayerEntity> sendToPlayers = PlayerLookup.tracking(changingPlayer);
 		for(ServerPlayerEntity player : sendToPlayers) {
 			ServerPlayNetworking.send(player, packet);
@@ -198,11 +199,18 @@ public class ModMarioQuaMario implements ModInitializer {
 		return player + " is now set to " + powerUp.getFormName(character) + (isMario ? "." : ". (Disabled)");
 	}
 
-	private void setPlayerModel(PlayerEntity player) {
+	private static void setPlayerModel(PlayerEntity player) {
 		if(getIsMario(player)) {
-
+			LOGGER.info("setPlayerModel1: " + ModCPMIntegration.commonAPI);
+			ModCPMIntegration.commonAPI.setPlayerModel(
+					PlayerEntity.class,
+					player,
+					"UwsBAAM+AmRQZAAA4rIAAPKu+ALyrgAAAAAAAAAA/wAAMigyAADKuAAA+qwCqvqsAAAAAAAAAAD/AAABAT8IAgkBAAAAAA+O",
+					true,
+					false
+			);
 		}
-//		else ICommonAPI.
+		else ModCPMIntegration.commonAPI.resetPlayerModel(PlayerEntity.class, player);
 	}
 
 	@Override
