@@ -29,6 +29,9 @@
     "modmenu" : [
       "fqf.qua_mario.ModMenuIntegration"
     ],
+    "uwu": [
+      "fqf.qua_mario.neostates.TestNeostate"
+    ],
     "cpmapi" : [
       "fqf.qua_mario.ModCPMIntegration"
     ]

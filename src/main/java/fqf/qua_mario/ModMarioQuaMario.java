@@ -3,6 +3,8 @@ package fqf.qua_mario;
 import com.tom.cpm.api.ICommonAPI;
 import fqf.qua_mario.characters.MarioCharacter;
 import fqf.qua_mario.characters.characters.CharaMario;
+import fqf.qua_mario.mariostates.MarioState;
+import fqf.qua_mario.mariostates.states.groundbound.Grounded;
 import fqf.qua_mario.powerups.PowerUp;
 import fqf.qua_mario.powerups.forms.SuperForm;
 import joptsimple.internal.Reflection;
@@ -230,6 +232,8 @@ public class ModMarioQuaMario implements ModInitializer {
 		public boolean isMario;
 		public MarioCharacter character;
 		public PowerUp powerUp;
+
+		public MarioState state;
 		public boolean canSneak;
 		private MarioPlayerInfo(boolean isMario, MarioCharacter character, PowerUp powerUp) {
 			this.isMario = isMario;
@@ -237,6 +241,7 @@ public class ModMarioQuaMario implements ModInitializer {
 			this.powerUp = powerUp;
 
 			// Non-persistent data
+			this.state = Grounded.INSTANCE;
 			this.canSneak = true;
 		}
 	}
