@@ -67,6 +67,10 @@ public class MarioRegistries {
 						}
 					}));
 
+	public static final GameRules.Key<GameRules.BooleanRule> VALIDATE_STATE_TRANSITIONS =
+			GameRuleRegistry.register("serverValidatesMarioActions", GameRules.Category.PLAYER,
+					GameRuleFactory.createBooleanRule(true));
+
 	public static final RegistryKey<DamageType> STOMP_DAMAGE = RegistryKey.of(RegistryKeys.DAMAGE_TYPE, Identifier.of(ModMarioQuaMario.MOD_ID, "stomp"));
 	public static final RegistryKey<DamageType> SPIN_JUMP_DAMAGE = RegistryKey.of(RegistryKeys.DAMAGE_TYPE, Identifier.of(ModMarioQuaMario.MOD_ID, "spin_jump"));
 	public static final RegistryKey<DamageType> GROUND_POUND_DAMAGE = RegistryKey.of(RegistryKeys.DAMAGE_TYPE, Identifier.of(ModMarioQuaMario.MOD_ID, "ground_pound"));

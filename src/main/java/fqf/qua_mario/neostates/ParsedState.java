@@ -29,13 +29,38 @@ public class ParsedState {
 		this.DEFINITION.tick();
 	}
 
-	public void executeTransitions(TransitionPhases phase) {
+	public void attemptTransitions(TransitionPhases phase) {
 		for(ParsedTransition tryTransition : TRANSITION_LISTS.get(phase)) {
 			if(tryTransition.evaluate()) {
 				ModMarioQuaMario.LOGGER.info("Transition to {}", tryTransition.TARGET_STATE.IDENTIFIER);
 				tryTransition.execute(MarioClient.player, RandomSeed.getSeed());
 			}
 		}
+	}
+
+	public void executeTransitionTo(PlayerEntity mario, long seed, ParsedState newState) {
+		ParsedTransition toExecute = findTransitionTo(newState);
+		if(toExecute == null) {
+			if(!mario.getWorld().isClient && mario.getWorld().getGameRules().getBoolean(MarioRegistries.VALIDATE_STATE_TRANSITIONS)) {
+				// Forcefully transition Mario back to the previous state
+			}
+			return;
+		}
+
+		toExecute.execute(mario, seed);
+	}
+
+	private ParsedTransition findTransitionTo(ParsedState newState) {
+		for(ParsedTransition checkMe : TRANSITION_LISTS.get(TransitionPhases.PRE_TICK))
+			if(checkMe.TARGET_STATE == newState)
+				return checkMe;
+		for(ParsedTransition checkMe : TRANSITION_LISTS.get(TransitionPhases.POST_TICK))
+			if(checkMe.TARGET_STATE == newState)
+				return checkMe;
+		for(ParsedTransition checkMe : TRANSITION_LISTS.get(TransitionPhases.POST_MOVE))
+			if(checkMe.TARGET_STATE == newState)
+				return checkMe;
+		return null;
 	}
 
 	private ParsedTransition[] parseDefinitionTransitionList(List<StateDefinition.NeoMarioTransition> definitionTransitionList) {
@@ -96,18 +121,18 @@ public class ParsedState {
 			return this.EVALUATOR.shouldTransition();
 		}
 
-		private void execute(PlayerEntity player, long seed) {
-			COMMON_EXECUTE.execute(player, seed);
-			if(player.getWorld().isClient) {
-				CLIENT_EXECUTE.execute(player, seed);
-				if(player.isMainPlayer()) {
+		private void execute(PlayerEntity mario, long seed) {
+			COMMON_EXECUTE.execute(mario, seed);
+			if(mario.getWorld().isClient) {
+				CLIENT_EXECUTE.execute(mario, seed);
+				if(mario.isMainPlayer()) {
 					// Send C2S state change packet
 					ModMarioQuaMario.LOGGER.info("Send packet telling server to change {}'s state to {} (raw ID {})",
-							player.getName(), this.TARGET_STATE.IDENTIFIER,MarioRegistries.STATES.getRawIdOrThrow(this.TARGET_STATE));
+							mario.getName(), this.TARGET_STATE.IDENTIFIER,MarioRegistries.STATES.getRawIdOrThrow(this.TARGET_STATE));
 				}
 			}
 			else {
-				SERVER_EXECUTE.execute(player, seed);
+				SERVER_EXECUTE.execute(mario, seed);
 			}
 		}
 	}

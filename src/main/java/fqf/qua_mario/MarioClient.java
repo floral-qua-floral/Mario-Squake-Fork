@@ -88,7 +88,7 @@ public class MarioClient {
 		Input.update(player.input);
 
 		if(neostate != null) {
-			neostate.executeTransitions(TransitionPhases.PRE_TICK);
+			neostate.attemptTransitions(TransitionPhases.PRE_TICK);
 		}
 
 		// Calculate forward and sideways vector components
