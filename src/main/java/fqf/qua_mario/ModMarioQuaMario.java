@@ -5,6 +5,7 @@ import fqf.qua_mario.characters.MarioCharacter;
 import fqf.qua_mario.characters.characters.CharaMario;
 import fqf.qua_mario.powerups.PowerUp;
 import fqf.qua_mario.powerups.forms.SuperForm;
+import joptsimple.internal.Reflection;
 import me.shedaniel.autoconfig.AutoConfig;
 import me.shedaniel.autoconfig.serializer.GsonConfigSerializer;
 import net.fabricmc.api.ModInitializer;
@@ -43,6 +44,9 @@ public class ModMarioQuaMario implements ModInitializer {
 		for(ServerPlayerEntity player : sendToPlayers) {
 			ServerPlayNetworking.send(player, packet);
 		}
+
+//		Reflection
+
 		if(!sendToPlayers.contains((ServerPlayerEntity) changingPlayer))
 			ServerPlayNetworking.send((ServerPlayerEntity) changingPlayer, packet);
 	}

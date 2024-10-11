@@ -1,8 +1,12 @@
 package fqf.qua_mario;
 
+import com.google.common.reflect.Reflection;
+import com.sun.jna.internal.ReflectionUtils;
 import fqf.qua_mario.characters.MarioCharacter;
 import fqf.qua_mario.characters.characters.CharaMario;
 import fqf.qua_mario.characters.characters.Luigi;
+import fqf.qua_mario.mariostates.MarioState;
+import fqf.qua_mario.mariostates.states.airborne.Backflip;
 import fqf.qua_mario.powerups.PowerUp;
 import fqf.qua_mario.powerups.forms.FireForm;
 import fqf.qua_mario.powerups.forms.MiniForm;
@@ -25,6 +29,10 @@ import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.sound.SoundEvent;
 import net.minecraft.util.Identifier;
 import net.minecraft.world.GameRules;
+import org.apache.logging.log4j.core.util.ReflectionUtil;
+import sun.reflect.ReflectionFactory;
+
+import java.util.Set;
 
 public class MarioRegistries {
 	public static final RegistryKey<Registry<MarioCharacter>> CHARACTERS_KEY = RegistryKey.ofRegistry(
@@ -64,12 +72,17 @@ public class MarioRegistries {
 	public static final SoundEvent STOMP_SOUND_EVENT = SoundEvent.of(STOMP_SOUND_ID);
 
 	public static void register() {
+		registerStates();
 		registerPowerUps();
 		registerCharacters(); // Characters have to be registered after power-ups so they know which power-ups they need models for!!
 		registerStompTypes();
 
 		Registry.register(Registries.SOUND_EVENT, JUMP_SOUND_ID, JUMP_SOUND_EVENT);
 		Registry.register(Registries.SOUND_EVENT, STOMP_SOUND_ID, STOMP_SOUND_EVENT);
+	}
+
+	public static void registerStates() {
+
 	}
 
 	public static void registerPowerUps() {
