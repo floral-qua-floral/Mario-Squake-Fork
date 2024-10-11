@@ -1,13 +1,10 @@
 package fqf.qua_mario;
 
-import com.google.common.reflect.Reflection;
-import com.sun.jna.internal.ReflectionUtils;
 import fqf.qua_mario.characters.MarioCharacter;
 import fqf.qua_mario.characters.characters.CharaMario;
 import fqf.qua_mario.characters.characters.Luigi;
-import fqf.qua_mario.mariostates.MarioState;
-import fqf.qua_mario.mariostates.states.airborne.Backflip;
-import fqf.qua_mario.neostates.NeoMarioState;
+import fqf.qua_mario.neostates.StateDefinition;
+import fqf.qua_mario.neostates.ParsedState;
 import fqf.qua_mario.powerups.PowerUp;
 import fqf.qua_mario.powerups.forms.FireForm;
 import fqf.qua_mario.powerups.forms.MiniForm;
@@ -32,28 +29,32 @@ import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.sound.SoundEvent;
 import net.minecraft.util.Identifier;
 import net.minecraft.world.GameRules;
-import org.apache.logging.log4j.core.util.ReflectionUtil;
-import sun.reflect.ReflectionFactory;
 
+import java.util.HashMap;
 import java.util.List;
-import java.util.Set;
-import java.util.stream.Collectors;
+import java.util.Map;
 
 public class MarioRegistries {
+	public static final RegistryKey<Registry<ParsedState>> STATES_KEY = RegistryKey.ofRegistry(
+			Identifier.of(ModMarioQuaMario.MOD_ID, "states"));
+	public static final Registry<ParsedState> STATES = FabricRegistryBuilder.createSimple(STATES_KEY)
+			.attribute(RegistryAttribute.SYNCED)
+			.buildAndRegister();
+
 	public static final RegistryKey<Registry<MarioCharacter>> CHARACTERS_KEY = RegistryKey.ofRegistry(
-			Identifier. of(ModMarioQuaMario.MOD_ID, "characters"));
+			Identifier.of(ModMarioQuaMario.MOD_ID, "characters"));
 	public static final Registry<MarioCharacter> CHARACTERS = FabricRegistryBuilder.createSimple(CHARACTERS_KEY)
 			.attribute(RegistryAttribute.SYNCED)
 			.buildAndRegister();
 
 	public static final RegistryKey<Registry<PowerUp>> POWER_UPS_KEY = RegistryKey.ofRegistry(
-			Identifier. of(ModMarioQuaMario.MOD_ID, "power_ups"));
+			Identifier.of(ModMarioQuaMario.MOD_ID, "power_ups"));
 	public static final Registry<PowerUp> POWER_UPS = FabricRegistryBuilder.createSimple(POWER_UPS_KEY)
 			.attribute(RegistryAttribute.SYNCED)
 			.buildAndRegister();
 
 	public static final RegistryKey<Registry<StompType>> STOMP_TYPES_KEY = RegistryKey.ofRegistry(
-			Identifier. of(ModMarioQuaMario.MOD_ID, "stomp_types"));
+			Identifier.of(ModMarioQuaMario.MOD_ID, "stomp_types"));
 	public static final Registry<StompType> STOMP_TYPES = FabricRegistryBuilder.createSimple(STOMP_TYPES_KEY)
 			.attribute(RegistryAttribute.SYNCED)
 			.buildAndRegister();
@@ -77,21 +78,34 @@ public class MarioRegistries {
 	public static final SoundEvent STOMP_SOUND_EVENT = SoundEvent.of(STOMP_SOUND_ID);
 
 	public static void register() {
-
+		registerStates();
 		registerPowerUps();
 		registerCharacters(); // Characters have to be registered after power-ups so they know which power-ups they need models for!!
 		registerStompTypes();
-		registerStates();
+
 
 		Registry.register(Registries.SOUND_EVENT, JUMP_SOUND_ID, JUMP_SOUND_EVENT);
 		Registry.register(Registries.SOUND_EVENT, STOMP_SOUND_ID, STOMP_SOUND_EVENT);
 	}
 
 	public static void registerStates() {
-		List<NeoMarioState> uwu = FabricLoader.getInstance().getEntrypointContainers("uwu", NeoMarioState.class).stream().map(EntrypointContainer::getEntrypoint).toList();
-		for(NeoMarioState boogula : uwu) {
-			ModMarioQuaMario.LOGGER.info("Boogula: " + boogula.getID());
+		ModMarioQuaMario.LOGGER.info("Registering action states...");
+		List<StateDefinition> allStateDefinitions = FabricLoader.getInstance().getEntrypointContainers("mariostates", StateDefinition.class).stream().map(EntrypointContainer::getEntrypoint).toList();
+		for(StateDefinition stateDefinition : allStateDefinitions) {
+			ModMarioQuaMario.LOGGER.info("Entrypoint found state definition for: {}", stateDefinition.getID());
+
+			ParsedState state = new ParsedState(stateDefinition);
+			Registry.register(STATES, state.IDENTIFIER, state);
 		}
+
+		for(ParsedState finishMe : STATES) {
+			ModMarioQuaMario.LOGGER.info("Populating transition lists for {}", finishMe.IDENTIFIER);
+			finishMe.populateTransitionLists();
+		}
+
+		STATES.freeze();
+
+		MarioClient.neostate = STATES.get(Identifier.of("qua_mario:standing_test"));
 	}
 
 	public static void registerPowerUps() {

@@ -29,8 +29,10 @@
     "modmenu" : [
       "fqf.qua_mario.ModMenuIntegration"
     ],
-    "uwu": [
-      "fqf.qua_mario.neostates.TestNeostate"
+    "mariostates": [
+      "fqf.qua_mario.neostates.states.StandingTest",
+      "fqf.qua_mario.neostates.states.DuckingTest",
+      "fqf.qua_mario.neostates.states.JumpingTest"
     ],
     "cpmapi" : [
       "fqf.qua_mario.ModCPMIntegration"

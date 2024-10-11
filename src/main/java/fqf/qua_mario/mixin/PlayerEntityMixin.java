@@ -3,7 +3,7 @@ package fqf.qua_mario.mixin;
 import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
 import fqf.qua_mario.ModMarioQuaMario;
-import fqf.qua_mario.mariostates.states.groundbound.DuckSlide;
+import fqf.qua_mario.oldmariostates.states.groundbound.DuckSlide;
 import fqf.qua_mario.powerups.PowerUp;
 import net.minecraft.entity.EntityDimensions;
 import net.minecraft.entity.EntityPose;

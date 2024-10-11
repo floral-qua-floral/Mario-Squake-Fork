@@ -1,13 +1,12 @@
 package fqf.qua_mario;
 
-import com.tom.cpm.api.ICommonAPI;
 import fqf.qua_mario.characters.MarioCharacter;
 import fqf.qua_mario.characters.characters.CharaMario;
-import fqf.qua_mario.mariostates.MarioState;
-import fqf.qua_mario.mariostates.states.groundbound.Grounded;
+import fqf.qua_mario.neostates.ParsedState;
+import fqf.qua_mario.oldmariostates.OldMarioState;
+import fqf.qua_mario.oldmariostates.states.groundbound.Grounded;
 import fqf.qua_mario.powerups.PowerUp;
 import fqf.qua_mario.powerups.forms.SuperForm;
-import joptsimple.internal.Reflection;
 import me.shedaniel.autoconfig.AutoConfig;
 import me.shedaniel.autoconfig.serializer.GsonConfigSerializer;
 import net.fabricmc.api.ModInitializer;
@@ -16,6 +15,7 @@ import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.network.packet.CustomPayload;
 import net.minecraft.server.network.ServerPlayerEntity;
+import net.minecraft.util.Identifier;
 import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -233,7 +233,7 @@ public class ModMarioQuaMario implements ModInitializer {
 		public MarioCharacter character;
 		public PowerUp powerUp;
 
-		public MarioState state;
+		public ParsedState state;
 		public boolean canSneak;
 		private MarioPlayerInfo(boolean isMario, MarioCharacter character, PowerUp powerUp) {
 			this.isMario = isMario;
@@ -241,7 +241,7 @@ public class ModMarioQuaMario implements ModInitializer {
 			this.powerUp = powerUp;
 
 			// Non-persistent data
-			this.state = Grounded.INSTANCE;
+			this.state = MarioRegistries.STATES.get(Identifier.of(MOD_ID, "standing_test"));
 			this.canSneak = true;
 		}
 	}

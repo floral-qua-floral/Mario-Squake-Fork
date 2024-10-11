@@ -4,18 +4,15 @@ import fqf.qua_mario.ModMarioQuaMario;
 import net.minecraft.util.Identifier;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.ArrayList;
 import java.util.List;
 
-public class TestNeostate implements NeoMarioState {
+public class TestNeostate implements StateDefinition {
 	@Override @NotNull public Identifier getID() {
 		return Identifier.of(ModMarioQuaMario.MOD_ID, "test_state");
 	}
 
 	@Override
 	public void tick() {
-//		goobulor();
-
 	}
 
 	@Override
@@ -32,7 +29,4 @@ public class TestNeostate implements NeoMarioState {
 	public List<NeoMarioTransition> getPostMoveTransitions() {
 		return null;
 	}
-
-//	@Override
-
 }

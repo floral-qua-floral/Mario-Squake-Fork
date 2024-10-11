@@ -1,13 +1,10 @@
 package fqf.qua_mario.powerups;
 
 import fqf.qua_mario.MarioRegistries;
-import fqf.qua_mario.characters.CharaStat;
 import fqf.qua_mario.characters.MarioCharacter;
-import fqf.qua_mario.mariostates.MarioState;
+import fqf.qua_mario.oldmariostates.OldMarioState;
 import net.minecraft.registry.Registry;
 import net.minecraft.util.Identifier;
-
-import java.util.EnumMap;
 
 public abstract class PowerUp {
 	protected Identifier ID;
@@ -16,8 +13,8 @@ public abstract class PowerUp {
 	protected float heightFactor = 1.0F;
 	protected float voicePitch = 1.0F;
 
-	public abstract MarioState customTransition(MarioState state, MarioState.TransitionPhases phase);
-	public abstract MarioState interceptTransition(MarioState from, MarioState to);
+	public abstract OldMarioState customTransition(OldMarioState state, OldMarioState.TransitionPhases phase);
+	public abstract OldMarioState interceptTransition(OldMarioState from, OldMarioState to);
 
 	public Identifier getID() {
 		return(this.ID);

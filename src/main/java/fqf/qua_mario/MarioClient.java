@@ -3,7 +3,10 @@ package fqf.qua_mario;
 import fqf.qua_mario.characters.characters.CharaMario;
 import fqf.qua_mario.characters.CharaStat;
 import fqf.qua_mario.characters.MarioCharacter;
-import fqf.qua_mario.mariostates.states.groundbound.Grounded;
+import fqf.qua_mario.neostates.ParsedState;
+import fqf.qua_mario.neostates.TransitionPhases;
+import fqf.qua_mario.oldmariostates.OldMarioState;
+import fqf.qua_mario.oldmariostates.states.groundbound.Grounded;
 import fqf.qua_mario.powerups.PowerUp;
 import fqf.qua_mario.powerups.forms.SuperForm;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
@@ -14,7 +17,6 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
 import fqf.qua_mario.cameraanims.CameraAnim;
-import fqf.qua_mario.mariostates.MarioState;
 import org.jetbrains.annotations.Nullable;
 import org.joml.Vector2d;
 
@@ -29,10 +31,10 @@ public class MarioClient {
 	public static double rightwardInput;
 	private static final double INPUT_FACTOR = 1.02040816327;
 
-	private static MarioState marioState = Grounded.INSTANCE;
+	private static OldMarioState marioState = Grounded.INSTANCE;
 	public static int stateTimer = 0;
 	public static boolean jumpCapped = false;
-	public static boolean changeState(MarioState newState) {
+	public static boolean changeState(OldMarioState newState) {
 		if(newState == null || marioState == newState) return false;
 
 		if(marioState.getSneakLegality() != newState.getSneakLegality())
@@ -42,7 +44,9 @@ public class MarioClient {
 		marioState = newState;
 		return true;
 	}
-	public static MarioState getState() { return(marioState); }
+	public static OldMarioState getState() { return(marioState); }
+
+	public static ParsedState neostate;
 
 	public static int jumpLandingTime = 0;
 	public static int doubleJumpLandingTime = 0;
@@ -83,9 +87,9 @@ public class MarioClient {
 		// Update Mario's custom inputs class
 		Input.update(player.input);
 
-		// Undo vanilla vertical swimming
-		if(player.input.pressingLeft)
-			MarioClient.yVel += (player.input.sneaking ? 0.04 : 0.0) - (player.input.jumping ? 0.04 : 0.0);
+		if(neostate != null) {
+			neostate.executeTransitions(TransitionPhases.PRE_TICK);
+		}
 
 		// Calculate forward and sideways vector components
 		double yawRad = Math.toRadians(player.getYaw());
@@ -105,9 +109,9 @@ public class MarioClient {
 		yVel = currentVel.y;
 
 		// Execute Mario's state behavior
-		marioState.evaluateTransitions(MarioState.TransitionPhases.PRE_TICK);
+		marioState.evaluateTransitions(OldMarioState.TransitionPhases.PRE_TICK);
 		marioState.tick();
-		marioState.evaluateTransitions(MarioState.TransitionPhases.POST_TICK);
+		marioState.evaluateTransitions(OldMarioState.TransitionPhases.POST_TICK);
 
 		// Apply new y velocity
 		Vec3d newVel = player.getVelocity();
@@ -115,8 +119,8 @@ public class MarioClient {
 
 		// Use velocities
 		player.move(MovementType.SELF, player.getVelocity());
-		marioState.evaluateTransitions(MarioState.TransitionPhases.POST_MOVE);
-		marioState.evaluateTransitions(MarioState.TransitionPhases.POST_STATE); // only for power-ups
+		marioState.evaluateTransitions(OldMarioState.TransitionPhases.POST_MOVE);
+		marioState.evaluateTransitions(OldMarioState.TransitionPhases.POST_STATE); // only for power-ups
 
 		// Decrement timers
 		jumpLandingTime--;
